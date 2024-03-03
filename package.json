@@ -1,53 +1,23 @@
 {
-  "name": "spicetify-marketplace",
-  "version": "0.9.4",
-  "homepage": "https://github.com/spicetify/spicetify-marketplace",
-  "repository": "github:spicetify/spicetify-marketplace",
-  "bugs": {
-    "url": "https://github.com/spicetify/spicetify-marketplace/issues"
-  },
-  "packageManager": "pnpm@8.14.2",
-  "scripts": {
-    "build": "spicetify-creator",
-    "build:local": "spicetify-creator --out=dist --minify",
-    "build:prod": "pnpm build:local && pnpm copy:docs",
-    "copy:docs": "copyfiles README.md dist/",
-    "lint": "eslint --fix src",
-    "lint:ci": "eslint src",
-    "type-check": "tsc --noEmit",
-    "watch": "spicetify-creator --watch",
-    "prepare": "husky install",
-    "update-types": "curl -s -o src/types/spicetify.d.ts https://raw.githubusercontent.com/spicetify/spicetify-cli/master/globals.d.ts"
-  },
-  "engines": {
-    "yarn": "please-use-pnpm",
-    "npm": "please-use-pnpm",
-    "pnpm": ">=8",
-    "node": ">=20"
-  },
-  "devDependencies": {
-    "@types/chroma-js": "^2.4.3",
-    "@types/react": "18.2.0",
-    "@types/react-dom": "18.2.0",
-    "@types/semver": "^7.5.6",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2",
-    "copyfiles": "^2.4.1",
-    "eslint": "^8.55.0",
-    "eslint-plugin-react": "^7.33.2",
-    "husky": "^8.0.3",
-    "spicetify-creator": "^1.0.17",
-    "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "chroma-js": "^2.4.2",
-    "i18next": "^23.7.8",
-    "i18next-browser-languagedetector": "^7.2.0",
-    "prismjs": "^1.29.0",
-    "react-dropdown": "^1.11.0",
-    "react-i18next": "^13.5.0",
-    "react-simple-code-editor": "^0.13.1",
-    "semver": "^7.5.4"
-  },
-  "private": true
+	"name": "spicetify-marketplace",
+	"version": "0.9.4",
+	"homepage": "https://github.com/spicetify/spicetify-marketplace",
+	"repository": "github:spicetify/spicetify-marketplace",
+	"bugs": {
+		"url": "https://github.com/spicetify/spicetify-marketplace/issues"
+	},
+	"scripts": {},
+	"devDependencies": {
+		"@types/chroma-js": "^2.4.3",
+		"@types/semver": "^7.5.6",
+		"chroma-js": "^2.4.2",
+		"i18next": "^23.7.8",
+		"i18next-browser-languagedetector": "^7.2.0",
+		"prismjs": "^1.29.0",
+		"react-dropdown": "^1.11.0",
+		"react-i18next": "^13.5.0",
+		"react-simple-code-editor": "^0.13.1",
+		"semver": "^7.5.4"
+	},
+	"private": true
 }

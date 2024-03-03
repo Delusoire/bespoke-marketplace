@@ -1,0 +1,10 @@
+{
+	"name": "spicetify-marketplace",
+	"authors": ["Delusoire"],
+	"entries": {
+		"js": "src/app.js",
+		"css": false,
+		"mixin": false
+	},
+	"dependencies": ["Delusoire/std", "Delusoire/delulib"]
+}
