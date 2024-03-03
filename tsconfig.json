@@ -1,6 +1,7 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../../tsconfig.json",
     "compilerOptions": {
+        "baseUrl": "../../../",
         "paths": {
             "/*": ["./*"],
             "https://esm.sh/v135/*": [
@@ -17,5 +18,5 @@
             ]
         }
     },
-    "include": ["/modules/Delusoire/std/"]
+    "references": [{ "path": "../../../modules/Delusoire/std/" }]
 }
