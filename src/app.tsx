@@ -6,7 +6,7 @@ import LanguageDetector from "https://esm.sh/i18next-browser-languagedetector";
 import "./styles/styles.scss";
 import locales from "./resources/locales";
 import Grid from "./components/Grid.js";
-import ReadmePage from "./components/ReadmePage.js";
+import ModulePage from "./components/ModulePage.js";
 
 i18n
 	.use(initReactI18next)
@@ -30,7 +30,7 @@ const Marketplace = () => {
 		<div id="stats-app">
 			<S.ReactComponents.Routes>
 				<S.ReactComponents.Route path="/" element={<Grid title={t("grid.spicetifyMarketplace")} />} />
-				<S.ReactComponents.Route path=":module" element={<ReadmePage title={t("readmePage.title")} module={selectedModule} />} />
+				<S.ReactComponents.Route path=":module" element={<ModulePage module={selectedModule} />} />
 			</S.ReactComponents.Routes>
 		</div>
 	);

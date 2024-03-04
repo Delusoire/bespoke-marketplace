@@ -1,32 +1,31 @@
-import React from "react";
+import { S } from "/modules/Delusoire/std/index.js";
 
-import styles from "../styles/modules/toggle.module.scss";
+interface ToggleProps {
+	storageKey: string;
+	enabled: boolean;
+	clickable?: boolean;
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
-const Toggle = (props: {
-  name: string;
-  storageKey: string;
-  enabled: boolean;
-  clickable?: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  const toggleId = `toggle:${props.storageKey}`;
+export default function ({ storageKey, enabled, clickable, onChange }: ToggleProps) {
+	const labelClass = S.classnames("spicetify-marketplace-toggle-wrapper", {
+		"spicetify-marketplace-disabled": clickable,
+	});
 
-  const wrapperClassList = [styles["toggle-wrapper"]];
-  if (props.clickable === false) wrapperClassList.push(styles.disabled);
-
-  return (
-    <label className={wrapperClassList.join(" ")}>
-      <input className={styles["toggle-input"]} type='checkbox' checked={props.enabled}
-        data-storage-key={props.storageKey}
-        id={toggleId}
-        title={`Toggle for ${props.storageKey}`}
-        onChange={props.onChange}
-      />
-      <span className={styles["toggle-indicator-wrapper"]}>
-        <span className={styles["toggle-indicator"]}></span>
-      </span>
-    </label>
-  );
-};
-
-export default Toggle;
+	return (
+		<label className={labelClass}>
+			<input
+				className="spicetify-marketplace-toggle-input"
+				type="checkbox"
+				checked={enabled}
+				data-storage-key={storageKey}
+				id={`toggle:${storageKey}`}
+				title={`Toggle for ${storageKey}`}
+				onChange={onChange}
+			/>
+			<span className="spicetify-marketplace-toggle-indicator-wrapper">
+				<span className="spicetify-marketplace-toggle-indicator" />
+			</span>
+		</label>
+	);
+}

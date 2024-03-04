@@ -1,19 +1,23 @@
-import React from "react";
+import { S } from "/modules/Delusoire/std/index.js";
 
-export default class LoadMoreIcon extends React.Component<
-{onClick: () => void}
-> {
-  render() {
-    return (
-      <div onClick={this.props.onClick}>
-        <p style={{
-          fontSize: 100,
-          lineHeight: "65px",
-        }}>»</p>
-        <span style={{
-          fontSize: 20,
-        }}>Load more</span>
-      </div>
-    );
-  }
+export default function ({ onClick }: { onClick: () => void }) {
+	return (
+		<div onClick={onClick}>
+			<p
+				style={{
+					fontSize: 100,
+					lineHeight: "65px",
+				}}
+			>
+				»
+			</p>
+			<span
+				style={{
+					fontSize: 20,
+				}}
+			>
+				Load more
+			</span>
+		</div>
+	);
 }

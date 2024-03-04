@@ -3,17 +3,13 @@ const { React } = S;
 import { withTranslation } from "https://esm.sh/react-i18next";
 import { t } from "i18next";
 
-import { CardItem, CardType, Config, SchemeIni, Snippet, VisualConfig } from "../../types/marketplace-types";
 import { LOCALSTORAGE_KEYS, CUSTOM_APP_PATH, SNIPPETS_PAGE_URL } from "../../constants";
-import { getLocalStorageDataFromKey, parseIni, initializeSnippets, parseCSS, injectUserCSS, generateKey } from "../../logic/Utils";
 import TrashIcon from "../Icons/TrashIcon";
 import DownloadIcon from "../Icons/DownloadIcon";
 import GitHubIcon from "../Icons/GitHubIcon";
-import { openModal } from "../../logic/LaunchModals";
 import AuthorsDiv from "./AuthorsDiv";
 import TagsDiv from "./TagsDiv";
 import Button from "../Button";
-const Spicetify = window.Spicetify;
 
 export type CardProps = {
 	// From `fetchExtensionManifest()`, `fetchThemeManifest()`, and snippets.json
@@ -27,7 +23,7 @@ export type CardProps = {
 	activeThemeKey?: string;
 };
 
-class Card extends React.Component<
+class Card extends React.ModulePage<
 	CardProps,
 	{
 		installed: boolean;

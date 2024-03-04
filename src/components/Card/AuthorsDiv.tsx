@@ -1,9 +1,9 @@
 import { S } from "/modules/Delusoire/std/index.js";
 import { Author } from "../../types/marketplace-types";
 
-const AuthorsDiv = (props: {
+export default function (props: {
 	authors: Author[];
-}) => {
+}) {
 	// Add a div with author links inside
 	const authorsDiv = (
 		<div className="marketplace-card__authors">
@@ -28,6 +28,4 @@ const AuthorsDiv = (props: {
 	);
 
 	return authorsDiv;
-};
-
-export default AuthorsDiv;
+}
