@@ -1,6 +1,11 @@
 import { S } from "/modules/Delusoire/std/index.js";
 import Dropdown, { Option } from "https://esm.sh/react-dropdown";
 
+interface SortBoxOption {
+	key: string;
+	value: string;
+}
+
 interface SortBoxProps {
 	options: SortBoxOption[];
 	onChange: (value: string) => void;

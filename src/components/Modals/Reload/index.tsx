@@ -1,15 +1,15 @@
 import { t } from "https://esm.sh/i18next";
 import Button from "../../Button.js";
 import { S } from "/modules/Delusoire/std/index.js";
+import { hide } from "/modules/Delusoire/std/api/modal.js";
 
-const ReloadModal = () => {
+export default function () {
 	return (
 		<div id="marketplace-reload-container">
 			<p>{t("reloadModal.description")}</p>
 			<div className="marketplace-reload-modal__button-container">
 				<Button
 					onClick={() => {
-						Spicetify.PopupModal.hide();
 						location.reload();
 					}}
 				>
@@ -17,7 +17,7 @@ const ReloadModal = () => {
 				</Button>
 				<Button
 					onClick={() => {
-						Spicetify.PopupModal.hide();
+						hide();
 					}}
 				>
 					{t("reloadModal.reloadLater")}
@@ -25,6 +25,4 @@ const ReloadModal = () => {
 			</div>
 		</div>
 	);
-};
-
-export default ReloadModal;
+}

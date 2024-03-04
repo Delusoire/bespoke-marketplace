@@ -1,37 +1,36 @@
 import { S } from "/modules/Delusoire/std/index.js";
+const { React } = S;
 import { t } from "https://esm.sh/i18next";
 
-import { LATEST_RELEASE_URL, MARKETPLACE_VERSION, RELEASES_URL } from "../../../constants";
-import { getMarkdownHTML } from "../../../logic/Utils";
+import { LATEST_RELEASE_URL, MARKETPLACE_VERSION, RELEASES_URL } from "../../../constants.js";
+import { logger } from "../../../index.js";
 
 async function fetchLatestReleaseInfo(): Promise<{
 	version: string;
 	changelog: string | null;
 } | null> {
-	try {
-		const result = await fetch(LATEST_RELEASE_URL);
-		const resultJson = await result.json();
-		const { body, tag_name, message } = resultJson;
-		return body && tag_name && !message
-			? {
-					version: tag_name.replace("v", ""),
-					changelog: await getMarkdownHTML(body.match(/## What's Changed([\s\S]*?)(\r\n\r|\n\n##)/)[1], "spicetify", "spicetify-marketplace"),
-			  }
-			: null;
-	} catch (error) {
-		console.error(error);
-		return null;
+	const result = await fetch(LATEST_RELEASE_URL);
+	const { body, tag_name, message } = await result.json();
+	if (body && tag_name && !message) {
+		// FIXME
+		// const changelog = await getMarkdownHTML(body.match(/## What's Changed([\s\S]*?)(\r\n\r|\n\n##)/)[1], "spicetify", "spicetify-marketplace");
+		return {
+			version: tag_name.replace("v", ""),
+			changelog,
+		};
 	}
 }
 
-function UpdateModal(): React.ReactElement {
+export default function () {
 	const [releaseInfo, setReleaseInfo] = React.useState<{
 		version: string;
 		changelog: string | null;
 	} | null>(null);
 
 	React.useEffect(() => {
-		fetchLatestReleaseInfo().then(releaseInfo => setReleaseInfo(releaseInfo));
+		fetchLatestReleaseInfo()
+			.then(releaseInfo => setReleaseInfo(releaseInfo))
+			.catch(err => logger.error(err));
 	}, []);
 
 	return (
@@ -57,5 +56,3 @@ function UpdateModal(): React.ReactElement {
 		</div>
 	);
 }
-
-export default UpdateModal;
