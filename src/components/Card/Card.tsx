@@ -1,15 +1,15 @@
 import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
 import { withTranslation } from "https://esm.sh/react-i18next";
-import { t } from "i18next";
+import { t } from "https://esm.sh/i18next";
 
-import { LOCALSTORAGE_KEYS, CUSTOM_APP_PATH, SNIPPETS_PAGE_URL } from "../../constants";
-import TrashIcon from "../Icons/TrashIcon";
-import DownloadIcon from "../Icons/DownloadIcon";
-import GitHubIcon from "../Icons/GitHubIcon";
-import AuthorsDiv from "./AuthorsDiv";
-import TagsDiv from "./TagsDiv";
-import Button from "../Button";
+import { LOCALSTORAGE_KEYS, CUSTOM_APP_PATH, SNIPPETS_PAGE_URL } from "../../constants.js";
+import TrashIcon from "../Icons/TrashIcon.js";
+import DownloadIcon from "../Icons/DownloadIcon.js";
+import GitHubIcon from "../Icons/GitHubIcon.js";
+import AuthorsDiv from "./AuthorsDiv.js";
+import TagsDiv from "./TagsDiv.js";
+import Button from "../Button.js";
 
 export type CardProps = {
 	// From `fetchExtensionManifest()`, `fetchThemeManifest()`, and snippets.json

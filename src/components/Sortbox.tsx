@@ -1,43 +1,29 @@
-import React from "react";
-import Dropdown, { Option } from "react-dropdown";
-import { SortBoxOption } from "../types/marketplace-types";
+import { S } from "/modules/Delusoire/std/index.js";
+import Dropdown, { Option } from "https://esm.sh/react-dropdown";
 
-interface Props {
-  sortBoxOptions: SortBoxOption[];
-  onChange: (value: string) => void;
-  sortBySelectedFn: (item: SortBoxOption) => boolean;
+interface SortBoxProps {
+	options: SortBoxOption[];
+	onChange: (value: string) => void;
+	selectedOption: string;
 }
 
-const SortBox = (props: Props) => {
-
-  const _onSelect = (item: Option) => {
-    props.onChange(item.value);
-  };
-
-  const options: Option[] = props.sortBoxOptions.map((item) => {
-    return {
-      value: item.key,
-      label: item.value,
-    };
-  });
-
-  const sortBySelected = props.sortBoxOptions.find(props.sortBySelectedFn);
-  // console.log(sortBySelected);
-  return (
-    // Create a drop down menu
-    <div className="marketplace-sortBox">
-      <div className="marketplace-sortBox-header">
-        <div className="marketplace-sortBox-header-title">
-        </div>
-
-        <Dropdown placeholder="Select an option"
-          options={options} value={sortBySelected?.key}
-          onChange={_onSelect}
-        />
-
-      </div>
-    </div>
-  );
-};
-
-export default SortBox;
+export default function ({ options, onChange, selectedOption }: SortBoxProps) {
+	return (
+		<div className="marketplace-sortBox">
+			<div className="marketplace-sortBox-header">
+				<div className="marketplace-sortBox-header-title" />
+				<Dropdown
+					placeholder="Select an option"
+					options={options.map(item => ({
+						value: item.key,
+						label: item.value,
+					}))}
+					value={selectedOption}
+					onChange={(item: Option) => {
+						onChange(item.value);
+					}}
+				/>
+			</div>
+		</div>
+	);
+}

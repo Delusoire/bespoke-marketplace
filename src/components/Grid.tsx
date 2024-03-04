@@ -1,23 +1,19 @@
-import React from "react";
-import { withTranslation } from "react-i18next";
-import semver from "semver";
-import { Option } from "react-dropdown";
-const Spicetify = window.Spicetify;
+import { S } from "/modules/Delusoire/std/index.js";
+const { React } = S;
+import { withTranslation } from "https://esm.sh/react-i18next";
+import semver from "https://esm.sh/semver";
+import { Option } from "https://esm.sh/react-dropdown";
 
-import { CardItem, CardType, Config, SchemeIni, Snippet, TabItemConfig } from "../types/marketplace-types";
-import { getLocalStorageDataFromKey, generateSchemesOptions, injectColourScheme, generateSortOptions, sortCardItems } from "../logic/Utils";
-import { LOCALSTORAGE_KEYS, ITEMS_PER_REQUEST, MARKETPLACE_VERSION, LATEST_RELEASE_URL } from "../constants";
-import { openModal } from "../logic/LaunchModals";
-import { getTaggedRepos, fetchExtensionManifest, fetchThemeManifest, fetchAppManifest, fetchCssSnippets, getBlacklist } from "../logic/FetchRemotes";
-import LoadMoreIcon from "./Icons/LoadMoreIcon";
-import LoadingIcon from "./Icons/LoadingIcon";
-import SettingsIcon from "./Icons/SettingsIcon";
-import ThemeDeveloperToolsIcon from "./Icons/ThemeDeveloperToolsIcon";
-import SortBox from "./Sortbox";
-import { TopBarContent } from "./TabBar";
-import Card from "./Card/Card";
-import Button from "./Button";
-import DownloadIcon from "./Icons/DownloadIcon";
+import { LOCALSTORAGE_KEYS, MARKETPLACE_VERSION, LATEST_RELEASE_URL } from "../constants.js";
+import LoadMoreIcon from "./Icons/LoadMoreIcon.js";
+import LoadingIcon from "./Icons/LoadingIcon.js";
+import SettingsIcon from "./Icons/SettingsIcon.js";
+import ThemeDeveloperToolsIcon from "./Icons/ThemeDeveloperToolsIcon.js";
+import SortBox from "./Sortbox.js";
+import { TopBarContent } from "./TabBar.js";
+import Card from "./Card/Card.js";
+import Button from "./Button.js";
+import DownloadIcon from "./Icons/DownloadIcon.js";
 
 class Grid extends React.ModulePage<
 	{
@@ -545,11 +541,7 @@ class Grid extends React.ModulePage<
 						) : null}
 						{/* Generate a new box for sorting options */}
 						<h2 className="marketplace-header__label">{t("grid.sort.label")}</h2>
-						<SortBox
-							onChange={value => this.updateSort(value)}
-							sortBoxOptions={generateSortOptions(t)}
-							sortBySelectedFn={a => a.key === this.CONFIG.sort}
-						/>
+						<SortBox onChange={value => this.updateSort(value)} options={generateSortOptions(t)} sortBySelectedFn={a => a.key === this.CONFIG.sort} />
 					</div>
 					<div className="marketplace-header__right">
 						{/* Show theme developer tools button if themeDevTools is enabled */}
@@ -570,7 +562,7 @@ class Grid extends React.ModulePage<
 							<SortBox
 								onChange={value => this.updateColourSchemes(this.state.schemes, value)}
 								// TODO: Make this compatible with the changes to the theme install process: need to create a method to update the scheme options without a full reload.
-								sortBoxOptions={generateSchemesOptions(this.state.schemes)}
+								options={generateSchemesOptions(this.state.schemes)}
 								// It doesn't work when I directly use CONFIG.theme.activeScheme in the sortBySelectedFn
 								// because it hardcodes the value into the fn
 								sortBySelectedFn={a => a.key === this.getActiveScheme()}

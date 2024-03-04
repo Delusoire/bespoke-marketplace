@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { withTranslation } from "react-i18next";
-import Dropdown, { Option } from "react-dropdown";
-import { TabItemConfig } from "../types/marketplace-types";
+import { S } from "/modules/Delusoire/std/index.js";
+import { withTranslation } from "https://esm.sh/react-i18next";
+import Dropdown, { Option } from "https://esm.sh/react-dropdown";
 
 // NOTE: The label and value are the same (e.g. "Extensions")
 type TabOptionConfig = Option & {
