@@ -2,7 +2,7 @@ import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
 import { t } from "https://esm.sh/i18next";
 
-import { LATEST_RELEASE_URL, MARKETPLACE_VERSION, RELEASES_URL } from "../../../constants.js";
+import { LATEST_RELEASE_URL, MARKETPLACE_VERSION, RELEASES_URL } from "../../../static.js";
 import { logger } from "../../../index.js";
 
 async function fetchLatestReleaseInfo(): Promise<{

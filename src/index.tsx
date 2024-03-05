@@ -4,7 +4,7 @@ import { createSettings } from "/modules/Delusoire/std/api/settings.js";
 import { NavLink } from "/modules/Delusoire/std/registers/navlink.js";
 import { Module } from "/hooks/module.js";
 import type { Settings } from "/modules/Delusoire/std/api/settings.js";
-import { ACTIVE_ICON, ICON } from "./constants.js";
+import { ACTIVE_ICON, ICON } from "./static.js";
 
 export let storage: Storage = undefined;
 export let logger: Console = undefined;

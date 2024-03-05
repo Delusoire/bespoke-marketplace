@@ -2,7 +2,7 @@ import { t } from "i18next";
 import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
 
-import { MAX_TAGS } from "../../constants";
+import { MAX_TAGS } from "../../static";
 
 const englishTagMap = {
 	[t("grid.externalJS")]: "external JS",

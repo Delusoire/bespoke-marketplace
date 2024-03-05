@@ -1,10 +1,10 @@
 import { withTranslation } from "https://esm.sh/react-i18next";
 import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
-import Button from "./Button.js";
-import DownloadIcon from "./Icons/DownloadIcon.js";
-import LoadingIcon from "./Icons/LoadingIcon.js";
-import TrashIcon from "./Icons/TrashIcon.js";
+import Button from "../components/Button/index.js";
+import DownloadIcon from "../components/icons/DownloadIcon.js";
+import LoadingIcon from "../components/icons/LoadingIcon.js";
+import TrashIcon from "../components/icons/TrashIcon.js";
 import { t } from "https://esm.sh/i18next";
 
 const ModulePage = ({ identifier, metadataURL, readmeURL, installed, setInstalled, enabled }) => {
