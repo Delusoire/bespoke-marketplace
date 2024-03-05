@@ -1,6 +1,5 @@
 import { S } from "/modules/Delusoire/std/index.js";
 import SortBox from "../components/SortBox/index.js";
-import { modules } from "/hooks/module.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
 
 const m = {
@@ -13,8 +12,6 @@ const m = {
 const merge = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
 export default function () {
-	modules.map(module => [module.getIdentifier(), module]);
-
 	return (
 		<section className="contentSpacing">
 			<div className="marketplace-header">
