@@ -4,15 +4,12 @@ const { React } = S;
 
 import { MAX_TAGS } from "../../static";
 
-const englishTagMap = {
-	[t("grid.externalJS")]: "external JS",
+const knownTags = {
 	[t("grid.archived")]: "archived",
-	[t("grid.dark")]: "dark",
-	[t("grid.light")]: "light",
 };
 
 const Tag = (tag: string) => (
-	<li className="marketplace-card__tag" draggable={false} data-tag={englishTagMap[tag]}>
+	<li className="marketplace-card__tag" draggable={false} data-tag={knownTags[tag]}>
 		{tag}
 	</li>
 );
@@ -20,13 +17,12 @@ const Tag = (tag: string) => (
 interface TagsDivProps {
 	tags: string[];
 	importantTags: string[];
-	showTags: boolean;
+	shouldShowTags: boolean;
 }
-export default function ({ tags, importantTags, showTags }: TagsDivProps) {
+export default function ({ tags, importantTags, shouldShowTags }: TagsDivProps) {
 	const [expanded, setExpanded] = React.useState(false);
 
-	// Sort tags so that externalJS and archived tags come first
-	const baseTags = [importantTags, showTags && tags].flat();
+	const baseTags = [importantTags, shouldShowTags && tags].flat();
 
 	let extraTags = new Array<string>();
 	// If there are more than one extra tags, slice them and add an expand button

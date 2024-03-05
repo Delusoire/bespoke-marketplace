@@ -4,14 +4,14 @@ type ButtonType = "round" | "circle";
 
 interface ButtonProps {
 	onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-	className?: string[];
+	className?: string;
 	label?: string | null;
 	type?: ButtonType;
 	children: React.ReactNode;
 	disabled?: boolean;
 }
 
-export default function ({ onClick, className = [], label = "", type = "round", children, disabled = false }: ButtonProps) {
+export default function ({ onClick, className, label = "", type = "round", children, disabled = false }: ButtonProps) {
 	const btnClass = S.classnames(
 		"spicetify-marketplace-button",
 		{

@@ -4,6 +4,7 @@ import { t } from "https://esm.sh/i18next";
 
 import { LATEST_RELEASE_URL, MARKETPLACE_VERSION, RELEASES_URL } from "../../../static.js";
 import { logger } from "../../../index.js";
+import { renderMarkdown } from "../../../api/github.js";
 
 async function fetchLatestReleaseInfo(): Promise<{
 	version: string;
@@ -11,9 +12,9 @@ async function fetchLatestReleaseInfo(): Promise<{
 } | null> {
 	const result = await fetch(LATEST_RELEASE_URL);
 	const { body, tag_name, message } = await result.json();
+	// TODO: do we need message?
 	if (body && tag_name && !message) {
-		// FIXME
-		// const changelog = await getMarkdownHTML(body.match(/## What's Changed([\s\S]*?)(\r\n\r|\n\n##)/)[1], "spicetify", "spicetify-marketplace");
+		const changelog = await renderMarkdown(body);
 		return {
 			version: tag_name.replace("v", ""),
 			changelog,

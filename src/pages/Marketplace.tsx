@@ -1,25 +1,16 @@
 import { S } from "/modules/Delusoire/std/index.js";
-const { React } = S;
-import semver from "https://esm.sh/semver";
-import { Option } from "https://esm.sh/react-dropdown";
-
-import { LOCALSTORAGE_KEYS, MARKETPLACE_VERSION, LATEST_RELEASE_URL } from "../static.js";
-import LoadMoreIcon from "../components/icons/LoadMoreIcon.js";
-import LoadingIcon from "../components/icons/LoadingIcon.js";
-import SettingsIcon from "../components/icons/SettingsIcon.js";
-import ThemeDeveloperToolsIcon from "../components/icons/ThemeDeveloperToolsIcon.js";
 import SortBox from "../components/SortBox/index.js";
-import Card from "../components/Card/index.js";
-import Button from "../components/Button/index.js";
-import DownloadIcon from "../components/icons/DownloadIcon.js";
 import { modules } from "/hooks/module.js";
+import { _ } from "/modules/Delusoire/std/deps.js";
 
-const m1 = {
+const m = {
 	"Delusoire/std": [
 		"https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/std/metadata.json",
 		"https://raw.githubusercontent.com/Delusoire/bespoke/next/modules/Delusoire/std/metadata.json",
 	],
 };
+
+const merge = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
 export default function () {
 	modules.map(module => [module.getIdentifier(), module]);
@@ -43,7 +34,7 @@ export default function () {
 							}}
 						/>
 					</div>
-					{/* FIXME: add settings btn */}
+					{/* TODO: add settings btn */}
 				</div>
 			</div>
 			<>
