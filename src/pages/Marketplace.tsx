@@ -1,6 +1,7 @@
 import { S } from "/modules/Delusoire/std/index.js";
 import SortBox from "../components/SortBox/index.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
+import { t } from "../i18n.js";
 
 const m = {
 	"Delusoire/std": [

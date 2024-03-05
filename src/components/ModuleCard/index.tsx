@@ -4,9 +4,11 @@ import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import { Module } from "/hooks/module.js";
 
+const History = S.Platform.getHistory();
+
 // TODO: add remoteMetaList support, add more importantTags
 interface ModuleCardProps {}
-export default function ({ identifier, remoteMeta, remoteMetaList, setRemoteMeta, metadata, shouldShowTags }) {
+export default function ({ identifier, metadata, remoteMeta, setRemoteMeta, remoteMetaList, shouldShowTags }) {
 	const { name, description, tags, authors, preview } = metadata;
 
 	const module = Module.registry.get(identifier);
@@ -22,7 +24,7 @@ export default function ({ identifier, remoteMeta, remoteMetaList, setRemoteMeta
 		<div
 			className={cardClasses}
 			onClick={() => {
-				S.Platform.getHistory().push(`spotify:app:marketplace:${identifier}`);
+				History.push(`spotify:app:marketplace:${identifier}`);
 			}}
 		>
 			<div className="main-card-draggable" draggable="true">
@@ -55,7 +57,7 @@ export default function ({ identifier, remoteMeta, remoteMetaList, setRemoteMeta
 						title={name}
 						className="main-cardHeader-link"
 						dir="auto"
-						href={remoteMeta}
+						href={remoteReadme}
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
