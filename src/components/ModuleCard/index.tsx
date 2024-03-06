@@ -1,9 +1,7 @@
 import { S } from "/modules/Delusoire/std/index.js";
-const { React } = S;
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import { Metadata, Module } from "/hooks/module.js";
-import { fetchJSON } from "/hooks/util.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
 
 const History = S.Platform.getHistory();

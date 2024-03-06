@@ -1,5 +1,4 @@
 import { S } from "/modules/Delusoire/std/index.js";
-const { React } = S;
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import { Module } from "/hooks/module.js";

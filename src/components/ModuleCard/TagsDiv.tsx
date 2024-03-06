@@ -36,7 +36,7 @@ export default function ({ tags, importantTags, showTags }: TagsDivProps) {
 				{baseTags.map(Tag)}
 				{expanded && extraTags.map(Tag)}
 			</ul>
-			{!expanded && extraTags.length && (
+			{!expanded && extraTags.length > 0 && (
 				<button
 					className="marketplace-card__tags-more-btn"
 					onClick={e => {

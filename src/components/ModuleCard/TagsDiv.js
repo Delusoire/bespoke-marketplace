@@ -18,7 +18,7 @@ export default function ({ tags, importantTags, showTags }) {
         S.React.createElement("ul", { className: "marketplace-card__tags" },
             baseTags.map(Tag),
             expanded && extraTags.map(Tag)),
-        !expanded && extraTags.length && (S.React.createElement("button", { className: "marketplace-card__tags-more-btn", onClick: e => {
+        !expanded && extraTags.length > 0 && (S.React.createElement("button", { className: "marketplace-card__tags-more-btn", onClick: e => {
                 e.stopPropagation();
                 setExpanded(true);
             } }, "..."))));
