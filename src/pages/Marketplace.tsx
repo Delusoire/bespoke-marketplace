@@ -27,26 +27,32 @@ const dummyMetadata = {
 } as Metadata;
 
 export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
-	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(() =>
-		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
+	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState({} as Record<string, string>);
+	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState({} as Record<string, Metadata>);
+
+	React.useEffect(() => {
+		const identifiersToMetaURLs = _.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
 			const module = Module.registry.get(identifier);
 			const installed = module !== undefined;
 
 			return installed ? module.getLocalMeta() : metaList[0];
-		}),
-	);
+		});
+		setIdentifiersToMetaURLs(identifiersToMetaURLs);
+	}, [identifiersToMetadataLists]);
 
-	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState(() =>
-		_.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
+	React.useEffect(() => {
+		const identifiersToMetadatas = _.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
 			const module = Module.registry.get(identifier);
 			const installed = module !== undefined;
 			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
 
 			return isLocalMetadata ? module.metadata : dummyMetadata;
-		}),
-	);
+		});
+		setIdentifiersToMetadatas(identifiersToMetadatas);
+	}, [identifiersToMetaURLs]);
 
 	React.useEffect(() => {
+		let expired = false;
 		for (const [identifier, metaURL] of Object.entries(identifiersToMetaURLs)) {
 			const module = Module.registry.get(identifier);
 			const installed = module !== undefined;
@@ -54,13 +60,17 @@ export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) =
 
 			if (!isLocalMetadata) {
 				fetchMetaURL(metaURL).then(metadata => {
+					if (expired) return;
 					const identifiersToMetadatasCopy = Object.assign({}, identifiersToMetadatas);
 					identifiersToMetadatasCopy[identifier] = metadata;
 					setIdentifiersToMetadatas(identifiersToMetadatasCopy);
 				});
 			}
 		}
-	}, []);
+		return () => {
+			expired = true;
+		};
+	}, [identifiersToMetaURLs]);
 
 	return _.mapValues(identifiersToMetadataLists, (_, identifier) => ({
 		metadata: identifiersToMetadatas[identifier],

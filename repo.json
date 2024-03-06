@@ -1,0 +1,5 @@
+{
+	"Delusoire/std": ["https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/std/metadata.json"],
+	"Delusoire/sort-plus": ["https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/sort-plus/metadata.json"],
+	"Delusoire/search-on-youtube": ["https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/search-on-youtube/metadata.json"]
+}
