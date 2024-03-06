@@ -43,7 +43,11 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 
 // TODO: Disable removing local-only modules (remoteMeta = undefined), update the azkjgdh oizaj d
 export default function ({ murl }: { murl: string }) {
-	const metadata = await fetchJSON(murl);
+	const { data: metadata } = S.ReactQuery.useSuspenseQuery({
+		queryKey: ["modulePage", murl],
+		queryFn: () => fetchJSON(murl),
+	});
+
 	const identifier = `${metadata.authors[0]}/${metadata.name}`;
 
 	const module = Module.registry.get(identifier);
@@ -67,7 +71,7 @@ export default function ({ murl }: { murl: string }) {
 							if (installed) {
 								ModuleManager.remove(identifier);
 							} else {
-								ModuleManager.add(metaURL);
+								ModuleManager.add(murl);
 							}
 						}}
 						label={label}

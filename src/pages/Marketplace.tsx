@@ -3,9 +3,65 @@ const { React } = S;
 import SortBox from "../components/SortBox/index.js";
 import { _, _ } from "/modules/Delusoire/std/deps.js";
 import { t } from "../i18n.js";
-import { Module } from "/hooks/module.js";
+import { Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
-import ModuleCard, { useMetas } from "../components/ModuleCard/index.js";
+import ModuleCard from "../components/ModuleCard/index.js";
+
+const cachedMetaURLs = new Map<string, Metadata>();
+const fetchMetaURL = async (metaURL: string) => {
+	const cachedMetadata = cachedMetaURLs.get(metaURL);
+	if (cachedMetadata) {
+		return cachedMetadata;
+	}
+
+	const metadata = await fetchJSON(metaURL);
+	cachedMetaURLs.set(metaURL, metadata);
+	return metadata;
+};
+
+export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
+	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(() =>
+		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
+			const module = Module.registry.get(identifier);
+			const installed = module !== undefined;
+
+			return installed ? module.getLocalMeta() : metaList[0];
+		}),
+	);
+
+	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState(() =>
+		_.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
+			const module = Module.registry.get(identifier);
+			const installed = module !== undefined;
+			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
+
+			return isLocalMetadata ? module.metadata : dummyMetadata;
+		}),
+	);
+
+	React.useEffect(() => {
+		for (const [identifier, metaURL] of Object.entries(identifiersToMetaURLs)) {
+			const module = Module.registry.get(identifier);
+			const installed = module !== undefined;
+			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
+
+			if (!isLocalMetadata) {
+				fetchMetaURL(metaURL).then(metadata => {
+					const identifiersToMetadatasCopy = Object.assign({}, identifiersToMetadatas);
+					identifiersToMetadatasCopy[identifier] = metadata;
+					setIdentifiersToMetadatas(identifiersToMetadatasCopy);
+				});
+			}
+		}
+	}, []);
+
+	return _.mapValues(identifiersToMetadataLists, (_, identifier) => ({
+		metadata: identifiersToMetadatas[identifier],
+		metaURL: identifiersToMetaURLs[identifier],
+		setMetaURL: (metaURL: string) =>
+			setIdentifiersToMetaURLs(identifiersToMetaURLs => Object.assign({}, identifiersToMetaURLs, { [identifier]: metaURL })),
+	}));
+};
 
 const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/repo.json");
 
