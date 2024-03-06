@@ -16,7 +16,7 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 		error,
 		data: markdown,
 	} = S.ReactQuery.useQuery({
-		queryKey: [url],
+		queryKey: ["markdown", url],
 		queryFn: () =>
 			fetch(url)
 				.then(res => res.text())

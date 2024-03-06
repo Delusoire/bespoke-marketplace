@@ -19,6 +19,14 @@ const fetchMetaURL = async (metaURL: string) => {
 	return metadata;
 };
 
+const dummyMetadata = {
+	name: "",
+	description: "",
+	tags: [],
+	authors: [],
+	preview: "",
+} as Metadata;
+
 export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
 	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(() =>
 		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {

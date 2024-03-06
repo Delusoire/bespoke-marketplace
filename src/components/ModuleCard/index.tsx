@@ -8,14 +8,6 @@ import { _ } from "/modules/Delusoire/std/deps.js";
 
 const History = S.Platform.getHistory();
 
-const dummyMetadata = {
-	name: "",
-	description: "",
-	tags: [],
-	authors: [],
-	preview: "",
-} as Metadata;
-
 interface ModuleCardProps {
 	identifier: string;
 	metadata: Metadata;
