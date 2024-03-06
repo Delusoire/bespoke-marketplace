@@ -1,7 +1,6 @@
 import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
-import SortBox from "../components/SortBox/index.js";
-import { _, _ } from "/modules/Delusoire/std/deps.js";
+import { _ } from "/modules/Delusoire/std/deps.js";
 import { t } from "../i18n.js";
 import { Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
@@ -102,7 +101,7 @@ export default function () {
 			<div className="marketplace-header">
 				<div className="marketplace-header__left">
 					<h2 className="marketplace-header__label">{t("grid.sort.label")}</h2>
-					<SortBox onChange={value => updateSort(value)} options={sortOptions} selectedOption={sortOptions[0]} />
+					{/* TODO: add sort box */}
 				</div>
 				<div className="marketplace-header__right">
 					{searchbar}
@@ -116,7 +115,7 @@ export default function () {
 							const { metadata } = props;
 							const { authors, name, tags } = metadata;
 							const searchFiels = [...authors, name, ...tags];
-							return searchFiels.some(f => f.toLowerCase().includes(search));
+							return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
 						})
 						.sort()
 						.map(props => (
@@ -135,9 +134,9 @@ const Searchbar = ({ value, onChange }) => {
 				className="searchbar-bar"
 				type="text"
 				placeholder={`${t("grid.search")} ${t("tabs.modules")}...`}
-				value={this.state.searchValue}
+				value={value}
 				onChange={event => {
-					onChange(event.target.value.toLowerCase());
+					onChange(event.target.value);
 				}}
 			/>
 		</div>
@@ -145,18 +144,16 @@ const Searchbar = ({ value, onChange }) => {
 };
 
 const useSearchbar = () => {
-	const [search, setSearch] = React.useState("");
-
-	const setSearchDebounced = _.debounce(setSearch, 1000);
+	const [value, setValue] = React.useState("");
 
 	const searchbar = (
 		<Searchbar
 			value={value}
 			onChange={str => {
-				setSearchDebounced(str);
+				setValue(str);
 			}}
 		/>
 	);
 
-	return [searchbar, search] as const;
+	return [searchbar, value] as const;
 };
