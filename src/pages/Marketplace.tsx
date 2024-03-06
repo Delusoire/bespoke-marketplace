@@ -2,17 +2,22 @@ import { S } from "/modules/Delusoire/std/index.js";
 import SortBox from "../components/SortBox/index.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
 import { t } from "../i18n.js";
+import { Module } from "/hooks/module.js";
+import { fetchJSON } from "/hooks/util.js";
+import { useMetas } from "../components/ModuleCard/index.js";
 
-const m = {
-	"Delusoire/std": [
-		"https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/std/metadata.json",
-		"https://raw.githubusercontent.com/Delusoire/bespoke/next/modules/Delusoire/std/metadata.json",
-	],
-};
+const identifiersToRemoteMetadataLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/repo.json");
 
-const merge = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
+const mergeObjectsWithArraysConcatenated = (a, b) =>
+	_.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
 export default function () {
+	const localModules = Module.getModules();
+	const identifiersToLocalMetadataLists = Object.fromEntries(localModules.map(module => [module.getIdentifier(), [module.getLocalMeta()]]));
+	const identifiersToMetadataLists = mergeObjectsWithArraysConcatenated(identifiersToLocalMetadataLists, identifiersToRemoteMetadataLists);
+
+	const identifiersToProps = useMetas(identifiersToMetadataLists);
+
 	return (
 		<section className="contentSpacing">
 			<div className="marketplace-header">
@@ -25,7 +30,7 @@ export default function () {
 						<input
 							className="searchbar-bar"
 							type="text"
-							placeholder={`${t("grid.search")} ${t(`tabs.${this.CONFIG.activeTab}`)}...`}
+							placeholder={`${t("grid.search")} ${t("tabs.modules")}...`}
 							value={this.state.searchValue}
 							onChange={event => {
 								this.setState({ searchValue: event.target.value });

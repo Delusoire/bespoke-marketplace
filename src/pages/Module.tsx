@@ -8,6 +8,7 @@ import { t } from "../i18n.js";
 import { renderMarkdown } from "../api/github.js";
 import { logger } from "../index.js";
 import { Module, ModuleManager } from "/hooks/module.js";
+import { fetchJSON } from "/hooks/util.js";
 
 const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 	const {
@@ -41,11 +42,16 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 });
 
 // TODO: Disable removing local-only modules (remoteMeta = undefined), update the azkjgdh oizaj d
-export default function ({ identifier, remoteMeta }) {
+export default function ({ murl }: { murl: string }) {
+	const metadata = await fetchJSON(murl);
+	const identifier = `${metadata.authors[0]}/${metadata.name}`;
+
 	const module = Module.registry.get(identifier);
 	const installed = module !== undefined;
 
 	const label = t(installed ? "remove" : "install");
+
+	const readmeURL = murl.replace(/metadata\.json$/, "README.md");
 
 	return (
 		<section className="contentSpacing">
@@ -61,7 +67,7 @@ export default function ({ identifier, remoteMeta }) {
 							if (installed) {
 								ModuleManager.remove(identifier);
 							} else {
-								ModuleManager.add(remoteMeta);
+								ModuleManager.add(metaURL);
 							}
 						}}
 						label={label}
@@ -71,7 +77,7 @@ export default function ({ identifier, remoteMeta }) {
 				</div>
 			</div>
 			// TODO: replace with github's get markdown api call
-			<RemoteMarkdown url={remoteMeta.replace(/metadata\.json$/, "README.md")} />
+			<RemoteMarkdown url={readmeURL} />
 		</section>
 	);
 }

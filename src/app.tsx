@@ -4,14 +4,14 @@ import Marketplace from "./pages/Marketplace.js";
 import ModulePage from "./pages/Module.js";
 
 export default function () {
-	const match = S.useMatch("/marketplace/:module");
-	const selectedModule = match?.params?.module;
+	const match = S.useMatch("/marketplace/:mrl");
+	const murl = match?.params?.murl;
 
 	return (
 		<div id="stats-app">
 			<S.ReactComponents.Routes>
 				<S.ReactComponents.Route path="/" element={<Marketplace />} />
-				<S.ReactComponents.Route path=":module" element={<ModulePage module={selectedModule} />} />
+				<S.ReactComponents.Route path=":module" element={<ModulePage murl={murl} />} />
 			</S.ReactComponents.Routes>
 		</div>
 	);

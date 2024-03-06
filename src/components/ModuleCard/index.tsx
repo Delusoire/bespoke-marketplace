@@ -1,25 +1,102 @@
 import { S } from "/modules/Delusoire/std/index.js";
-
+const { React } = S;
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
-import { Module } from "/hooks/module.js";
+import { Metadata, Module } from "/hooks/module.js";
+import { fetchJSON } from "/hooks/util.js";
+import { _ } from "/modules/Delusoire/std/deps.js";
 
 const History = S.Platform.getHistory();
 
-// TODO: add remoteMetaList support, add more importantTags
-interface ModuleCardProps {}
-export default function ({ identifier, metadata, remoteMeta, setRemoteMeta, remoteMetaList, shouldShowTags }) {
-	const { name, description, tags, authors, preview } = metadata;
+const dummyMetadata = {
+	name: "",
+	description: "",
+	tags: [],
+	authors: [],
+	preview: "",
+} as Metadata;
 
+const cachedMetaURLs = new Map<string, Metadata>();
+const fetchMetaURL = async (metaURL: string) => {
+	const cachedMetadata = cachedMetaURLs.get(metaURL);
+	if (cachedMetadata) {
+		return cachedMetadata;
+	}
+
+	const metadata = await fetchJSON(metaURL);
+	cachedMetaURLs.set(metaURL, metadata);
+	return metadata;
+};
+
+export const useMetas = identifiersToMetadataLists => {
+	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(() =>
+		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
+			const module = Module.registry.get(identifier);
+			const installed = module !== undefined;
+
+			return installed ? module.getLocalMeta() : metaList[0];
+		}),
+	);
+
+	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState(() =>
+		_.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
+			const module = Module.registry.get(identifier);
+			const installed = module !== undefined;
+			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
+
+			return isLocalMetadata ? module.metadata : dummyMetadata;
+		}),
+	);
+
+	React.useEffect(() => {
+		for (const [identifier, metaURL] of Object.entries(identifiersToMetaURLs)) {
+			const module = Module.registry.get(identifier);
+			const installed = module !== undefined;
+			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
+
+			if (!isLocalMetadata) {
+				fetchMetaURL(metaURL).then(metadata => {
+					const identifiersToMetadatasCopy = Object.assign({}, identifiersToMetadatas);
+					identifiersToMetadatasCopy[identifier] = metadata;
+					setIdentifiersToMetadatas(identifiersToMetadatasCopy);
+				});
+			}
+		}
+	}, []);
+
+	return _.mapValues(identifiersToMetadataLists, (_, identifier) => ({
+		metadata: identifiersToMetadatas[identifier],
+		metaURL: identifiersToMetaURLs[identifier],
+		setMetaURL: (metaURL: string) =>
+			setIdentifiersToMetaURLs(identifiersToMetaURLs => Object.assign({}, identifiersToMetaURLs, { [identifier]: metaURL })),
+	}));
+};
+
+interface ModuleCardProps {
+	identifier: string;
+	metadata: Metadata;
+	metaURL: string;
+	setMetaURL: (metaURL: string) => void;
+	metaURLList: string[];
+	showTags: boolean;
+}
+
+export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
 	const module = Module.registry.get(identifier);
 	const installed = module !== undefined;
+
+	const { name, description, tags, authors, preview } = metadata;
 
 	const cardClasses = S.classnames("main-card-card", `marketplace-card--${this.props.type}`, {
 		"marketplace-card--installed": installed,
 	});
 
+	const remoteDir = metaURL.replace(/\/metadata\.json$/, "");
+
+	// TODO: add more important tags
 	const importantTags = [installed && "installed"].filter(Boolean);
 
+	// TODO: add metaURLList support
 	return (
 		<div
 			className={cardClasses}
@@ -57,7 +134,7 @@ export default function ({ identifier, metadata, remoteMeta, setRemoteMeta, remo
 						title={name}
 						className="main-cardHeader-link"
 						dir="auto"
-						href={remoteReadme}
+						href={remoteDir}
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
@@ -69,7 +146,7 @@ export default function ({ identifier, metadata, remoteMeta, setRemoteMeta, remo
 					</div>
 					<p className="marketplace-card-desc">{description}</p>
 					<div className="marketplace-card__bottom-meta main-type-mestoBold">
-						<TagsDiv tags={tags} shouldShowTags={shouldShowTags} importantTags={importantTags} />
+						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />
 					</div>
 				</div>
 			</div>

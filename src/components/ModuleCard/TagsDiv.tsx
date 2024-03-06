@@ -17,12 +17,12 @@ const Tag = (tag: string) => (
 interface TagsDivProps {
 	tags: string[];
 	importantTags: string[];
-	shouldShowTags: boolean;
+	showTags: boolean;
 }
-export default function ({ tags, importantTags, shouldShowTags }: TagsDivProps) {
+export default function ({ tags, importantTags, showTags }: TagsDivProps) {
 	const [expanded, setExpanded] = React.useState(false);
 
-	const baseTags = [importantTags, shouldShowTags && tags].flat();
+	const baseTags = [importantTags, showTags && tags].flat();
 
 	let extraTags = new Array<string>();
 	// If there are more than one extra tags, slice them and add an expand button
