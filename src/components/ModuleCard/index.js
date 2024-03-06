@@ -8,7 +8,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
     const module = Module.registry.get(identifier);
     const installed = module !== undefined;
     const { name, description, tags, authors, preview } = metadata;
-    const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", `marketplace-card--${this.props.type}`, {
+    const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
         "marketplace-card--installed": installed,
     });
     const remoteDir = metaURL.replace(/\/metadata\.json$/, "");

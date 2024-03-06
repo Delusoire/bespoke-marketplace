@@ -1,6 +1,10 @@
 {
 	"name": "spicetify-marketplace",
+	"tags": [],
+	"preview": "",
+	"version": "",
 	"authors": ["Delusoire"],
+	"description": "",
 	"entries": {
 		"js": "src/index.js",
 		"css": "src/index.css",

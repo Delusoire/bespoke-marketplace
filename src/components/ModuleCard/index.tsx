@@ -23,7 +23,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 
 	const { name, description, tags, authors, preview } = metadata;
 
-	const cardClasses = S.classnames("main-card-card", `marketplace-card--${this.props.type}`, {
+	const cardClasses = S.classnames("main-card-card", {
 		"marketplace-card--installed": installed,
 	});
 

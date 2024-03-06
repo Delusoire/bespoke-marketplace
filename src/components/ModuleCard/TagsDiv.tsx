@@ -1,8 +1,8 @@
-import { t } from "i18next";
 import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
 
-import { MAX_TAGS } from "../../static";
+import { MAX_TAGS } from "../../static.js";
+import { t } from "../../i18n.js";
 
 const knownTags = {
 	[t("grid.archived")]: "archived",

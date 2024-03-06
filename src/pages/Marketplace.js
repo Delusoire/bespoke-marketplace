@@ -23,23 +23,25 @@ const dummyMetadata = {
     preview: "",
 };
 export const useMetas = (identifiersToMetadataLists) => {
-    const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState({});
-    const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState({});
+    const updateIdentifiersToMetaURLs = () => _.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
+        const module = Module.registry.get(identifier);
+        const installed = module !== undefined;
+        return installed ? module.getLocalMeta() : metaList[0];
+    });
+    const updateIdentifiersToMetadatas = () => _.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
+        const module = Module.registry.get(identifier);
+        const installed = module !== undefined;
+        const isLocalMetadata = installed && metaURL === module.getLocalMeta();
+        return isLocalMetadata ? module.metadata : dummyMetadata;
+    });
+    const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(updateIdentifiersToMetaURLs);
+    const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState(updateIdentifiersToMetadatas);
     React.useEffect(() => {
-        const identifiersToMetaURLs = _.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
-            const module = Module.registry.get(identifier);
-            const installed = module !== undefined;
-            return installed ? module.getLocalMeta() : metaList[0];
-        });
+        const identifiersToMetaURLs = updateIdentifiersToMetaURLs();
         setIdentifiersToMetaURLs(identifiersToMetaURLs);
     }, [identifiersToMetadataLists]);
     React.useEffect(() => {
-        const identifiersToMetadatas = _.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
-            const module = Module.registry.get(identifier);
-            const installed = module !== undefined;
-            const isLocalMetadata = installed && metaURL === module.getLocalMeta();
-            return isLocalMetadata ? module.metadata : dummyMetadata;
-        });
+        const identifiersToMetadatas = updateIdentifiersToMetadatas();
         setIdentifiersToMetadatas(identifiersToMetadatas);
     }, [identifiersToMetaURLs]);
     React.useEffect(() => {
@@ -68,7 +70,7 @@ export const useMetas = (identifiersToMetadataLists) => {
         setMetaURL: (metaURL) => setIdentifiersToMetaURLs(identifiersToMetaURLs => Object.assign({}, identifiersToMetaURLs, { [identifier]: metaURL })),
     }));
 };
-const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/repo.json");
+const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 const mergeObjectsWithArraysConcatenated = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 export default function () {
     const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);

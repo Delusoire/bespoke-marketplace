@@ -122,13 +122,6 @@
     gap: 8px;
 }
 
-.marketplace-card--snippet {
-    // Hide image preview for CSS snippets
-    // .main-card-imageContainer { display: none; }
-
-    // TODO: what do we do if the snippet has no image?
-}
-
 .marketplace-card--installed {
     flex: 0 !important;
     -webkit-box-flex: 0 !important;

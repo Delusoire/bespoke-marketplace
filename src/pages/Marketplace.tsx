@@ -27,27 +27,33 @@ const dummyMetadata = {
 } as Metadata;
 
 export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
-	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState({} as Record<string, string>);
-	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState({} as Record<string, Metadata>);
-
-	React.useEffect(() => {
-		const identifiersToMetaURLs = _.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
+	const updateIdentifiersToMetaURLs = () =>
+		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
 			const module = Module.registry.get(identifier);
 			const installed = module !== undefined;
 
 			return installed ? module.getLocalMeta() : metaList[0];
 		});
-		setIdentifiersToMetaURLs(identifiersToMetaURLs);
-	}, [identifiersToMetadataLists]);
 
-	React.useEffect(() => {
-		const identifiersToMetadatas = _.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
+	const updateIdentifiersToMetadatas = () =>
+		_.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
 			const module = Module.registry.get(identifier);
 			const installed = module !== undefined;
 			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
 
 			return isLocalMetadata ? module.metadata : dummyMetadata;
 		});
+
+	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(updateIdentifiersToMetaURLs);
+	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState(updateIdentifiersToMetadatas);
+
+	React.useEffect(() => {
+		const identifiersToMetaURLs = updateIdentifiersToMetaURLs();
+		setIdentifiersToMetaURLs(identifiersToMetaURLs);
+	}, [identifiersToMetadataLists]);
+
+	React.useEffect(() => {
+		const identifiersToMetadatas = updateIdentifiersToMetadatas();
 		setIdentifiersToMetadatas(identifiersToMetadatas);
 	}, [identifiersToMetaURLs]);
 
@@ -80,7 +86,7 @@ export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) =
 	}));
 };
 
-const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/repo.json");
+const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 
 const mergeObjectsWithArraysConcatenated = (a, b) =>
 	_.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
