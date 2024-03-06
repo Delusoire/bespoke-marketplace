@@ -1,22 +1,33 @@
 import { S } from "/modules/Delusoire/std/index.js";
+const { React } = S;
 import SortBox from "../components/SortBox/index.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
 import { t } from "../i18n.js";
 import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
-import { useMetas } from "../components/ModuleCard/index.js";
+import ModuleCard, { useMetas } from "../components/ModuleCard/index.js";
 
-const identifiersToRemoteMetadataLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/repo.json");
+const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/repo.json");
 
 const mergeObjectsWithArraysConcatenated = (a, b) =>
 	_.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
 export default function () {
-	const localModules = Module.getModules();
-	const identifiersToLocalMetadataLists = Object.fromEntries(localModules.map(module => [module.getIdentifier(), [module.getLocalMeta()]]));
-	const identifiersToMetadataLists = mergeObjectsWithArraysConcatenated(identifiersToLocalMetadataLists, identifiersToRemoteMetadataLists);
+	const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
 
-	const identifiersToProps = useMetas(identifiersToMetadataLists);
+	const identifiersToMetadataURLsLists = React.useMemo(() => {
+		const localModules = Module.getModules();
+		const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map(module => [module.getIdentifier(), [module.getLocalMeta()]]));
+		return mergeObjectsWithArraysConcatenated(identifiersToLocalMetadataURLsLists, identifiersToRemoteMetadataURLsLists);
+	}, [refreshCount]);
+
+	const identifiersToMetadataProps = useMetas(identifiersToMetadataURLsLists);
+
+	const propsList = Object.entries(identifiersToMetadataProps).map(([identifier, metadataProps]) =>
+		Object.assign({ identifier, showTags: true, metaURLList: identifiersToMetadataURLsLists[identifier] }, metadataProps),
+	);
+
+	const [search, setSearch] = React.useState("");
 
 	return (
 		<section className="contentSpacing">
@@ -33,7 +44,7 @@ export default function () {
 							placeholder={`${t("grid.search")} ${t("tabs.modules")}...`}
 							value={this.state.searchValue}
 							onChange={event => {
-								this.setState({ searchValue: event.target.value });
+								setSearch(event.target.value);
 							}}
 						/>
 					</div>
@@ -41,7 +52,11 @@ export default function () {
 				</div>
 			</div>
 			<>
-				<div className="marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth">{cards}</div>
+				<div className="marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth">
+					{propsList.map(props => (
+						<ModuleCard key={props.identifier} {...props} />
+					))}
+				</div>
 			</>
 		</section>
 	);

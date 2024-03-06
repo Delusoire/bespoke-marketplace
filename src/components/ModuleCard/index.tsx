@@ -28,7 +28,7 @@ const fetchMetaURL = async (metaURL: string) => {
 	return metadata;
 };
 
-export const useMetas = identifiersToMetadataLists => {
+export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
 	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(() =>
 		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
 			const module = Module.registry.get(identifier);
