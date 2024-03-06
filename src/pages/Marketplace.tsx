@@ -1,7 +1,7 @@
 import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
 import SortBox from "../components/SortBox/index.js";
-import { _ } from "/modules/Delusoire/std/deps.js";
+import { _, _ } from "/modules/Delusoire/std/deps.js";
 import { t } from "../i18n.js";
 import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
@@ -23,11 +23,15 @@ export default function () {
 
 	const identifiersToMetadataProps = useMetas(identifiersToMetadataURLsLists);
 
-	const propsList = Object.entries(identifiersToMetadataProps).map(([identifier, metadataProps]) =>
-		Object.assign({ identifier, showTags: true, metaURLList: identifiersToMetadataURLsLists[identifier] }, metadataProps),
+	const propsList = React.useMemo(
+		() =>
+			Object.entries(identifiersToMetadataProps).map(([identifier, metadataProps]) =>
+				Object.assign({ identifier, showTags: true, metaURLList: identifiersToMetadataURLsLists[identifier] }, metadataProps),
+			),
+		[identifiersToMetadataURLsLists, identifiersToMetadataProps],
 	);
 
-	const [search, setSearch] = React.useState("");
+	const [searchbar, search] = useSearchbar();
 
 	return (
 		<section className="contentSpacing">
@@ -37,27 +41,58 @@ export default function () {
 					<SortBox onChange={value => updateSort(value)} options={sortOptions} selectedOption={sortOptions[0]} />
 				</div>
 				<div className="marketplace-header__right">
-					<div className="searchbar--bar__wrapper">
-						<input
-							className="searchbar-bar"
-							type="text"
-							placeholder={`${t("grid.search")} ${t("tabs.modules")}...`}
-							value={this.state.searchValue}
-							onChange={event => {
-								setSearch(event.target.value);
-							}}
-						/>
-					</div>
+					{searchbar}
 					{/* TODO: add settings btn */}
 				</div>
 			</div>
 			<>
 				<div className="marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth">
-					{propsList.map(props => (
-						<ModuleCard key={props.identifier} {...props} />
-					))}
+					{propsList
+						.filter(props => {
+							const { metadata } = props;
+							const { authors, name, tags } = metadata;
+							const searchFiels = [...authors, name, ...tags];
+							return searchFiels.some(f => f.toLowerCase().includes(search));
+						})
+						.sort()
+						.map(props => (
+							<ModuleCard key={props.identifier} {...props} />
+						))}
 				</div>
 			</>
 		</section>
 	);
 }
+
+const Searchbar = ({ value, onChange }) => {
+	return (
+		<div className="searchbar--bar__wrapper">
+			<input
+				className="searchbar-bar"
+				type="text"
+				placeholder={`${t("grid.search")} ${t("tabs.modules")}...`}
+				value={this.state.searchValue}
+				onChange={event => {
+					onChange(event.target.value.toLowerCase());
+				}}
+			/>
+		</div>
+	);
+};
+
+const useSearchbar = () => {
+	const [search, setSearch] = React.useState("");
+
+	const setSearchDebounced = _.debounce(setSearch, 1000);
+
+	const searchbar = (
+		<Searchbar
+			value={value}
+			onChange={str => {
+				setSearchDebounced(str);
+			}}
+		/>
+	);
+
+	return [searchbar, search] as const;
+};
