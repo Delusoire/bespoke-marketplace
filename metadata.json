@@ -3,7 +3,7 @@
 	"authors": ["Delusoire"],
 	"entries": {
 		"js": "src/index.js",
-		"css": "src/styles/styles.css",
+		"css": "src/index.css",
 		"mixin": false
 	},
 	"dependencies": ["Delusoire/std", "Delusoire/delulib"]
