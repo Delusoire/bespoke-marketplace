@@ -10,12 +10,11 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
         "marketplace-card--installed": installed,
     });
-    const remoteDir = metaURL.replace(/\/metadata\.json$/, "");
     // TODO: add more important tags
     const importantTags = [installed && "installed"].filter(Boolean);
     // TODO: add metaURLList support
     return (S.React.createElement("div", { className: cardClasses, onClick: () => {
-            History.push(`spotify:app:marketplace:${identifier}`);
+            History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
         } },
         S.React.createElement("div", { className: "XiVwj5uoqqSFpS4cYOC6", draggable: "true" },
             S.React.createElement("div", { className: "xBV4XgMq0gC5lQICFWY_" },
@@ -27,7 +26,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
                                 e.currentTarget.closest(".g4PZpjkqEh5g7xDpCr2K")?.classList.add("main-cardImage-imageWrapper--error");
                             } })))),
             S.React.createElement("div", { className: "E1N1ByPFWo4AJLHovIBQ" },
-                S.React.createElement("a", { draggable: "false", title: name, className: "Nqa6Cw3RkDMV8QnYreTr", dir: "auto", href: remoteDir, target: "_blank", rel: "noopener noreferrer", onClick: e => e.stopPropagation() },
+                S.React.createElement("a", { draggable: "false", title: name, className: "Nqa6Cw3RkDMV8QnYreTr", dir: "auto", href: metaURL, target: "_blank", rel: "noopener noreferrer", onClick: e => e.stopPropagation() },
                     S.React.createElement("div", { className: "nk6UgB4GUYNoAcPtAQaG main-type-balladBold" }, name)),
                 S.React.createElement("div", { className: "Za_uNH8nTZ0qCuIqbPLZ main-type-mestoBold marketplace-cardSubHeader" },
                     S.React.createElement(AuthorsDiv, { authors: authors })),

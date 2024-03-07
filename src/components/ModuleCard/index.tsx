@@ -25,8 +25,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 		"marketplace-card--installed": installed,
 	});
 
-	const remoteDir = metaURL.replace(/\/metadata\.json$/, "");
-
 	// TODO: add more important tags
 	const importantTags = [installed && "installed"].filter(Boolean);
 
@@ -35,7 +33,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 		<div
 			className={cardClasses}
 			onClick={() => {
-				History.push(`spotify:app:marketplace:${identifier}`);
+				History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
 			}}
 		>
 			<div className="main-card-draggable" draggable="true">
@@ -68,7 +66,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						title={name}
 						className="main-cardHeader-link"
 						dir="auto"
-						href={remoteDir}
+						href={metaURL}
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}

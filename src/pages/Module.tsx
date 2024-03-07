@@ -80,7 +80,6 @@ export default function ({ murl }: { murl: string }) {
 					</Button>
 				</div>
 			</div>
-			// TODO: replace with github's get markdown api call
 			<RemoteMarkdown url={readmeURL} />
 		</section>
 	);

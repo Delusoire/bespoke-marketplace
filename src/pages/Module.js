@@ -57,9 +57,6 @@ export default function ({ murl }) {
                     }, label: label },
                     installed ? S.React.createElement(TrashIcon, null) : S.React.createElement(DownloadIcon, null),
                     " ",
-                    label)))
-    // TODO: replace with github's get markdown api call
-    ,
-        "// TODO: replace with github's get markdown api call",
+                    label))),
         S.React.createElement(RemoteMarkdown, { url: readmeURL })));
 }
