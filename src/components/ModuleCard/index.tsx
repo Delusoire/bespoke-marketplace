@@ -18,6 +18,8 @@ interface ModuleCardProps {
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
 	const module = Module.registry.get(identifier);
 	const installed = module !== undefined;
+	const outdated = installed && module.metadata.version !== metadata.version;
+	const enabled = installed && module.isEnabled();
 
 	const { name, description, tags, authors, preview } = metadata;
 
