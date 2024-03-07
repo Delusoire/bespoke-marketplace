@@ -3,6 +3,7 @@ import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import { Metadata, Module } from "/hooks/module.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
+import { useModule } from "../../pages/Module.js";
 
 const History = S.Platform.getHistory();
 
@@ -16,10 +17,8 @@ interface ModuleCardProps {
 }
 
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
-	const module = Module.registry.get(identifier);
-	const installed = module !== undefined;
-	const outdated = installed && module.metadata.version !== metadata.version;
-	const enabled = installed && module.isEnabled();
+	// TODO: add visual indicators for these
+	const { installed, enabled, outdated, localOnly } = useModule(identifier);
 
 	const { name, description, tags, authors, preview } = metadata;
 

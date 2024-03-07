@@ -7,13 +7,15 @@ import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
-const fetchMetaURL = async (metaURL: string) => {
-	const cachedMetadata = cachedMetaURLs.get(metaURL);
+export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
+
+export const fetchMetaURL = async (metaURL: string) => {
+	const cachedMetadata = fetchMetaURLSync(metaURL);
 	if (cachedMetadata) {
 		return cachedMetadata;
 	}
 
-	const metadata = await fetchJSON(metaURL);
+	const metadata = await fetchJSON<Metadata>(metaURL);
 	cachedMetaURLs.set(metaURL, metadata);
 	return metadata;
 };
