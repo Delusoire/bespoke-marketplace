@@ -1,11 +1,11 @@
 import { S } from "/modules/Delusoire/std/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
-import { Module } from "/hooks/module.js";
+import { useModule } from "../../pages/Module.js";
 const History = S.Platform.getHistory();
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }) {
-    const module = Module.registry.get(identifier);
-    const installed = module !== undefined;
+    // TODO: add visual indicators for these
+    const { installed, enabled, outdated, localOnly } = useModule(identifier);
     const { name, description, tags, authors, preview } = metadata;
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
         "marketplace-card--installed": installed,

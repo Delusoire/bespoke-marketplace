@@ -1,13 +1,13 @@
 declare const _default: {
-    ca: any;
-    en: any;
-    "en-US": any;
-    es: any;
-    fr: any;
-    ru: any;
-    "zh-TW": any;
-    "zh-CN": any;
-    et: any;
-    pl: any;
+    ca: unknown;
+    en: unknown;
+    "en-US": unknown;
+    es: unknown;
+    fr: unknown;
+    ru: unknown;
+    "zh-TW": unknown;
+    "zh-CN": unknown;
+    et: unknown;
+    pl: unknown;
 };
 export default _default;

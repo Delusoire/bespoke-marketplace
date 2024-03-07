@@ -6,8 +6,9 @@ import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 const cachedMetaURLs = new Map();
-const fetchMetaURL = async (metaURL) => {
-    const cachedMetadata = cachedMetaURLs.get(metaURL);
+export const fetchMetaURLSync = (metaURL) => cachedMetaURLs.get(metaURL);
+export const fetchMetaURL = async (metaURL) => {
+    const cachedMetadata = fetchMetaURLSync(metaURL);
     if (cachedMetadata) {
         return cachedMetadata;
     }
