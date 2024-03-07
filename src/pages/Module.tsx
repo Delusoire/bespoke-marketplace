@@ -7,7 +7,7 @@ import TrashIcon from "../components/icons/TrashIcon.js";
 import { t } from "../i18n.js";
 import { renderMarkdown } from "../api/github.js";
 import { logger } from "../index.js";
-import { Module, ModuleManager } from "/hooks/module.js";
+import { Metadata, Module, ModuleManager } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 
 const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
@@ -45,17 +45,26 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 export default function ({ murl }: { murl: string }) {
 	const { data: metadata } = S.ReactQuery.useSuspenseQuery({
 		queryKey: ["modulePage", murl],
-		queryFn: () => fetchJSON(murl),
+		queryFn: () => fetchJSON<Metadata>(murl),
 	});
 
 	const identifier = `${metadata.authors[0]}/${metadata.name}`;
 
-	const module = Module.registry.get(identifier);
+	const updateModule = () => Module.registry.get(identifier);
+
+	const [module, setModule] = React.useState(updateModule);
+	React.useEffect(() => {
+		const module = updateModule();
+		setModule(module);
+	}, [identifier]);
+
 	const installed = module !== undefined;
+	const outdated = installed && module.metadata.version !== metadata.version;
+	const enabled = installed && module.isEnabled();
+
+	const readmeURL = `${murl}/../${metadata.readme}`;
 
 	const label = t(installed ? "remove" : "install");
-
-	const readmeURL = murl.replace(/metadata\.json$/, "README.md");
 
 	return (
 		<section className="contentSpacing">
@@ -69,9 +78,12 @@ export default function ({ murl }: { murl: string }) {
 						onClick={e => {
 							e.preventDefault();
 							if (installed) {
-								ModuleManager.remove(identifier);
+								module.dispose();
+								setModule(undefined);
 							} else {
 								ModuleManager.add(murl);
+								// create new module
+								setModule();
 							}
 						}}
 						label={label}
