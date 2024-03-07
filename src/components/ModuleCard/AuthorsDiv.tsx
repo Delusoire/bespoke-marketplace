@@ -4,7 +4,7 @@ interface AuthorsProps {
 	authors: string[];
 }
 export default function ({ authors }: AuthorsProps) {
-	const authorsDiv = (
+	return (
 		<div className="marketplace-card__authors">
 			{authors.map((author, index) => (
 				<a
@@ -23,6 +23,4 @@ export default function ({ authors }: AuthorsProps) {
 			))}
 		</div>
 	);
-
-	return authorsDiv;
 }
