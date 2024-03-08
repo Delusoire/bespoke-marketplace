@@ -5,6 +5,8 @@ import { t } from "../i18n.js";
 import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
+import useDropdown from "../components/Dropdown/useDropdown.js";
+import { settingsButton } from "../index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL) => cachedMetaURLs.get(metaURL);
 export const fetchMetaURL = async (metaURL) => {
@@ -18,10 +20,18 @@ export const fetchMetaURL = async (metaURL) => {
 };
 const dummyMetadata = {
     name: "",
-    description: "",
     tags: [],
-    authors: [],
     preview: "",
+    version: "",
+    authors: [],
+    description: "",
+    readme: "",
+    entries: {
+        js: false,
+        css: false,
+        mixin: false,
+    },
+    dependencies: [],
 };
 export const useMetas = (identifiersToMetadataLists) => {
     const updateIdentifiersToMetaURLs = () => _.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
@@ -73,6 +83,11 @@ export const useMetas = (identifiersToMetadataLists) => {
 };
 const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 const mergeObjectsWithArraysConcatenated = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
+const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
+const SortFns = {
+    "a-z": (a, b) => b.name > a.name,
+    "z-a": (a, b) => a.name > b.name,
+};
 export default function () {
     const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
     const identifiersToMetadataURLsLists = React.useMemo(() => {
@@ -82,21 +97,26 @@ export default function () {
     }, [refreshCount]);
     const identifiersToMetadataProps = useMetas(identifiersToMetadataURLsLists);
     const propsList = React.useMemo(() => Object.entries(identifiersToMetadataProps).map(([identifier, metadataProps]) => Object.assign({ identifier, showTags: true, metaURLList: identifiersToMetadataURLsLists[identifier] }, metadataProps)), [identifiersToMetadataURLsLists, identifiersToMetadataProps]);
+    const [sortbox, sortOption] = useDropdown(SortOptions);
+    const sortFn = SortFns[sortOption];
     const [searchbar, search] = useSearchbar();
     return (S.React.createElement("section", { className: "contentSpacing" },
         S.React.createElement("div", { className: "marketplace-header" },
             S.React.createElement("div", { className: "marketplace-header__left" },
-                S.React.createElement("h2", { className: "marketplace-header__label" }, t("grid.sort.label"))),
-            S.React.createElement("div", { className: "marketplace-header__right" }, searchbar)),
+                S.React.createElement("h2", { className: "marketplace-header__label" }, t("grid.sort.label")),
+                sortbox),
+            S.React.createElement("div", { className: "marketplace-header__right" },
+                searchbar,
+                settingsButton)),
         S.React.createElement(S.React.Fragment, null,
-            S.React.createElement("div", { className: "marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd" }, propsList
+            S.React.createElement("div", { className: "marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth" }, propsList
                 .filter(props => {
                 const { metadata } = props;
                 const { authors, name, tags } = metadata;
                 const searchFiels = [...authors, name, ...tags];
                 return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
             })
-                .sort()
+                .sort((a, b) => sortFn(a.metadata, b.metadata))
                 .map(props => (S.React.createElement(ModuleCard, { key: props.identifier, ...props })))))));
 }
 const Searchbar = ({ value, onChange }) => {

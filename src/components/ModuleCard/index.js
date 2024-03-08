@@ -7,7 +7,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
     // TODO: add visual indicators for these
     const { installed, enabled, outdated, localOnly } = useModule(identifier);
     const { name, description, tags, authors, preview } = metadata;
-    const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
+    const cardClasses = S.classnames("main-card-card", {
         "marketplace-card--installed": installed,
     });
     // TODO: add more important tags
@@ -16,19 +16,19 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
     return (S.React.createElement("div", { className: cardClasses, onClick: () => {
             History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
         } },
-        S.React.createElement("div", { className: "XiVwj5uoqqSFpS4cYOC6", draggable: "true" },
-            S.React.createElement("div", { className: "xBV4XgMq0gC5lQICFWY_" },
-                S.React.createElement("div", { className: "g4PZpjkqEh5g7xDpCr2K" },
+        S.React.createElement("div", { className: "main-card-draggable", draggable: "true" },
+            S.React.createElement("div", { className: "main-card-imageContainer" },
+                S.React.createElement("div", { className: "main-cardImage-imageWrapper" },
                     S.React.createElement("div", null,
-                        S.React.createElement("img", { alt: "ur blind haha *points finger*", "aria-hidden": "false", draggable: "false", loading: "lazy", src: preview, className: "mMx2LUixlnN_Fu45JpFB SKJSok3LfyedjZjujmFt", onError: e => {
+                        S.React.createElement("img", { alt: "ur blind haha *points finger*", "aria-hidden": "false", draggable: "false", loading: "lazy", src: preview, className: "main-image-image main-cardImage-image", onError: e => {
                                 // https://png-pixel.com
                                 e.currentTarget.setAttribute("src", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII");
-                                e.currentTarget.closest(".g4PZpjkqEh5g7xDpCr2K")?.classList.add("main-cardImage-imageWrapper--error");
+                                e.currentTarget.closest(".main-cardImage-imageWrapper")?.classList.add("main-cardImage-imageWrapper--error");
                             } })))),
-            S.React.createElement("div", { className: "E1N1ByPFWo4AJLHovIBQ" },
-                S.React.createElement("a", { draggable: "false", title: name, className: "Nqa6Cw3RkDMV8QnYreTr", dir: "auto", href: metaURL, target: "_blank", rel: "noopener noreferrer", onClick: e => e.stopPropagation() },
-                    S.React.createElement("div", { className: "nk6UgB4GUYNoAcPtAQaG main-type-balladBold" }, name)),
-                S.React.createElement("div", { className: "Za_uNH8nTZ0qCuIqbPLZ main-type-mestoBold marketplace-cardSubHeader" },
+            S.React.createElement("div", { className: "main-card-cardMetadata" },
+                S.React.createElement("a", { draggable: "false", title: name, className: "main-cardHeader-link", dir: "auto", href: metaURL, target: "_blank", rel: "noopener noreferrer", onClick: e => e.stopPropagation() },
+                    S.React.createElement("div", { className: "main-cardHeader-text main-type-balladBold" }, name)),
+                S.React.createElement("div", { className: "main-cardSubHeader-root main-type-mestoBold marketplace-cardSubHeader" },
                     S.React.createElement(AuthorsDiv, { authors: authors })),
                 S.React.createElement("p", { className: "marketplace-card-desc" }, description),
                 S.React.createElement("div", { className: "marketplace-card__bottom-meta main-type-mestoBold" },
