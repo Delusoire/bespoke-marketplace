@@ -5,6 +5,7 @@ import { t } from "../i18n.js";
 import { Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
+import useDropdown from "../components/Dropdown/useDropdown.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
 export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
@@ -20,13 +21,21 @@ export const fetchMetaURL = async (metaURL: string) => {
 	return metadata;
 };
 
-const dummyMetadata = {
+const dummyMetadata: Metadata = {
 	name: "",
-	description: "",
 	tags: [],
-	authors: [],
 	preview: "",
-} as Metadata;
+	version: "",
+	authors: [],
+	description: "",
+	readme: "",
+	entries: {
+		js: false,
+		css: false,
+		mixin: false,
+	},
+	dependencies: [],
+};
 
 export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
 	const updateIdentifiersToMetaURLs = () =>
@@ -93,6 +102,12 @@ const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.github
 const mergeObjectsWithArraysConcatenated = (a, b) =>
 	_.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
+const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
+const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => number | boolean> = {
+	"a-z": (a, b) => b.name > a.name,
+	"z-a": (a, b) => a.name > b.name,
+};
+
 export default function () {
 	const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
 
@@ -112,6 +127,8 @@ export default function () {
 		[identifiersToMetadataURLsLists, identifiersToMetadataProps],
 	);
 
+	const [sortbox, sortOption] = useDropdown(SortOptions);
+	const sortFn = SortFns[sortOption];
 	const [searchbar, search] = useSearchbar();
 
 	return (
@@ -119,7 +136,7 @@ export default function () {
 			<div className="marketplace-header">
 				<div className="marketplace-header__left">
 					<h2 className="marketplace-header__label">{t("grid.sort.label")}</h2>
-					{/* TODO: add sort box */}
+					{sortbox}
 				</div>
 				<div className="marketplace-header__right">
 					{searchbar}
@@ -135,7 +152,7 @@ export default function () {
 							const searchFiels = [...authors, name, ...tags];
 							return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
 						})
-						.sort()
+						.sort((a, b) => sortFn(a.metadata, b.metadata) as number)
 						.map(props => (
 							<ModuleCard key={props.identifier} {...props} />
 						))}
