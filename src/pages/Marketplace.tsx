@@ -105,8 +105,8 @@ const mergeObjectsWithArraysConcatenated = (a, b) =>
 
 const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
 const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => number | boolean> = {
-	"a-z": (a, b) => b.name > a.name,
-	"z-a": (a, b) => a.name > b.name,
+	"a-z": (a, b) => b.name > a.name ? 1 : a.name > b.name ? -1 : 0,
+	"z-a": (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
 };
 
 export default function () {

@@ -85,8 +85,8 @@ const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.github
 const mergeObjectsWithArraysConcatenated = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
 const SortFns = {
-    "a-z": (a, b) => b.name > a.name,
-    "z-a": (a, b) => a.name > b.name,
+    "a-z": (a, b) => b.name > a.name ? 1 : a.name > b.name ? -1 : 0,
+    "z-a": (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
 };
 export default function () {
     const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
@@ -109,7 +109,7 @@ export default function () {
                 searchbar,
                 settingsButton)),
         S.React.createElement(S.React.Fragment, null,
-            S.React.createElement("div", { className: "marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth" }, propsList
+            S.React.createElement("div", { className: "marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd" }, propsList
                 .filter(props => {
                 const { metadata } = props;
                 const { authors, name, tags } = metadata;

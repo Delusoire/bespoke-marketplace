@@ -6,7 +6,7 @@ type SortBoxOptions<K extends string> = Record<K, React.ReactNode>;
 
 type ValueOf<R> = R[keyof R];
 export default function <K extends string>(options: SortBoxOptions<K>) {
-	const [activeOption, setActiveOption] = React.useState(Object.values(options)[0] as keyof typeof options);
+	const [activeOption, setActiveOption] = React.useState(Object.keys(options)[0] as keyof typeof options);
 
 	const dropdown = (
 		<div className="marketplace-sortBox">

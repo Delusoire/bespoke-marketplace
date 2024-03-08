@@ -53,7 +53,7 @@ export const useModule = (identifier) => {
             const outdated = module.metadata.version !== remoteMetadata.version;
             setOutdated(outdated);
         };
-        if (!localOnly) {
+        if (installed && !localOnly) {
             updateOutdated(module.remoteMetadataURL);
         }
         return () => {
