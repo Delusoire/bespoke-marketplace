@@ -6,6 +6,7 @@ import { Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import useDropdown from "../components/Dropdown/useDropdown.js";
+import { settingsButton } from "../index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
 export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
@@ -140,7 +141,7 @@ export default function () {
 				</div>
 				<div className="marketplace-header__right">
 					{searchbar}
-					{/* TODO: add settings btn */}
+					{settingsButton}
 				</div>
 			</div>
 			<>
