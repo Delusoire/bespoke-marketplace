@@ -52,7 +52,6 @@ export const useModule = (identifier: string) => {
 	}, [identifier]);
 
 	const installed = module !== undefined;
-	// TODO: add visual indicators for these
 	const enabled = installed && module.isEnabled();
 	const [outdated, setOutdated] = React.useState(false);
 	const localOnly = installed && module.remoteMetadataURL === undefined;
@@ -76,10 +75,9 @@ export const useModule = (identifier: string) => {
 		};
 	}, [module]);
 
-	return { module, installed, enabled, outdated, localOnly };
+	return { module, setModule, installed, enabled, outdated, localOnly };
 };
 
-// TODO: Disable removing localOnly modules
 export default function ({ murl }: { murl: string }) {
 	const { data: metadata } = S.ReactQuery.useSuspenseQuery({
 		queryKey: ["modulePage", murl],
@@ -89,7 +87,7 @@ export default function ({ murl }: { murl: string }) {
 	const identifier = `${metadata.authors[0]}/${metadata.name}`;
 
 	// TODO: add visual indicators for these
-	const { module, installed, enabled, outdated, localOnly } = useModule(identifier);
+	const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
 
 	const readmeURL = `${murl}/../${metadata.readme}`;
 
@@ -102,25 +100,27 @@ export default function ({ murl }: { murl: string }) {
 					<h1>{t("readmePage.title")}</h1>
 				</div>
 				<div className="marketplace-header__right">
-					<Button
-						className="marketplace-header__button"
-						onClick={e => {
-							e.preventDefault();
+					{!localOnly && (
+						<Button
+							className="marketplace-header__button"
+							onClick={e => {
+								e.preventDefault();
 
-							// TODO: these are optimistic updates, they may cause de-sync
-							if (installed) {
-								module.dispose(true);
-								setModule(undefined);
-							} else {
-								ModuleManager.add(murl);
-								const module = new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
-								setModule(module);
-							}
-						}}
-						label={label}
-					>
-						{installed ? <TrashIcon /> : <DownloadIcon />} {label}
-					</Button>
+								// TODO: these are optimistic updates, they may cause de-sync
+								if (installed) {
+									module.dispose(true);
+									setModule(undefined);
+								} else {
+									ModuleManager.add(murl);
+									const module = new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
+									setModule(module);
+								}
+							}}
+							label={label}
+						>
+							{installed ? <TrashIcon /> : <DownloadIcon />} {label}
+						</Button>
+					)}
 				</div>
 			</div>
 			<RemoteMarkdown url={readmeURL} />

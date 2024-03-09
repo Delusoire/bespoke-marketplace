@@ -1,11 +1,26 @@
 import { S } from "/modules/Delusoire/std/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
-import { Metadata, Module } from "/hooks/module.js";
+import type { Metadata } from "/hooks/module.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
 import { useModule } from "../../pages/Module.js";
+import Dropdown from "/modules/types/api/components/Dropdown.js";
 
 const History = S.Platform.getHistory();
+
+interface UseMetaSelectorOpts {
+	metaURL: string;
+	setMetaURL: (metaURL: string) => void;
+	metaURLList: string[];
+}
+
+const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOpts) => {
+	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, metaURL] as const)) as { [K in string]: K };
+
+	const dropdown = <Dropdown options={options} activeOption={metaURL} onSwitch={metaURL => setMetaURL(metaURL)} />;
+
+	return dropdown;
+};
 
 interface ModuleCardProps {
 	identifier: string;
@@ -17,19 +32,22 @@ interface ModuleCardProps {
 }
 
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
-	// TODO: add visual indicators for these
 	const { installed, enabled, outdated, localOnly } = useModule(identifier);
+	const metaSelector = useMetaSelector({ metaURL, setMetaURL, metaURLList });
 
 	const { name, description, tags, authors, preview } = metadata;
 
+	// TODO: add css for these classes
 	const cardClasses = S.classnames("main-card-card", {
+		"marketplace-card--localOnly": localOnly,
+		"marketplace-card--outdated": outdated,
+		"marketplace-card--enabled": enabled,
 		"marketplace-card--installed": installed,
 	});
 
 	// TODO: add more important tags
 	const importantTags = [installed && "installed"].filter(Boolean);
 
-	// TODO: add metaURLList support
 	return (
 		<div
 			className={cardClasses}
@@ -81,6 +99,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 					<div className="marketplace-card__bottom-meta main-type-mestoBold">
 						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />
 					</div>
+					{metaSelector}
 				</div>
 			</div>
 		</div>

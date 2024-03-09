@@ -2,11 +2,11 @@ import { S } from "/modules/Delusoire/std/index.js";
 const { React } = S;
 import { _ } from "/modules/Delusoire/std/deps.js";
 import { t } from "../i18n.js";
-import { Metadata, Module } from "/hooks/module.js";
+import { type Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
-import useDropdown from "../components/Dropdown/useDropdown.js";
 import { settingsButton } from "../index.js";
+import { useDropdown } from "/modules/Delusoire/std/api/components/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
 export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
@@ -105,8 +105,8 @@ const mergeObjectsWithArraysConcatenated = (a, b) =>
 
 const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
 const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => number | boolean> = {
-	"a-z": (a, b) => b.name > a.name ? 1 : a.name > b.name ? -1 : 0,
-	"z-a": (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+	"a-z": (a, b) => (b.name > a.name ? 1 : a.name > b.name ? -1 : 0),
+	"z-a": (a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0),
 };
 
 export default function () {
@@ -128,7 +128,7 @@ export default function () {
 		[identifiersToMetadataURLsLists, identifiersToMetadataProps],
 	);
 
-	const [sortbox, sortOption] = useDropdown(SortOptions);
+	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 	const [searchbar, search] = useSearchbar();
 
