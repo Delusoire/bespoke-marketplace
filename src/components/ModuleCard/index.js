@@ -2,17 +2,26 @@ import { S } from "/modules/Delusoire/std/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import { useModule } from "../../pages/Module.js";
+import Dropdown from "/modules/types/api/components/Dropdown.js";
 const History = S.Platform.getHistory();
+const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }) => {
+    const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, metaURL]));
+    const dropdown = S.React.createElement(Dropdown, { options: options, activeOption: metaURL, onSwitch: metaURL => setMetaURL(metaURL) });
+    return dropdown;
+};
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }) {
-    // TODO: add visual indicators for these
     const { installed, enabled, outdated, localOnly } = useModule(identifier);
+    const metaSelector = useMetaSelector({ metaURL, setMetaURL, metaURLList });
     const { name, description, tags, authors, preview } = metadata;
+    // TODO: add css for these classes
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
+        "marketplace-card--localOnly": localOnly,
+        "marketplace-card--outdated": outdated,
+        "marketplace-card--enabled": enabled,
         "marketplace-card--installed": installed,
     });
     // TODO: add more important tags
     const importantTags = [installed && "installed"].filter(Boolean);
-    // TODO: add metaURLList support
     return (S.React.createElement("div", { className: cardClasses, onClick: () => {
             History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
         } },
@@ -32,5 +41,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
                     S.React.createElement(AuthorsDiv, { authors: authors })),
                 S.React.createElement("p", { className: "marketplace-card-desc" }, description),
                 S.React.createElement("div", { className: "marketplace-card__bottom-meta main-type-mestoBold" },
-                    S.React.createElement(TagsDiv, { tags: tags, showTags: showTags, importantTags: importantTags }))))));
+                    S.React.createElement(TagsDiv, { tags: tags, showTags: showTags, importantTags: importantTags })),
+                metaSelector))));
 }

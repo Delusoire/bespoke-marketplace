@@ -39,7 +39,6 @@ export const useModule = (identifier) => {
         setModule(module);
     }, [identifier]);
     const installed = module !== undefined;
-    // TODO: add visual indicators for these
     const enabled = installed && module.isEnabled();
     const [outdated, setOutdated] = React.useState(false);
     const localOnly = installed && module.remoteMetadataURL === undefined;
@@ -60,39 +59,37 @@ export const useModule = (identifier) => {
             expired = true;
         };
     }, [module]);
-    return { module, installed, enabled, outdated, localOnly };
+    return { module, setModule, installed, enabled, outdated, localOnly };
 };
-// TODO: Disable removing localOnly modules
 export default function ({ murl }) {
     const { data: metadata } = S.ReactQuery.useSuspenseQuery({
         queryKey: ["modulePage", murl],
         queryFn: () => fetchJSON(murl),
     });
     const identifier = `${metadata.authors[0]}/${metadata.name}`;
-    // TODO: add visual indicators for these
-    const { module, installed, enabled, outdated, localOnly } = useModule(identifier);
+    // TODO: add visual indicator & toggle for enabled
+    const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
     const readmeURL = `${murl}/../${metadata.readme}`;
     const label = t(installed ? "remove" : "install");
     return (S.React.createElement("section", { className: "contentSpacing" },
         S.React.createElement("div", { className: "marketplace-header" },
             S.React.createElement("div", { className: "marketplace-header__left" },
                 S.React.createElement("h1", null, t("readmePage.title"))),
-            S.React.createElement("div", { className: "marketplace-header__right" },
-                S.React.createElement(Button, { className: "marketplace-header__button", onClick: e => {
-                        e.preventDefault();
-                        // TODO: these are optimistic updates, they may cause de-sync
-                        if (installed) {
-                            module.dispose(true);
-                            setModule(undefined);
-                        }
-                        else {
-                            ModuleManager.add(murl);
-                            const module = new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
-                            setModule(module);
-                        }
-                    }, label: label },
-                    installed ? S.React.createElement(TrashIcon, null) : S.React.createElement(DownloadIcon, null),
-                    " ",
-                    label))),
+            S.React.createElement("div", { className: "marketplace-header__right" }, !localOnly && (S.React.createElement(Button, { className: "marketplace-header__button", onClick: e => {
+                    e.preventDefault();
+                    // TODO: these are optimistic updates, they may cause de-sync
+                    if (installed && !outdated) {
+                        module.dispose(true);
+                        setModule(undefined);
+                    }
+                    else {
+                        ModuleManager.add(murl);
+                        const module = new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
+                        setModule(module);
+                    }
+                }, label: label },
+                installed ? S.React.createElement(TrashIcon, null) : S.React.createElement(DownloadIcon, null),
+                " ",
+                label)))),
         S.React.createElement(RemoteMarkdown, { url: readmeURL })));
 }

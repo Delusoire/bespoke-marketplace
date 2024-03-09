@@ -5,8 +5,8 @@ import { t } from "../i18n.js";
 import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
-import useDropdown from "../components/Dropdown/useDropdown.js";
 import { settingsButton } from "../index.js";
+import { useDropdown } from "/modules/Delusoire/std/api/components/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL) => cachedMetaURLs.get(metaURL);
 export const fetchMetaURL = async (metaURL) => {
@@ -85,8 +85,8 @@ const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.github
 const mergeObjectsWithArraysConcatenated = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
 const SortFns = {
-    "a-z": (a, b) => b.name > a.name ? 1 : a.name > b.name ? -1 : 0,
-    "z-a": (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+    "a-z": (a, b) => (b.name > a.name ? 1 : a.name > b.name ? -1 : 0),
+    "z-a": (a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0),
 };
 export default function () {
     const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
@@ -97,7 +97,7 @@ export default function () {
     }, [refreshCount]);
     const identifiersToMetadataProps = useMetas(identifiersToMetadataURLsLists);
     const propsList = React.useMemo(() => Object.entries(identifiersToMetadataProps).map(([identifier, metadataProps]) => Object.assign({ identifier, showTags: true, metaURLList: identifiersToMetadataURLsLists[identifier] }, metadataProps)), [identifiersToMetadataURLsLists, identifiersToMetadataProps]);
-    const [sortbox, sortOption] = useDropdown(SortOptions);
+    const [sortbox, sortOption] = useDropdown({ options: SortOptions });
     const sortFn = SortFns[sortOption];
     const [searchbar, search] = useSearchbar();
     return (S.React.createElement("section", { className: "contentSpacing" },
