@@ -55,7 +55,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 
 	const { name, description, tags, authors, preview } = metadata;
 
-	// TODO: add css for these classes
 	const cardClasses = S.classnames("main-card-card", {
 		"marketplace-card--localOnly": localOnly,
 		"marketplace-card--outdated": !localOnly && outdated,
