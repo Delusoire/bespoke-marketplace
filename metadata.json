@@ -1,11 +1,11 @@
 {
 	"name": "spicetify-marketplace",
 	"tags": [],
-	"preview": "",
-	"version": "",
+	"preview": "./PREVIEW.png",
+	"version": "beta",
 	"authors": ["Delusoire"],
-	"description": "",
-	"readme": "",
+	"description": "The marketplace for bespoke modules.",
+	"readme": "./README.md",
 	"entries": {
 		"js": "src/index.js",
 		"css": "src/index.css",
