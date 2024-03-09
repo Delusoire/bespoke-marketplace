@@ -4,7 +4,7 @@ import TagsDiv from "./TagsDiv.js";
 import type { Metadata } from "/hooks/module.js";
 import { _ } from "/modules/Delusoire/std/deps.js";
 import { useModule } from "../../pages/Module.js";
-import Dropdown from "/modules/types/api/components/Dropdown.js";
+import Dropdown from "/modules/Delusoire/std/api/components/Dropdown.js";
 
 const History = S.Platform.getHistory();
 
@@ -15,7 +15,25 @@ interface UseMetaSelectorOpts {
 }
 
 const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOpts) => {
-	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, metaURL] as const)) as { [K in string]: K };
+	const prettifyMeta = (metaURL: string) => {
+		const moduleURL = metaURL.replace(/\/metadata\.json$/, "");
+		try {
+			const url = new URL(moduleURL);
+			switch (url.hostname) {
+				case "raw.githubusercontent.com": {
+					return `@github: ${url.pathname}`;
+				}
+			}
+		} catch (e) {
+			const match = moduleURL.match(/^\/modules(?<modulePath>\/.*)$/);
+			const { modulePath } = match.groups ?? {};
+			return `@local: ${modulePath}`;
+		}
+
+		return moduleURL;
+	};
+
+	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, prettifyMeta(metaURL)] as const)) as { [K in string]: K };
 
 	const dropdown = <Dropdown options={options} activeOption={metaURL} onSwitch={metaURL => setMetaURL(metaURL)} />;
 
@@ -40,25 +58,27 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 	// TODO: add css for these classes
 	const cardClasses = S.classnames("main-card-card", {
 		"marketplace-card--localOnly": localOnly,
-		"marketplace-card--outdated": outdated,
-		"marketplace-card--enabled": enabled,
-		"marketplace-card--installed": installed,
+		"marketplace-card--outdated": !localOnly && outdated,
+		"marketplace-card--enabled": !localOnly && !outdated && enabled,
+		"marketplace-card--disabled": !localOnly && !outdated && !enabled && installed,
 	});
 
+	const href = metaURL.startsWith("http") ? metaURL : null;
+
 	// TODO: add more important tags
-	const importantTags = [installed && "installed"].filter(Boolean);
+	const importantTags = [].filter(Boolean);
 
 	return (
-		<div
-			className={cardClasses}
-			onClick={() => {
-				History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
-			}}
-		>
+		<div className={cardClasses}>
 			<div className="main-card-draggable" draggable="true">
 				<div className="main-card-imageContainer">
 					<div className="main-cardImage-imageWrapper">
-						<div>
+						<div
+							onClick={() => {
+								History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
+							}}
+							style={{ pointerEvents: "all", cursor: "pointer" }}
+						>
 							<img
 								alt="ur blind haha *points finger*"
 								aria-hidden="false"
@@ -80,18 +100,28 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 					</div>
 				</div>
 				<div className="main-card-cardMetadata">
-					<a
-						draggable="false"
-						title={name}
-						className="main-cardHeader-link"
-						dir="auto"
-						href={metaURL}
-						target="_blank"
-						rel="noopener noreferrer"
-						onClick={e => e.stopPropagation()}
+					<div
+						style={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							flexDirection: "row",
+						}}
 					>
-						<div className="main-cardHeader-text main-type-balladBold">{name}</div>
-					</a>
+						<a
+							draggable="false"
+							title={name}
+							className="main-cardHeader-link"
+							dir="auto"
+							href={href}
+							target="_blank"
+							rel="noopener noreferrer"
+							onClick={e => e.stopPropagation()}
+						>
+							<div className="main-cardHeader-text main-type-balladBold">{name}</div>
+						</a>
+						{metaSelector}
+					</div>
 					<div className="main-cardSubHeader-root main-type-mestoBold marketplace-cardSubHeader">
 						<AuthorsDiv authors={authors} />
 					</div>
@@ -99,7 +129,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 					<div className="marketplace-card__bottom-meta main-type-mestoBold">
 						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />
 					</div>
-					{metaSelector}
 				</div>
 			</div>
 		</div>

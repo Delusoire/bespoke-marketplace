@@ -83,8 +83,9 @@ export const useMetas = (identifiersToMetadataLists) => {
 };
 const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 const mergeObjectsWithArraysConcatenated = (a, b) => _.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
-const SortOptions = { "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
+const SortOptions = { default: t("sort.default"), "a-z": t("sort.a-z"), "z-a": t("sort.z-a") };
 const SortFns = {
+    default: undefined,
     "a-z": (a, b) => (b.name > a.name ? 1 : a.name > b.name ? -1 : 0),
     "z-a": (a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0),
 };
@@ -116,7 +117,7 @@ export default function () {
                 const searchFiels = [...authors, name, ...tags];
                 return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
             })
-                .sort((a, b) => sortFn(a.metadata, b.metadata))
+                .sort((a, b) => sortFn?.(a.metadata, b.metadata))
                 .map(props => (S.React.createElement(ModuleCard, { key: props.identifier, ...props })))))));
 }
 const Searchbar = ({ value, onChange }) => {

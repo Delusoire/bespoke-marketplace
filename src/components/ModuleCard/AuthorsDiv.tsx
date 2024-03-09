@@ -10,7 +10,7 @@ export default function ({ authors }: AuthorsProps) {
 				<a
 					title={author}
 					className="marketplace-card__author"
-					href={author.url}
+					href={`https://github.com/${author}`}
 					draggable="false"
 					dir="auto"
 					target="_blank"

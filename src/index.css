@@ -1088,10 +1088,28 @@
   gap: 8px;
 }
 
-.marketplace-card--installed {
+.marketplace-card--localOnly {
   flex: 0 !important;
   -webkit-box-flex: 0 !important;
-  border: 1px solid var(--spice-button);
+  border: 1px solid var(--essential-announcement);
+}
+
+.marketplace-card--outdated {
+  flex: 0 !important;
+  -webkit-box-flex: 0 !important;
+  border: 1px solid var(--essential-warning);
+}
+
+.marketplace-card--enabled {
+  flex: 0 !important;
+  -webkit-box-flex: 0 !important;
+  border: 1px solid var(--essential-bright-accent);
+}
+
+.marketplace-card--disabled {
+  flex: 0 !important;
+  -webkit-box-flex: 0 !important;
+  border: 1px solid var(--essential-negative);
 }
 
 .marketplace-installButton {
