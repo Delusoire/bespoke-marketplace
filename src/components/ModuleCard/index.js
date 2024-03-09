@@ -37,6 +37,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
         "marketplace-card--disabled": !localOnly && !outdated && !enabled && installed,
     });
     const href = metaURL.startsWith("http") ? metaURL : null;
+    const previewHref = `${metaURL}/../${preview}`;
     // TODO: add more important tags
     const importantTags = [].filter(Boolean);
     return (S.React.createElement("div", { className: cardClasses },
@@ -46,7 +47,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
                     S.React.createElement("div", { onClick: () => {
                             History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
                         }, style: { pointerEvents: "all", cursor: "pointer" } },
-                        S.React.createElement("img", { alt: "ur blind haha *points finger*", "aria-hidden": "false", draggable: "false", loading: "lazy", src: preview, className: "mMx2LUixlnN_Fu45JpFB SKJSok3LfyedjZjujmFt", onError: e => {
+                        S.React.createElement("img", { alt: "ur blind haha *points finger*", "aria-hidden": "false", draggable: "false", loading: "lazy", src: previewHref, className: "mMx2LUixlnN_Fu45JpFB SKJSok3LfyedjZjujmFt", onError: e => {
                                 // https://png-pixel.com
                                 e.currentTarget.setAttribute("src", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII");
                                 e.currentTarget.closest(".g4PZpjkqEh5g7xDpCr2K")?.classList.add("main-cardImage-imageWrapper--error");

@@ -63,6 +63,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 	});
 
 	const href = metaURL.startsWith("http") ? metaURL : null;
+	const previewHref = `${metaURL}/../${preview}`;
 
 	// TODO: add more important tags
 	const importantTags = [].filter(Boolean);
@@ -83,7 +84,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 								aria-hidden="false"
 								draggable="false"
 								loading="lazy"
-								src={preview}
+								src={previewHref}
 								className="main-image-image main-cardImage-image"
 								onError={e => {
 									// https://png-pixel.com
