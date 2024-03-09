@@ -86,7 +86,7 @@ export default function ({ murl }: { murl: string }) {
 
 	const identifier = `${metadata.authors[0]}/${metadata.name}`;
 
-	// TODO: add visual indicators & toggles for enabled and outdated
+	// TODO: add visual indicator & toggle for enabled
 	const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
 
 	const readmeURL = `${murl}/../${metadata.readme}`;
