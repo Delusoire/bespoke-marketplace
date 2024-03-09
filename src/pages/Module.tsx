@@ -7,7 +7,7 @@ import TrashIcon from "../components/icons/TrashIcon.js";
 import { t } from "../i18n.js";
 import { renderMarkdown } from "../api/github.js";
 import { logger } from "../index.js";
-import { Metadata, Module, ModuleManager } from "/hooks/module.js";
+import { type Metadata, Module, ModuleManager } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import { fetchMetaURL } from "./Marketplace.js";
 
@@ -86,7 +86,7 @@ export default function ({ murl }: { murl: string }) {
 
 	const identifier = `${metadata.authors[0]}/${metadata.name}`;
 
-	// TODO: add visual indicators for these
+	// TODO: add visual indicators & toggles for enabled and outdated
 	const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
 
 	const readmeURL = `${murl}/../${metadata.readme}`;
@@ -107,7 +107,7 @@ export default function ({ murl }: { murl: string }) {
 								e.preventDefault();
 
 								// TODO: these are optimistic updates, they may cause de-sync
-								if (installed) {
+								if (installed && !outdated) {
 									module.dispose(true);
 									setModule(undefined);
 								} else {
