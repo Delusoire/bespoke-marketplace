@@ -91,7 +91,7 @@ export default function ({ murl }: { murl: string }) {
 
 	const readmeURL = `${murl}/../${metadata.readme}`;
 
-	const label = t(installed ? "remove" : "install");
+	const label = t(installed ? "pages.module.remove" : "pages.module.install");
 
 	return (
 		<section className="contentSpacing">

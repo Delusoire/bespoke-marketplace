@@ -12,7 +12,9 @@
 				}
 			},
 			"module": {
-				"title": "Module page"
+				"title": "Module page",
+				"install": "Install",
+				"remove": "Remove"
 			}
 		},
 		"sort": {

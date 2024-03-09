@@ -70,7 +70,7 @@ export default function ({ murl }) {
     // TODO: add visual indicator & toggle for enabled
     const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
     const readmeURL = `${murl}/../${metadata.readme}`;
-    const label = t(installed ? "remove" : "install");
+    const label = t(installed ? "pages.module.remove" : "pages.module.install");
     return (S.React.createElement("section", { className: "contentSpacing" },
         S.React.createElement("div", { className: "marketplace-header" },
             S.React.createElement("div", { className: "marketplace-header__left" },
