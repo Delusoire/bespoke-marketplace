@@ -1,5 +1,19 @@
 {
-	"Delusoire/std": ["https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/std/metadata.json"],
-	"Delusoire/sort-plus": ["https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/sort-plus/metadata.json"],
-	"Delusoire/search-on-youtube": ["https://raw.githubusercontent.com/Delusoire/bespoke/main/modules/Delusoire/search-on-youtube/metadata.json"]
+	"Delusoire/better-lyrics": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/better-lyrics/metadata.json"],
+	"Delusoire/delulib": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/delulib/metadata.json"],
+	"Delusoire/dexie-react-hooks": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/dexie-react-hooks/metadata.json"],
+	"Delusoire/filter-duplicates": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/filter-duplicates/metadata.json"],
+	"Delusoire/hazy-theme": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/hazy-theme/metadata.json"],
+	"Delusoire/keyboard-shortcuts": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/keyboard-shortcuts/metadata.json"],
+	"Delusoire/library-db": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/library-db/metadata.json"],
+	"Delusoire/playlist-labels": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/playlist-labels/metadata.json"],
+	"Delusoire/search-on-youtube": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/search-on-youtube/metadata.json"],
+	"Delusoire/show-the-genres": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/show-the-genres/metadata.json"],
+	"Delusoire/sort-plus": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/sort-plus/metadata.json"],
+	"Delusoire/marketplace": ["https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/metadata.json"],
+	"Delusoire/spoqify-radios": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/spoqify-radios/metadata.json"],
+	"Delusoire/star-ratings": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/star-ratings/metadata.json"],
+	"Delusoire/stats-app": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/stats-app/metadata.json"],
+	"Delusoire/std": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/std/metadata.json"],
+	"Delusoire/vaultify": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/vaultify/metadata.json"]
 }
