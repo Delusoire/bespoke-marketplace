@@ -30,7 +30,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
     const { installed, enabled, outdated, localOnly } = useModule(identifier);
     const metaSelector = useMetaSelector({ metaURL, setMetaURL, metaURLList });
     const { name, description, tags, authors, preview } = metadata;
-    // TODO: add css for these classes
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
         "marketplace-card--localOnly": localOnly,
         "marketplace-card--outdated": !localOnly && outdated,

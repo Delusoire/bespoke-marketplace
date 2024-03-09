@@ -3,7 +3,7 @@ const { React } = S;
 import { MAX_TAGS } from "../../static.js";
 import { t } from "../../i18n.js";
 const knownTags = {
-    [t("grid.archived")]: "archived",
+    [t("module.archived")]: "archived",
 };
 const Tag = (tag) => (S.React.createElement("li", { className: "marketplace-card__tag", draggable: false, "data-tag": knownTags[tag] }, tag));
 export default function ({ tags, importantTags, showTags }) {

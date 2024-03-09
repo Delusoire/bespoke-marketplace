@@ -97,7 +97,7 @@ export default function ({ murl }: { murl: string }) {
 		<section className="contentSpacing">
 			<div className="marketplace-header">
 				<div className="marketplace-header__left">
-					<h1>{t("readmePage.title")}</h1>
+					<h1>{t("pages.module.title")}</h1>
 				</div>
 				<div className="marketplace-header__right">
 					{!localOnly && (

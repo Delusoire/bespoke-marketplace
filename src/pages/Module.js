@@ -74,7 +74,7 @@ export default function ({ murl }) {
     return (S.React.createElement("section", { className: "contentSpacing" },
         S.React.createElement("div", { className: "marketplace-header" },
             S.React.createElement("div", { className: "marketplace-header__left" },
-                S.React.createElement("h1", null, t("readmePage.title"))),
+                S.React.createElement("h1", null, t("pages.module.title"))),
             S.React.createElement("div", { className: "marketplace-header__right" }, !localOnly && (S.React.createElement(Button, { className: "marketplace-header__button", onClick: e => {
                     e.preventDefault();
                     // TODO: these are optimistic updates, they may cause de-sync

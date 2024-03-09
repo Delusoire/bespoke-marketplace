@@ -137,7 +137,7 @@ export default function () {
 		<section className="contentSpacing">
 			<div className="marketplace-header">
 				<div className="marketplace-header__left">
-					<h2 className="marketplace-header__label">{t("grid.sort.label")}</h2>
+					<h2 className="marketplace-header__label">{t("pages.marketplace.sort.label")}</h2>
 					{sortbox}
 				</div>
 				<div className="marketplace-header__right">
@@ -170,7 +170,7 @@ const Searchbar = ({ value, onChange }) => {
 			<input
 				className="searchbar-bar"
 				type="text"
-				placeholder={`${t("grid.search")} ${t("tabs.modules")}...`}
+				placeholder={`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`}
 				value={value}
 				onChange={event => {
 					onChange(event.target.value);

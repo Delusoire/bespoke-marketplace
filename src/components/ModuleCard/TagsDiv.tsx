@@ -5,7 +5,7 @@ import { MAX_TAGS } from "../../static.js";
 import { t } from "../../i18n.js";
 
 const knownTags = {
-	[t("grid.archived")]: "archived",
+	[t("module.archived")]: "archived",
 };
 
 const Tag = (tag: string) => (

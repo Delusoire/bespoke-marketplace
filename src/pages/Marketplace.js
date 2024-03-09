@@ -104,7 +104,7 @@ export default function () {
     return (S.React.createElement("section", { className: "contentSpacing" },
         S.React.createElement("div", { className: "marketplace-header" },
             S.React.createElement("div", { className: "marketplace-header__left" },
-                S.React.createElement("h2", { className: "marketplace-header__label" }, t("grid.sort.label")),
+                S.React.createElement("h2", { className: "marketplace-header__label" }, t("pages.marketplace.sort.label")),
                 sortbox),
             S.React.createElement("div", { className: "marketplace-header__right" },
                 searchbar,
@@ -122,7 +122,7 @@ export default function () {
 }
 const Searchbar = ({ value, onChange }) => {
     return (S.React.createElement("div", { className: "searchbar--bar__wrapper" },
-        S.React.createElement("input", { className: "searchbar-bar", type: "text", placeholder: `${t("grid.search")} ${t("tabs.modules")}...`, value: value, onChange: event => {
+        S.React.createElement("input", { className: "searchbar-bar", type: "text", placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`, value: value, onChange: event => {
                 onChange(event.target.value);
             } })));
 };

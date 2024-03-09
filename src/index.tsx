@@ -2,7 +2,7 @@ import { S, createStorage, createRegistrar, createLogger } from "/modules/Deluso
 import { createSettings } from "/modules/Delusoire/std/api/settings.js";
 
 import { NavLink } from "/modules/Delusoire/std/registers/navlink.js";
-import { Module } from "/hooks/module.js";
+import type { Module } from "/hooks/module.js";
 import type { Settings } from "/modules/Delusoire/std/api/settings.js";
 import { ACTIVE_ICON, ICON } from "./static.js";
 
