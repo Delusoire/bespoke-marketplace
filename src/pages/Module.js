@@ -71,6 +71,7 @@ export default function ({ murl }) {
     const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
     const readmeURL = `${murl}/../${metadata.readme}`;
     const label = t(installed ? "pages.module.remove" : "pages.module.install");
+    const installedAndUpdated = installed && !outdated;
     return (S.React.createElement("section", { className: "contentSpacing" },
         S.React.createElement("div", { className: "marketplace-header" },
             S.React.createElement("div", { className: "marketplace-header__left" },
@@ -78,7 +79,7 @@ export default function ({ murl }) {
             S.React.createElement("div", { className: "marketplace-header__right" }, !localOnly && (S.React.createElement(Button, { className: "marketplace-header__button", onClick: e => {
                     e.preventDefault();
                     // TODO: these are optimistic updates, they may cause de-sync
-                    if (installed && !outdated) {
+                    if (installedAndUpdated) {
                         module.dispose(true);
                         setModule(undefined);
                     }
@@ -88,7 +89,7 @@ export default function ({ murl }) {
                         setModule(module);
                     }
                 }, label: label },
-                installed ? S.React.createElement(TrashIcon, null) : S.React.createElement(DownloadIcon, null),
+                installedAndUpdated ? S.React.createElement(TrashIcon, null) : S.React.createElement(DownloadIcon, null),
                 " ",
                 label)))),
         S.React.createElement(RemoteMarkdown, { url: readmeURL })));

@@ -93,6 +93,8 @@ export default function ({ murl }: { murl: string }) {
 
 	const label = t(installed ? "pages.module.remove" : "pages.module.install");
 
+	const installedAndUpdated = installed && !outdated;
+
 	return (
 		<section className="contentSpacing">
 			<div className="marketplace-header">
@@ -107,7 +109,7 @@ export default function ({ murl }: { murl: string }) {
 								e.preventDefault();
 
 								// TODO: these are optimistic updates, they may cause de-sync
-								if (installed && !outdated) {
+								if (installedAndUpdated) {
 									module.dispose(true);
 									setModule(undefined);
 								} else {
@@ -118,7 +120,7 @@ export default function ({ murl }: { murl: string }) {
 							}}
 							label={label}
 						>
-							{installed ? <TrashIcon /> : <DownloadIcon />} {label}
+							{installedAndUpdated ? <TrashIcon /> : <DownloadIcon />} {label}
 						</Button>
 					)}
 				</div>
