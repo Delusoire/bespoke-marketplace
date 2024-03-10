@@ -26,11 +26,13 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
             metaURL,
             prettifyMeta(metaURL)
         ]));
-    const dropdown = /*#__PURE__*/ S.React.createElement(Dropdown, {
+    const dropdown = /*#__PURE__*/ S.React.createElement("div", {
+        className: "min-w-fit"
+    }, /*#__PURE__*/ S.React.createElement(Dropdown, {
         options: options,
         activeOption: metaURL,
         onSwitch: (metaURL)=>setMetaURL(metaURL)
-    });
+    }));
     return dropdown;
 };
 export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }) {

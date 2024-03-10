@@ -35,7 +35,11 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOp
 
 	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, prettifyMeta(metaURL)] as const)) as { [K in string]: K };
 
-	const dropdown = <Dropdown options={options} activeOption={metaURL} onSwitch={metaURL => setMetaURL(metaURL)} />;
+	const dropdown = (
+		<div className="min-w-fit">
+			<Dropdown options={options} activeOption={metaURL} onSwitch={metaURL => setMetaURL(metaURL)} />
+		</div>
+	);
 
 	return dropdown;
 };
