@@ -1,5 +1,5 @@
 import { S } from "/modules/Delusoire/std/index.js";
-const { React } = S;
+const { React, ReactDOM } = S;
 import Button from "../components/Button/index.js";
 import DownloadIcon from "../components/icons/DownloadIcon.js";
 import LoadingIcon from "../components/icons/LoadingIcon.js";
@@ -10,6 +10,33 @@ import { logger } from "../index.js";
 import { type Metadata, Module, ModuleManager } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import { fetchMetaURL } from "./Marketplace.js";
+
+const ShadowContent = ({ root, children }) => ReactDOM.createPortal(children, root);
+
+interface ShowRootProps {
+	mode: "open" | "closed";
+	delegatesFocus: boolean;
+	styleSheets: CSSStyleSheet[];
+}
+const ShadowRoot = ({ mode, delegatesFocus, styleSheets, children }) => {
+	const node = React.useRef<HTMLDivElement>(null);
+	const [root, setRoot] = React.useState<ShadowRoot>(null);
+
+	React.useLayoutEffect(() => {
+		if (node.current) {
+			const root = node.current.attachShadow({
+				mode,
+				delegatesFocus,
+			});
+			if (styleSheets.length > 0) {
+				root.adoptedStyleSheets = styleSheets;
+			}
+			setRoot(root);
+		}
+	}, [node, styleSheets]);
+
+	return <div ref={node}>{root && <ShadowContent root={root}>{children}</ShadowContent>}</div>;
+};
 
 const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 	const {
@@ -24,6 +51,8 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 				.then(markdown => renderMarkdown(markdown)),
 	});
 
+	const fixRelativeImports = (markdown: string) => markdown.replace(/(src|href)="\.\//g, `$1="${url}/../`);
+
 	switch (status) {
 		case "pending": {
 			return (
@@ -33,7 +62,12 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 			);
 		}
 		case "success": {
-			return <div id="marketplace-readme" className="marketplace-readme__container" dangerouslySetInnerHTML={{ __html: markdown }} />;
+			return (
+				<ShadowRoot mode="open" delegatesFocus={true} styleSheets={[]}>
+					<style>@import "https://cdn.jsdelivr.xyz/npm/water.css@2/out/water.css";</style>
+					<div id="marketplace-readme" className="marketplace-readme__container" dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }} />
+				</ShadowRoot>
+			);
 		}
 		case "error": {
 			logger.error(error);

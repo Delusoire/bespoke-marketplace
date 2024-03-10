@@ -1,5 +1,3 @@
-@use "../static.scss";
-
 .marketplace-header {
     -webkit-box-pack: justify;
     -webkit-box-align: center;
@@ -11,13 +9,13 @@
     justify-content: space-between;
     padding-bottom: 8px;
 
-    // To position the settings button + colour schemes
+    /* To position the settings button + colour schemes */
     position: sticky;
     flex-direction: row;
     top: 64px;
     z-index: 1;
 
-    // Fix positioning on readme pages
+    /* Fix positioning on readme pages */
     .contentSpacing:has(#marketplace-readme) & {
         top: 0;
     }
@@ -58,7 +56,7 @@
     display: inline-block;
     pointer-events: auto;
 
-    // Fixes the tab bar alignment going weird when the "more" dropdown menu appears
+    /* Fixes the tab bar alignment going weird when the "more" dropdown menu appears */
     vertical-align: middle;
 }
 
@@ -101,7 +99,7 @@
 }
 
 .marketplace-header-icon-button {
-    border-radius: static.$btn-radius;
+    border-radius: 8px;
     color: var(--spice-text);
     display: inline-block;
     padding: 10px 14px 6px;
@@ -112,7 +110,7 @@
     background-color: transparent;
     border: none;
     background-color: var(--spice-sidebar);
-    transition-duration: static.$transition-default;
+    transition-duration: 200ms;
 
     &:hover {
         background-color: var(--spice-button-disabled);
@@ -124,7 +122,7 @@
     margin-right: 16px;
 }
 
-// Search bar
+/* Search bar */
 .searchbar--bar__wrapper {
     display: flex;
     flex-direction: column;
@@ -135,7 +133,7 @@
     border-style: solid;
     border-color: var(--spice-sidebar);
     background-color: var(--spice-sidebar) !important;
-    border-radius: static.$btn-radius;
+    border-radius: 8px;
     padding: 10px 12px;
     color: var(--spice-text) !important;
 }
@@ -143,12 +141,4 @@
 .marketplace-footer {
     margin: auto;
     text-align: center;
-}
-
-// "Add CSS" button
-.marketplace-add-snippet-btn {
-    position: -webkit-sticky;
-    position: sticky !important;
-    bottom: 32px;
-    left: 100%;
 }

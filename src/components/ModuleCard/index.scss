@@ -1,4 +1,4 @@
-// e.g. "Extensions" heading
+/* e.g. "Extensions" heading */
 .marketplace-card-type-heading {
     margin: 1em 0 0.5em;
     color: var(--spice-subtext);
@@ -20,7 +20,7 @@
             }
 
             .marketplace-card__author {
-                // Add comma before authors that have a sibling
+                /* Add comma before authors that have a sibling */
                 & ~ .marketplace-card__author {
                     &::before {
                         content: ", ";
@@ -66,7 +66,7 @@
                 margin-top: auto;
                 margin-bottom: 0;
 
-                // Add space between multiple blurbs
+                /* Add space between multiple blurbs */
                 & + .marketplace-card__bottom-meta {
                     margin-top: 8px;
                 }
@@ -75,7 +75,7 @@
     }
 }
 
-// Card preview image error placeholder
+/* Card preview image error placeholder */
 .main-cardImage-imageWrapper--error::before {
     content: "";
     display: block;
@@ -115,7 +115,7 @@
     color: var(--spice-subtext);
 }
 
-// author, stars, etc.
+/* author, stars, etc. */
 .marketplace-cardSubHeader {
     display: flex;
     flex-direction: column;

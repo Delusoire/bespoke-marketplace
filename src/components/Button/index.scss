@@ -1,4 +1,4 @@
-// This was taken from the Spotify styles for the button on the change profile pic modal
+/* This was taken from the Spotify styles for the button on the change profile pic modal */
 
 .spicetify-marketplace-button {
     box-sizing: border-box;
@@ -32,7 +32,7 @@
         letter-spacing: normal;
     }
 
-    // From the inner div...
+    /* From the inner div... */
     position: relative;
     background-color: var(--spice-text);
     color: var(--spice-main);
