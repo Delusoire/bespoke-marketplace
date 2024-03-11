@@ -54,7 +54,7 @@ interface ModuleCardProps {
 }
 
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
-	const { installed, enabled, outdated, localOnly } = useModule(identifier);
+	const { module, installed, enabled, updateEnabled, outdated, localOnly } = useModule(identifier);
 	const metaSelector = useMetaSelector({ metaURL, setMetaURL, metaURLList });
 
 	const { name, description, tags, authors, preview } = metadata;
@@ -71,6 +71,19 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 
 	// TODO: add more important tags
 	const importantTags = [].filter(Boolean);
+
+	<S.ReactComponents.SettingToggle
+		className="x-settings-button"
+		value={enabled}
+		onSelected={(checked: boolean) => {
+			if (checked) {
+				module.enable();
+			} else {
+				module.disable();
+			}
+			updateEnabled();
+		}}
+	/>;
 
 	return (
 		<div className={cardClasses}>
@@ -108,7 +121,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						style={{
 							display: "flex",
 							alignItems: "center",
-							justifyContent: "space-between",
+							// justifyContent: "space-between",
 							flexDirection: "row",
 						}}
 					>
