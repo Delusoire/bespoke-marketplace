@@ -72,19 +72,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 	// TODO: add more important tags
 	const importantTags = [].filter(Boolean);
 
-	<S.ReactComponents.SettingToggle
-		className="x-settings-button"
-		value={enabled}
-		onSelected={(checked: boolean) => {
-			if (checked) {
-				module.enable();
-			} else {
-				module.disable();
-			}
-			updateEnabled();
-		}}
-	/>;
-
 	return (
 		<div className={cardClasses}>
 			<div className="main-card-draggable" draggable="true">
@@ -121,7 +108,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						style={{
 							display: "flex",
 							alignItems: "center",
-							// justifyContent: "space-between",
 							flexDirection: "row",
 						}}
 					>
@@ -142,6 +128,20 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 					<div className="main-cardSubHeader-root main-type-mestoBold marketplace-cardSubHeader">
 						<AuthorsDiv authors={authors} />
 					</div>
+					{installed && (
+						<S.ReactComponents.SettingToggle
+							className="x-settings-button"
+							value={enabled}
+							onSelected={(checked: boolean) => {
+								if (checked) {
+									module.enable();
+								} else {
+									module.disable();
+								}
+								updateEnabled();
+							}}
+						/>
+					)}
 					<p className="marketplace-card-desc">{description}</p>
 					<div className="marketplace-card__bottom-meta main-type-mestoBold">
 						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />

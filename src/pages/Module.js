@@ -72,17 +72,29 @@ const RemoteMarkdown = React.memo(({ url })=>{
             }
     }
 });
+const useUpdate = (updater)=>{
+    const [state, setState] = React.useState(updater);
+    const update = React.useCallback(()=>setState(updater), [
+        updater
+    ]);
+    React.useEffect(update, [
+        update
+    ]);
+    return [
+        state,
+        update
+    ];
+};
 export const useModule = (identifier)=>{
-    const updateModule = ()=>Module.registry.get(identifier);
-    const [module, setModule] = React.useState(updateModule);
-    React.useEffect(()=>{
-        const module = updateModule();
-        setModule(module);
-    }, [
+    const moduleUpdater = React.useCallback(()=>Module.registry.get(identifier), [
         identifier
     ]);
+    const [module, updateModule] = useUpdate(moduleUpdater);
+    const enabledUpdater = React.useCallback(()=>installed && module.isEnabled(), [
+        module
+    ]);
     const installed = module !== undefined;
-    const enabled = installed && module.isEnabled();
+    const [enabled, updateEnabled] = useUpdate(enabledUpdater);
     const [outdated, setOutdated] = React.useState(false);
     const localOnly = installed && module.remoteMetadataURL === undefined;
     React.useEffect(()=>{
@@ -106,9 +118,10 @@ export const useModule = (identifier)=>{
     ]);
     return {
         module,
-        setModule,
+        updateModule,
         installed,
         enabled,
+        updateEnabled,
         outdated,
         localOnly
     };
@@ -123,7 +136,7 @@ export default function({ murl }) {
     });
     const identifier = `${metadata.authors[0]}/${metadata.name}`;
     // TODO: add visual indicator & toggle for enabled
-    const { module, setModule, installed, enabled, outdated, localOnly } = useModule(identifier);
+    const { module, updateModule, installed, enabled, outdated, localOnly } = useModule(identifier);
     const readmeURL = `${murl}/../${metadata.readme}`;
     const label = t(installed ? "pages.module.remove" : "pages.module.install");
     const installedAndUpdated = installed && !outdated;
@@ -142,11 +155,11 @@ export default function({ murl }) {
             // TODO: these are optimistic updates, they may cause de-sync
             if (installedAndUpdated) {
                 module.dispose(true);
-                setModule(undefined);
+                updateModule();
             } else {
                 ModuleManager.add(murl);
-                const module = new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
-                setModule(module);
+                new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
+                updateModule();
             }
         },
         label: label

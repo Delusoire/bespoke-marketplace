@@ -36,7 +36,7 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
     return dropdown;
 };
 export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }) {
-    const { installed, enabled, outdated, localOnly } = useModule(identifier);
+    const { module, installed, enabled, updateEnabled, outdated, localOnly } = useModule(identifier);
     const metaSelector = useMetaSelector({
         metaURL,
         setMetaURL,
@@ -88,7 +88,6 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         style: {
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
             flexDirection: "row"
         }
     }, /*#__PURE__*/ S.React.createElement("a", {
@@ -106,7 +105,18 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         className: "Za_uNH8nTZ0qCuIqbPLZ main-type-mestoBold marketplace-cardSubHeader"
     }, /*#__PURE__*/ S.React.createElement(AuthorsDiv, {
         authors: authors
-    })), /*#__PURE__*/ S.React.createElement("p", {
+    })), installed && /*#__PURE__*/ S.React.createElement(S.ReactComponents.SettingToggle, {
+        className: "rFFJg1UIumqUUFDgo6n7",
+        value: enabled,
+        onSelected: (checked)=>{
+            if (checked) {
+                module.enable();
+            } else {
+                module.disable();
+            }
+            updateEnabled();
+        }
+    }), /*#__PURE__*/ S.React.createElement("p", {
         className: "marketplace-card-desc"
     }, description), /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-card__bottom-meta main-type-mestoBold"
