@@ -19,3 +19,8 @@
     --column-count: auto-fill;
     --grid-gap: 24px;
 }
+
+.main-gridContainer-fixedWidth {
+    grid-template-columns: repeat(auto-fill, var(--column-width));
+    width: calc((var(--column-count) - 1) * var(--grid-gap) + var(--column-count) * var(--column-width));
+}
