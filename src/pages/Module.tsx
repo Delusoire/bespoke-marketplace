@@ -66,7 +66,7 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 			return (
 				<ShadowRoot mode="open" delegatesFocus={true} styleSheets={[]}>
 					<style>@import "https://cdn.jsdelivr.xyz/npm/water.css@2/out/water.css";</style>
-					<div id="marketplace-readme" className="select-text" dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }} />
+					<div id="module-readme" className="select-text" dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }} />
 				</ShadowRoot>
 			);
 		}

@@ -8,7 +8,7 @@
     position: sticky;
 
     /* Fix positioning on readme pages */
-    .contentSpacing:has(#marketplace-readme) & {
+    .contentSpacing:has(#module-readme) & {
         top: 0;
     }
 }

@@ -58,7 +58,7 @@ const RemoteMarkdown = React.memo(({ url })=>{
                     delegatesFocus: true,
                     styleSheets: []
                 }, /*#__PURE__*/ S.React.createElement("style", null, '@import "https://cdn.jsdelivr.xyz/npm/water.css@2/out/water.css";'), /*#__PURE__*/ S.React.createElement("div", {
-                    id: "marketplace-readme",
+                    id: "module-readme",
                     className: "select-text",
                     dangerouslySetInnerHTML: {
                         __html: fixRelativeImports(markdown)

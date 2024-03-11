@@ -9,7 +9,7 @@
 }
 
     /* Fix positioning on readme pages */
-    .contentSpacing:has(#marketplace-readme) .marketplace-header {
+    .contentSpacing:has(#module-readme) .marketplace-header {
         top: 0;
     }
 
@@ -20,7 +20,7 @@
     --grid-gap: 24px;
 }
 
-#marketplace-readme {
+#module-readme {
     --background-body: var(--spice-main);
     --background: var(--spice-main);
     --background-alt: var(--spice-shadow);
@@ -43,7 +43,7 @@
 
 /* === Custom tweaks to water.css ===*/
 
-#marketplace-readme code {
+#module-readme code {
         /*  TODO: I added this myself to try and make the code blocks look presentable*/
         /* since I don't havea good background colour*/
         border: 1px solid var(--spice-button-disabled);
@@ -51,44 +51,44 @@
 
 /* Add some basic styling (Spotify has it removed)*/
 
-#marketplace-readme ul,
-    #marketplace-readme li {
+#module-readme ul,
+    #module-readme li {
         list-style-position: inside;
     }
 
-#marketplace-readme ul li, #marketplace-readme li li {
+#module-readme ul li, #module-readme li li {
             margin-bottom: 8px;
         }
 
-#marketplace-readme ul {
+#module-readme ul {
         list-style-type: disc;
     }
 
-#marketplace-readme ol {
+#module-readme ol {
         list-style-type: auto;
     }
 
 /* Add some basic margin*/
 
-#marketplace-readme p,
-    #marketplace-readme pre,
-    #marketplace-readme code {
+#module-readme p,
+    #module-readme pre,
+    #module-readme code {
         margin: 8px 0;
     }
 
 /* Make single-line code blocks not trail offscreen*/
 
-#marketplace-readme pre {
+#module-readme pre {
         overflow-x: auto;
     }
 
-#marketplace-readme table {
+#module-readme table {
         /* Stop install directions "platform/path" stuff from doing the widths equally all the time*/
         table-layout: auto;
     }
 
-#marketplace-readme table th,
-        #marketplace-readme table td {
+#module-readme table th,
+        #module-readme table td {
             /* Add borders to table cells*/
             border: 1px solid var(--spice-button-disabled);
         }
@@ -160,14 +160,6 @@
         cursor: not-allowed;
     }
 
-/* e.g. "Extensions" heading */
-
-.marketplace-card-type-heading {
-    margin: 1em 0 0.5em;
-    color: var(--spice-subtext);
-    font-size: 1.3em;
-}
-
 /* Add comma before authors that have a sibling */
 
 .marketplace-card__author ~ .marketplace-card__author::before {
@@ -209,11 +201,6 @@
 
 .LunqxlFIupJw_Dkx6mNx:hover .main-cardImage-imageWrapper--error::before {
     filter: brightness(100%);
-}
-
-.marketplace-installButton {
-    cursor: pointer;
-    --size: 40px;
 }
 
 /*! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com*/
@@ -903,10 +890,6 @@ video {
 .py-2 {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-}
-
-.\!pb-0 {
-    padding-bottom: 0px !important;
 }
 
 .pb-1 {
