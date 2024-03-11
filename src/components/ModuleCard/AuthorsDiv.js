@@ -1,7 +1,7 @@
 import { S } from "/modules/Delusoire/std/index.js";
 export default function({ authors }) {
     return /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-card__authors"
+        className: ""
     }, authors.map((author, index)=>/*#__PURE__*/ S.React.createElement("a", {
             title: author,
             className: "marketplace-card__author",

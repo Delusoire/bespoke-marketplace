@@ -60,10 +60,11 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 	const { name, description, tags, authors, preview } = metadata;
 
 	const cardClasses = S.classnames("main-card-card", {
-		"marketplace-card--localOnly": localOnly,
-		"marketplace-card--outdated": !localOnly && outdated,
-		"marketplace-card--enabled": !localOnly && !outdated && enabled,
-		"marketplace-card--disabled": !localOnly && !outdated && !enabled && installed,
+		"border border-solid": installed,
+		"border-[var(--essential-announcement)]": localOnly,
+		"border-[var(--essential-warning)]": !localOnly && outdated,
+		"border-[var(--essential-bright-accent)]": !localOnly && !outdated && enabled,
+		"border-[var(--essential-negative)]": !localOnly && !outdated && !enabled && installed,
 	});
 
 	const href = metaURL.startsWith("http") ? metaURL : null;
@@ -74,8 +75,8 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 
 	return (
 		<div className={cardClasses}>
-			<div className="main-card-draggable" draggable="true">
-				<div className="main-card-imageContainer">
+			<div className="flex flex-col" draggable="true">
+				<div>
 					<div className="main-cardImage-imageWrapper">
 						<div
 							onClick={() => {
@@ -84,12 +85,12 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 							style={{ pointerEvents: "all", cursor: "pointer" }}
 						>
 							<img
-								alt="ur blind haha *points finger*"
+								alt=""
 								aria-hidden="false"
 								draggable="false"
 								loading="lazy"
 								src={previewHref}
-								className="main-image-image main-cardImage-image"
+								className="main-cardImage-image"
 								onError={e => {
 									// https://png-pixel.com
 									e.currentTarget.setAttribute(
@@ -103,7 +104,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						</div>
 					</div>
 				</div>
-				<div className="main-card-cardMetadata">
+				<div className="flex-grow flex flex-col">
 					<div
 						style={{
 							display: "flex",
@@ -114,18 +115,18 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						<a
 							draggable="false"
 							title={name}
-							className="main-cardHeader-link"
+							className="hover:underline"
 							dir="auto"
 							href={href}
 							target="_blank"
 							rel="noopener noreferrer"
 							onClick={e => e.stopPropagation()}
 						>
-							<div className="main-cardHeader-text main-type-balladBold">{name}</div>
+							<div className="main-type-balladBold">{name}</div>
 						</a>
 						{metaSelector}
 					</div>
-					<div className="main-cardSubHeader-root main-type-mestoBold marketplace-cardSubHeader">
+					<div className="main-type-mestoBold mt-1 whitespace-normal color-[var(--spice-subtext)] flex flex-col gap-2">
 						<AuthorsDiv authors={authors} />
 					</div>
 					{installed && (
@@ -142,8 +143,8 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 							}}
 						/>
 					)}
-					<p className="marketplace-card-desc">{description}</p>
-					<div className="marketplace-card__bottom-meta main-type-mestoBold">
+					<p className="text-sm my-3 mx-0 overflow-hidden line-clamp-3">{description}</p>
+					<div className="text-[var(--spice-subtext)] whitespace-normal main-type-mestoBold mt-auto mb-0 ">
 						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />
 					</div>
 				</div>

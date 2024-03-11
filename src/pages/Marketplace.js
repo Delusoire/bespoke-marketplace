@@ -131,13 +131,13 @@ export default function() {
     return /*#__PURE__*/ S.React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header"
+        className: "marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10"
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header__left"
+        className: "marketplace-header__left flex gap-2"
     }, /*#__PURE__*/ S.React.createElement("h2", {
-        className: "marketplace-header__label"
+        className: "inline-flex self-center"
     }, t("pages.marketplace.sort.label")), sortbox), /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header__right"
+        className: "marketplace-header__right flex gap-2"
     }, searchbar, settingsButton)), /*#__PURE__*/ S.React.createElement(S.React.Fragment, null, /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd"
     }, propsList.filter((props)=>{
@@ -156,9 +156,9 @@ export default function() {
 }
 const Searchbar = ({ value, onChange })=>{
     return /*#__PURE__*/ S.React.createElement("div", {
-        className: "searchbar--bar__wrapper"
+        className: "flex flex-col flex-grow items-end"
     }, /*#__PURE__*/ S.React.createElement("input", {
-        className: "searchbar-bar",
+        className: "!bg-[var(--backdrop)] border-[var(--spice-sidebar)] !text-[var(--spice-text)] border-solid h-8 py-2 px-3 rounded-lg",
         type: "text",
         placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`,
         value: value,

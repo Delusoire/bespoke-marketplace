@@ -5,72 +5,11 @@
     font-size: 1.3em;
 }
 
-.marketplace-grid {
-    .main-card-draggable {
-        display: flex;
-        flex-direction: column;
-
-        .main-card-cardMetadata {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-
-            .main-cardHeader-link:hover {
-                text-decoration: underline;
-            }
-
-            .marketplace-card__author {
-                /* Add comma before authors that have a sibling */
-                & ~ .marketplace-card__author {
-                    &::before {
-                        content: ", ";
-                    }
-                }
-            }
-
-            ul.marketplace-card__tags {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            li.marketplace-card__tag {
-                background-color: var(--spice-tab-active);
-                border-radius: 4px;
-                padding: 0px 9px 2px;
-            }
-
-            .marketplace-card__tags-more-btn {
-                background-color: var(--spice-tab-active);
-                border-radius: 4px;
-                padding: 0px 9px 2px;
-                margin-top: 8px;
-                border: none;
-
-                &:hover,
-                &:focus {
-                    filter: brightness(1.4);
-                }
-            }
-
-            .marketplace-card-desc {
-                font: -webkit-small-control;
-                margin: 12px 0;
-                display: -webkit-box;
-                overflow: hidden;
-                -webkit-box-orient: vertical;
-                -webkit-line-clamp: 3;
-            }
-
-            .marketplace-card__bottom-meta {
-                margin-top: auto;
-                margin-bottom: 0;
-
-                /* Add space between multiple blurbs */
-                & + .marketplace-card__bottom-meta {
-                    margin-top: 8px;
-                }
-            }
+.marketplace-card__author {
+    /* Add comma before authors that have a sibling */
+    & ~ .marketplace-card__author {
+        &::before {
+            content: ", ";
         }
     }
 }
@@ -106,48 +45,6 @@
 
 .main-card-card:hover .main-cardImage-imageWrapper--error::before {
     filter: brightness(100%);
-}
-
-.marketplace-cardSubHeader,
-.marketplace-card__bottom-meta {
-    margin-top: 4px;
-    white-space: normal;
-    color: var(--spice-subtext);
-}
-
-/* author, stars, etc. */
-.marketplace-cardSubHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.marketplace-card--localOnly {
-    flex: 0 !important;
-    -webkit-box-flex: 0 !important;
-
-    border: 1px solid var(--essential-announcement);
-}
-
-.marketplace-card--outdated {
-    flex: 0 !important;
-    -webkit-box-flex: 0 !important;
-
-    border: 1px solid var(--essential-warning);
-}
-
-.marketplace-card--enabled {
-    flex: 0 !important;
-    -webkit-box-flex: 0 !important;
-
-    border: 1px solid var(--essential-bright-accent);
-}
-
-.marketplace-card--disabled {
-    flex: 0 !important;
-    -webkit-box-flex: 0 !important;
-
-    border: 1px solid var(--essential-negative);
 }
 
 .marketplace-installButton {

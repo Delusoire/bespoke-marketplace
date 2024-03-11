@@ -1,7 +1,7 @@
 import { S } from "/modules/Delusoire/std/index.js";
 export default function({ onClick, className, label = "", type = "round", children, disabled = false }) {
     const btnClass = S.classnames("spicetify-marketplace-button", {
-        "spicetify-marketplace-circle": type === "circle"
+        "[&_svg]:absolute [&_svg]:top-1/2 [&_svg]:left-1/2 [&_svg]:-translate-y-1/2 [&_svg]:-translate-x-1/2 ps-4 pe-4 w-12 h-12": type === "circle"
     }, className);
     return /*#__PURE__*/ S.React.createElement("button", {
         className: btnClass,

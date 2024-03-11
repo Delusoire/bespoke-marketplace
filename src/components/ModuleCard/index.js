@@ -44,10 +44,11 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
     });
     const { name, description, tags, authors, preview } = metadata;
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
-        "marketplace-card--localOnly": localOnly,
-        "marketplace-card--outdated": !localOnly && outdated,
-        "marketplace-card--enabled": !localOnly && !outdated && enabled,
-        "marketplace-card--disabled": !localOnly && !outdated && !enabled && installed
+        "border border-solid": installed,
+        "border-[var(--essential-announcement)]": localOnly,
+        "border-[var(--essential-warning)]": !localOnly && outdated,
+        "border-[var(--essential-bright-accent)]": !localOnly && !outdated && enabled,
+        "border-[var(--essential-negative)]": !localOnly && !outdated && !enabled && installed
     });
     const href = metaURL.startsWith("http") ? metaURL : null;
     const previewHref = `${metaURL}/../${preview}`;
@@ -56,11 +57,9 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
     return /*#__PURE__*/ S.React.createElement("div", {
         className: cardClasses
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "XiVwj5uoqqSFpS4cYOC6",
+        className: "flex flex-col",
         draggable: "true"
-    }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "xBV4XgMq0gC5lQICFWY_"
-    }, /*#__PURE__*/ S.React.createElement("div", {
+    }, /*#__PURE__*/ S.React.createElement("div", null, /*#__PURE__*/ S.React.createElement("div", {
         className: "g4PZpjkqEh5g7xDpCr2K"
     }, /*#__PURE__*/ S.React.createElement("div", {
         onClick: ()=>{
@@ -71,19 +70,19 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
             cursor: "pointer"
         }
     }, /*#__PURE__*/ S.React.createElement("img", {
-        alt: "ur blind haha *points finger*",
+        alt: "",
         "aria-hidden": "false",
         draggable: "false",
         loading: "lazy",
         src: previewHref,
-        className: "mMx2LUixlnN_Fu45JpFB SKJSok3LfyedjZjujmFt",
+        className: "SKJSok3LfyedjZjujmFt",
         onError: (e)=>{
             // https://png-pixel.com
             e.currentTarget.setAttribute("src", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII");
             e.currentTarget.closest(".g4PZpjkqEh5g7xDpCr2K")?.classList.add("main-cardImage-imageWrapper--error");
         }
     })))), /*#__PURE__*/ S.React.createElement("div", {
-        className: "E1N1ByPFWo4AJLHovIBQ"
+        className: "flex-grow flex flex-col"
     }, /*#__PURE__*/ S.React.createElement("div", {
         style: {
             display: "flex",
@@ -93,16 +92,16 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
     }, /*#__PURE__*/ S.React.createElement("a", {
         draggable: "false",
         title: name,
-        className: "Nqa6Cw3RkDMV8QnYreTr",
+        className: "hover:underline",
         dir: "auto",
         href: href,
         target: "_blank",
         rel: "noopener noreferrer",
         onClick: (e)=>e.stopPropagation()
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "nk6UgB4GUYNoAcPtAQaG main-type-balladBold"
+        className: "main-type-balladBold"
     }, name)), metaSelector), /*#__PURE__*/ S.React.createElement("div", {
-        className: "Za_uNH8nTZ0qCuIqbPLZ main-type-mestoBold marketplace-cardSubHeader"
+        className: "main-type-mestoBold mt-1 whitespace-normal color-[var(--spice-subtext)] flex flex-col gap-2"
     }, /*#__PURE__*/ S.React.createElement(AuthorsDiv, {
         authors: authors
     })), installed && /*#__PURE__*/ S.React.createElement(S.ReactComponents.SettingToggle, {
@@ -117,9 +116,9 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
             updateEnabled();
         }
     }), /*#__PURE__*/ S.React.createElement("p", {
-        className: "marketplace-card-desc"
+        className: "text-sm my-3 mx-0 overflow-hidden line-clamp-3"
     }, description), /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-card__bottom-meta main-type-mestoBold"
+        className: "text-[var(--spice-subtext)] whitespace-normal main-type-mestoBold mt-auto mb-0 "
     }, /*#__PURE__*/ S.React.createElement(TagsDiv, {
         tags: tags,
         showTags: showTags,

@@ -6,7 +6,7 @@ const knownTags = {
     [t("module.archived")]: "archived"
 };
 const Tag = (tag)=>/*#__PURE__*/ S.React.createElement("li", {
-        className: "marketplace-card__tag",
+        className: "bg-[var(--spice-tab-active)] rounded pt-0 pb-1 px-2",
         draggable: false,
         "data-tag": knownTags[tag]
     }, tag);
@@ -22,11 +22,11 @@ export default function({ tags, importantTags, showTags }) {
         extraTags = baseTags.splice(MAX_TAGS);
     }
     return /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-card__tags-container"
+        className: ""
     }, /*#__PURE__*/ S.React.createElement("ul", {
-        className: "marketplace-card__tags"
+        className: "flex flex-wrap gap-2"
     }, baseTags.map(Tag), expanded && extraTags.map(Tag)), !expanded && extraTags.length > 0 && /*#__PURE__*/ S.React.createElement("button", {
-        className: "marketplace-card__tags-more-btn",
+        className: "bg-[var(--spice-tab-active)] rounded pt-0 pb-1 px-2 mt-2 border-none hover:brightness-150 focus:brightness-150",
         onClick: (e)=>{
             e.stopPropagation();
             setExpanded(true);

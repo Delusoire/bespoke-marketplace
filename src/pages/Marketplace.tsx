@@ -135,12 +135,12 @@ export default function () {
 
 	return (
 		<section className="contentSpacing">
-			<div className="marketplace-header">
-				<div className="marketplace-header__left">
-					<h2 className="marketplace-header__label">{t("pages.marketplace.sort.label")}</h2>
+			<div className="marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10">
+				<div className="marketplace-header__left flex gap-2">
+					<h2 className="inline-flex self-center">{t("pages.marketplace.sort.label")}</h2>
 					{sortbox}
 				</div>
-				<div className="marketplace-header__right">
+				<div className="marketplace-header__right flex gap-2">
 					{searchbar}
 					{settingsButton}
 				</div>
@@ -166,9 +166,9 @@ export default function () {
 
 const Searchbar = ({ value, onChange }) => {
 	return (
-		<div className="searchbar--bar__wrapper">
+		<div className="flex flex-col flex-grow items-end">
 			<input
-				className="searchbar-bar"
+				className="!bg-[var(--backdrop)] border-[var(--spice-sidebar)] !text-[var(--spice-text)] border-solid h-8 py-2 px-3 rounded-lg"
 				type="text"
 				placeholder={`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`}
 				value={value}

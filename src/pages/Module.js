@@ -48,7 +48,7 @@ const RemoteMarkdown = React.memo(({ url })=>{
         case "pending":
             {
                 return /*#__PURE__*/ S.React.createElement("footer", {
-                    className: "marketplace-footer"
+                    className: "m-auto text-center"
                 }, /*#__PURE__*/ S.React.createElement(LoadingIcon, null));
             }
         case "success":
@@ -59,7 +59,7 @@ const RemoteMarkdown = React.memo(({ url })=>{
                     styleSheets: []
                 }, /*#__PURE__*/ S.React.createElement("style", null, '@import "https://cdn.jsdelivr.xyz/npm/water.css@2/out/water.css";'), /*#__PURE__*/ S.React.createElement("div", {
                     id: "marketplace-readme",
-                    className: "marketplace-readme__container",
+                    className: "select-text",
                     dangerouslySetInnerHTML: {
                         __html: fixRelativeImports(markdown)
                     }
@@ -143,13 +143,12 @@ export default function({ murl }) {
     return /*#__PURE__*/ S.React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header"
+        className: "marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10"
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header__left"
+        className: "marketplace-header__left flex gap-2"
     }, /*#__PURE__*/ S.React.createElement("h1", null, t("pages.module.title"))), /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header__right"
+        className: "marketplace-header__right flex gap-2"
     }, !localOnly && /*#__PURE__*/ S.React.createElement(Button, {
-        className: "marketplace-header__button",
         onClick: (e)=>{
             e.preventDefault();
             // TODO: these are optimistic updates, they may cause de-sync

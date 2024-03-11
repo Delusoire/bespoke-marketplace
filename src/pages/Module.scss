@@ -1,80 +1,22 @@
-/* Readme pages */
-
-/* (This is just for reference)*/
-.spicetify-root-vars {
-    --spice-shadow: #1f1525;
-    --spice-text: #ffffff;
-    --spice-sidebar: #0a0e14;
-    --spice-button-disabled: #535353;
-    --spice-main: #0a0e14;
-    --spice-misc: #bfbfbf;
-    --spice-selected-row: #909090;
-    --spice-subtext: #f0f0f0;
-    --spice-tab-active: #795b84;
-    --spice-button: #6f3c89;
-    --spice-notification: #6f3c89;
-    --spice-player: #0a0e14;
-    --spice-notification-error: #e22134;
-    --spice-card: #6f3c89;
-    --spice-button-active: #795b84;
-}
-
-:root {
-    /* --background-body: #202b38; */
-    --background-body: var(--spice-main);
-
-    /* TODO: what do i use for this? nothing seems suitable*/
-    /* --background: #161f27;*/
-    /* --background: rgba(var(--spice-main), 0.5);*/
-    /* --background: var(--spice-shadow);*/
-    --background: var(--spice-main);
-
-    /* TODO: idk if this is a good colour choice*/
-    /* --background-alt: #1a242f;*/
-    --background-alt: var(--spice-shadow);
-
-    --selection: #1c76c5;
-
-    /* --text-main: #dbdbdb;*/
-    --text-main: var(--spice-subtext);
-
-    /* --text-bright: #fff;*/
-    --text-bright: var(--spice-text);
-
-    --text-muted: #a9b1ba;
-
-    --links: #41adff;
-
-    --focus: #0096bfab;
-
-    --border: #526980;
-
-    --code: #ffbe85;
-
-    --animation-duration: 0.1s;
-
-    --button-base: #0c151c;
-
-    --button-hover: #040a0f;
-
-    --scrollbar-thumb: var(--button-hover);
-
-    --scrollbar-thumb-hover: rgb(0, 0, 0);
-
-    --form-placeholder: #a9a9a9;
-
-    --form-text: #fff;
-
-    --variable: #d941e2;
-
-    --highlight: #efdb43;
-
-    --select-arrow: url("data:image/svg+xml;charset=utf-8,%3C?xml version='1.0' encoding='utf-8'?%3E %3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' height='62.5' width='116.9' fill='%23efefef'%3E %3Cpath d='M115.3,1.6 C113.7,0 111.1,0 109.5,1.6 L58.5,52.7 L7.4,1.6 C5.8,0 3.2,0 1.6,1.6 C0,3.2 0,5.8 1.6,7.4 L55.5,61.3 C56.3,62.1 57.3,62.5 58.4,62.5 C59.4,62.5 60.5,62.1 61.3,61.3 L115.2,7.4 C116.9,5.8 116.9,3.2 115.3,1.6Z'/%3E %3C/svg%3E");
-}
-
 #marketplace-readme {
-    /* Allow selecting text*/
-    user-select: text;
+    --background-body: var(--spice-main);
+    --background: var(--spice-main);
+    --background-alt: var(--spice-shadow);
+    --selection: #1c76c5;
+    --text-main: var(--spice-subtext);
+    --text-bright: var(--spice-text);
+    --text-muted: #a9b1ba;
+    --links: #41adff;
+    --border: #526980;
+    --code: #ffbe85;
+    --button-base: #0c151c;
+    --button-hover: #040a0f;
+    --scrollbar-thumb: var(--button-hover);
+    --scrollbar-thumb-hover: rgb(0, 0, 0);
+    --form-placeholder: #a9a9a9;
+    --form-text: #fff;
+    --variable: #d941e2;
+    --highlight: #efdb43;
 
     /* === Custom tweaks to water.css ===*/
     code {

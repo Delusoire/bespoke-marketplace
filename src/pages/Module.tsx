@@ -13,12 +13,13 @@ import { fetchMetaURL } from "./Marketplace.js";
 
 const ShadowContent = ({ root, children }) => ReactDOM.createPortal(children, root);
 
-interface ShowRootProps {
+interface ShadowRootProps {
 	mode: "open" | "closed";
 	delegatesFocus: boolean;
 	styleSheets: CSSStyleSheet[];
+	children: React.ReactNode;
 }
-const ShadowRoot = ({ mode, delegatesFocus, styleSheets, children }) => {
+const ShadowRoot = ({ mode, delegatesFocus, styleSheets, children }: ShadowRootProps) => {
 	const node = React.useRef<HTMLDivElement>(null);
 	const [root, setRoot] = React.useState<ShadowRoot>(null);
 
@@ -56,7 +57,7 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 	switch (status) {
 		case "pending": {
 			return (
-				<footer className="marketplace-footer">
+				<footer className="m-auto text-center">
 					<LoadingIcon />
 				</footer>
 			);
@@ -65,7 +66,7 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 			return (
 				<ShadowRoot mode="open" delegatesFocus={true} styleSheets={[]}>
 					<style>@import "https://cdn.jsdelivr.xyz/npm/water.css@2/out/water.css";</style>
-					<div id="marketplace-readme" className="marketplace-readme__container" dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }} />
+					<div id="marketplace-readme" className="select-text" dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }} />
 				</ShadowRoot>
 			);
 		}
@@ -136,14 +137,13 @@ export default function ({ murl }: { murl: string }) {
 
 	return (
 		<section className="contentSpacing">
-			<div className="marketplace-header">
-				<div className="marketplace-header__left">
+			<div className="marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10">
+				<div className="marketplace-header__left flex gap-2">
 					<h1>{t("pages.module.title")}</h1>
 				</div>
-				<div className="marketplace-header__right">
+				<div className="marketplace-header__right flex gap-2">
 					{!localOnly && (
 						<Button
-							className="marketplace-header__button"
 							onClick={e => {
 								e.preventDefault();
 

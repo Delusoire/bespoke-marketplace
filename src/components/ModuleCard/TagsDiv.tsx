@@ -9,7 +9,7 @@ const knownTags = {
 };
 
 const Tag = (tag: string) => (
-	<li className="marketplace-card__tag" draggable={false} data-tag={knownTags[tag]}>
+	<li className="bg-[var(--spice-tab-active)] rounded pt-0 pb-1 px-2" draggable={false} data-tag={knownTags[tag]}>
 		{tag}
 	</li>
 );
@@ -31,14 +31,14 @@ export default function ({ tags, importantTags, showTags }: TagsDivProps) {
 	}
 
 	return (
-		<div className="marketplace-card__tags-container">
-			<ul className="marketplace-card__tags">
+		<div className="">
+			<ul className="flex flex-wrap gap-2">
 				{baseTags.map(Tag)}
 				{expanded && extraTags.map(Tag)}
 			</ul>
 			{!expanded && extraTags.length > 0 && (
 				<button
-					className="marketplace-card__tags-more-btn"
+					className="bg-[var(--spice-tab-active)] rounded pt-0 pb-1 px-2 mt-2 border-none hover:brightness-150 focus:brightness-150"
 					onClick={e => {
 						e.stopPropagation();
 						setExpanded(true);

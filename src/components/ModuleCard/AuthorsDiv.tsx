@@ -5,7 +5,7 @@ interface AuthorsProps {
 }
 export default function ({ authors }: AuthorsProps) {
 	return (
-		<div className="marketplace-card__authors">
+		<div className="">
 			{authors.map((author, index) => (
 				<a
 					title={author}
