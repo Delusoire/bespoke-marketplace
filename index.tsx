@@ -1,9 +1,9 @@
-import { S, createStorage, createRegistrar, createLogger } from "/modules/Delusoire/std/index.js";
-import { createSettings } from "/modules/Delusoire/std/lib/settings.js";
+import { S, createStorage, createRegistrar, createLogger } from "/modules/Delusoire/stdlib/index.js";
+import { createSettings } from "/modules/Delusoire/stdlib/lib/settings.js";
 
-import { NavLink } from "/modules/Delusoire/std/src/registers/navlink.js";
+import { NavLink } from "/modules/Delusoire/stdlib/src/registers/navlink.js";
 import type { Module } from "/hooks/module.js";
-import type { Settings } from "/modules/Delusoire/std/lib/settings.js";
+import type { Settings } from "/modules/Delusoire/stdlib/lib/settings.js";
 import { ACTIVE_ICON, ICON } from "./src/static.js";
 
 export let storage: Storage = undefined;

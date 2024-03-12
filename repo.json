@@ -10,10 +10,10 @@
 	"Delusoire/search-on-youtube": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/search-on-youtube/metadata.json"],
 	"Delusoire/show-the-genres": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/show-the-genres/metadata.json"],
 	"Delusoire/sort-plus": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/sort-plus/metadata.json"],
-	"Delusoire/marketplace": ["https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/metadata.json"],
+	"Delusoire/marketplace": ["https://raw.githubusercontent.com/Delusoire/bespoke-marketplace/main/metadata.json"],
 	"Delusoire/spoqify-radios": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/spoqify-radios/metadata.json"],
 	"Delusoire/star-ratings": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/star-ratings/metadata.json"],
 	"Delusoire/stats-app": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/stats-app/metadata.json"],
-	"Delusoire/std": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/std/metadata.json"],
+	"Delusoire/stdlib": ["https://raw.githubusercontent.com/Delusoire/bespoke-stdlib/main/metadata.json"],
 	"Delusoire/vaultify": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/vaultify/metadata.json"]
 }

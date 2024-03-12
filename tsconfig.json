@@ -18,5 +18,5 @@
             ]
         }
     },
-    "references": [{ "path": "../../../modules/Delusoire/std/" }]
+    "references": [{ "path": "../../../modules/Delusoire/stdlib/" }]
 }

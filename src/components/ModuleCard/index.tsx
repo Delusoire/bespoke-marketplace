@@ -1,10 +1,10 @@
-import { S } from "/modules/Delusoire/std/index.js";
+import { S } from "/modules/Delusoire/stdlib/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import type { Metadata } from "/hooks/module.js";
-import { _ } from "/modules/Delusoire/std/deps.js";
+import { _ } from "/modules/Delusoire/stdlib/deps.js";
 import { useModule } from "../../pages/Module.js";
-import Dropdown from "/modules/Delusoire/std/lib/components/Dropdown.js";
+import Dropdown from "/modules/Delusoire/stdlib/lib/components/Dropdown.js";
 
 const History = S.Platform.getHistory();
 
