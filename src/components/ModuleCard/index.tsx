@@ -63,8 +63,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 		"border border-solid": installed,
 		"border-[var(--essential-announcement)]": localOnly,
 		"border-[var(--essential-warning)]": !localOnly && outdated,
-		"border-[var(--essential-bright-accent)]": !localOnly && !outdated && enabled,
-		"border-[var(--essential-negative)]": !localOnly && !outdated && !enabled && installed,
 	});
 
 	const href = metaURL.startsWith("http") ? metaURL : null;

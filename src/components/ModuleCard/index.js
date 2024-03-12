@@ -46,9 +46,7 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
         "border border-solid": installed,
         "border-[var(--essential-announcement)]": localOnly,
-        "border-[var(--essential-warning)]": !localOnly && outdated,
-        "border-[var(--essential-bright-accent)]": !localOnly && !outdated && enabled,
-        "border-[var(--essential-negative)]": !localOnly && !outdated && !enabled && installed
+        "border-[var(--essential-warning)]": !localOnly && outdated
     });
     const href = metaURL.startsWith("http") ? metaURL : null;
     const previewHref = `${metaURL}/../${preview}`;
