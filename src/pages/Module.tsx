@@ -6,7 +6,7 @@ import LoadingIcon from "../components/icons/LoadingIcon.js";
 import TrashIcon from "../components/icons/TrashIcon.js";
 import { t } from "../i18n.js";
 import { renderMarkdown } from "../api/github.js";
-import { logger } from "../index.js";
+import { logger } from "../../index.js";
 import { type Metadata, Module, ModuleManager } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import { fetchMetaURL } from "./Marketplace.js";

@@ -7,8 +7,8 @@
 	"description": "The marketplace for bespoke modules.",
 	"readme": "./README.md",
 	"entries": {
-		"js": "src/index.js",
-		"css": "src/index.css",
+		"js": "index.js",
+		"css": "src/app.css",
 		"mixin": false
 	},
 	"dependencies": ["Delusoire/std", "Delusoire/delulib"]

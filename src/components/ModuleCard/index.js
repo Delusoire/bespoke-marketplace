@@ -2,7 +2,7 @@ import { S } from "/modules/Delusoire/std/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import { useModule } from "../../pages/Module.js";
-import Dropdown from "/modules/Delusoire/std/api/components/Dropdown.js";
+import Dropdown from "/modules/Delusoire/std/lib/components/Dropdown.js";
 const History = S.Platform.getHistory();
 const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
     const prettifyMeta = (metaURL)=>{

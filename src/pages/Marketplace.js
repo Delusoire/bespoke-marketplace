@@ -5,8 +5,8 @@ import { t } from "../i18n.js";
 import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
-import { settingsButton } from "../index.js";
-import { useDropdown } from "/modules/Delusoire/std/api/components/index.js";
+import { settingsButton } from "../../index.js";
+import { useDropdown } from "/modules/Delusoire/std/lib/components/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL)=>cachedMetaURLs.get(metaURL);
 export const fetchMetaURL = async (metaURL)=>{
