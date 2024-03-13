@@ -362,14 +362,6 @@
     border-color: var(--essential-announcement);
 }
 
-.border-\[var\(--essential-bright-accent\)\] {
-    border-color: var(--essential-bright-accent);
-}
-
-.border-\[var\(--essential-negative\)\] {
-    border-color: var(--essential-negative);
-}
-
 .border-\[var\(--essential-warning\)\] {
     border-color: var(--essential-warning);
 }
