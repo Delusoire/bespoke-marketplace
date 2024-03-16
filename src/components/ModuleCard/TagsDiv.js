@@ -24,7 +24,7 @@ export default function({ tags, importantTags, showTags }) {
     return /*#__PURE__*/ S.React.createElement("div", {
         className: ""
     }, /*#__PURE__*/ S.React.createElement("ul", {
-        className: "flex flex-wrap gap-2"
+        className: "flex flex-wrap gap-2 text-sm"
     }, baseTags.map(Tag), expanded && extraTags.map(Tag)), !expanded && extraTags.length > 0 && /*#__PURE__*/ S.React.createElement("button", {
         className: "bg-[var(--spice-tab-active)] rounded pt-0 pb-1 px-2 mt-2 border-none hover:brightness-150 focus:brightness-150",
         onClick: (e)=>{

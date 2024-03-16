@@ -231,25 +231,12 @@
     margin-right: 0px;
 }
 
-.my-3 {
-    margin-top: 0.75rem;
-    margin-bottom: 0.75rem;
-}
-
-.mb-0 {
-    margin-bottom: 0px;
-}
-
-.mt-1 {
-    margin-top: 0.25rem;
+.mb-auto {
+    margin-bottom: auto;
 }
 
 .mt-2 {
     margin-top: 0.5rem;
-}
-
-.mt-auto {
-    margin-top: auto;
 }
 
 .line-clamp-3 {
@@ -273,6 +260,10 @@
 
 .h-8 {
     height: 2rem;
+}
+
+.h-full {
+    height: 100%;
 }
 
 .w-12 {
@@ -316,6 +307,10 @@
 
 .items-center {
     align-items: center;
+}
+
+.justify-end {
+    justify-content: flex-end;
 }
 
 .justify-between {
@@ -376,6 +371,10 @@
 
 .bg-\[var\(--spice-tab-active\)\] {
     background-color: var(--spice-tab-active);
+}
+
+.fill-current {
+    fill: currentColor;
 }
 
 .px-2 {

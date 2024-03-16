@@ -32,7 +32,7 @@ export default function ({ tags, importantTags, showTags }: TagsDivProps) {
 
 	return (
 		<div className="">
-			<ul className="flex flex-wrap gap-2">
+			<ul className="flex flex-wrap gap-2 text-sm">
 				{baseTags.map(Tag)}
 				{expanded && extraTags.map(Tag)}
 			</ul>
