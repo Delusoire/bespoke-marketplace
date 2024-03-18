@@ -1,29 +1,45 @@
 import { S } from "/modules/Delusoire/stdlib/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
+import { startCase } from "/modules/Delusoire/stdlib/deps.js";
 import { useModule } from "../../pages/Module.js";
 import Dropdown from "/modules/Delusoire/stdlib/lib/components/Dropdown.js";
 const History = S.Platform.getHistory();
 const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
-    const prettifyMeta = (metaURL)=>{
+    const parseMeta = (metaURL)=>{
         const moduleURL = metaURL.replace(/\/metadata\.json$/, "");
+        {
+            const match = moduleURL.match(/^\/modules(?<modulePath>\/.*)$/);
+            if (match) {
+                const { modulePath } = match.groups ?? {};
+                return {
+                    type: "local",
+                    path: modulePath
+                };
+            }
+        }
         try {
             const url = new URL(moduleURL);
             switch(url.hostname){
                 case "raw.githubusercontent.com":
                     {
-                        // return `@github: ${url.pathname}`;
-                        return `@github`;
+                        return {
+                            type: "github",
+                            path: url.pathname
+                        };
                     }
             }
-        } catch (e) {
-            // const match = moduleURL.match(/^\/modules(?<modulePath>\/.*)$/);
-            // const { modulePath } = match.groups ?? {};
-            // return `@local: ${modulePath}`;
-            return `@local`;
-        }
-        return moduleURL;
+        } catch (_) {}
+        return {
+            type: "unknown",
+            path: moduleURL
+        };
     };
+    const prettifyMeta = (metaURL, short = true)=>{
+        const { type, path } = parseMeta(metaURL);
+        return `@${type}${short ? "" : ` ${path}`}`;
+    };
+    // TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop
     const options = Object.fromEntries(metaURLList.map((metaURL)=>[
             metaURL,
             prettifyMeta(metaURL)
@@ -38,8 +54,7 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
     }));
     return dropdown;
 };
-function fallbackImage() {
-    return /*#__PURE__*/ S.React.createElement("svg", {
+const fallbackImage = ()=>/*#__PURE__*/ S.React.createElement("svg", {
         "data-encore-id": "icon",
         role: "img",
         "aria-hidden": "true",
@@ -53,10 +68,6 @@ function fallbackImage() {
     }, /*#__PURE__*/ S.React.createElement("path", {
         d: "M20.929,1.628A1,1,0,0,0,20,1H4a1,1,0,0,0-.929.628l-2,5A1.012,1.012,0,0,0,1,7V22a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V7a1.012,1.012,0,0,0-.071-.372ZM4.677,3H19.323l1.2,3H3.477ZM3,21V8H21V21Zm8-3a1,1,0,0,1-1,1H6a1,1,0,0,1,0-2h4A1,1,0,0,1,11,18Z"
     }));
-}
-function titleise(name) {
-    return name.split("-").map((word)=>word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-}
 export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }) {
     const { module, installed, enabled, updateEnabled, outdated, localOnly } = useModule(identifier);
     const metaSelector = useMetaSelector({
@@ -66,6 +77,7 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
     });
     const { name, description, tags, authors, preview } = metadata;
     const cardClasses = S.classnames("LunqxlFIupJw_Dkx6mNx", {
+        "border-[var(--essential-warning)]": !localOnly && outdated
     });
     const href = metaURL.startsWith("http") ? metaURL : null;
     const previewHref = `${metaURL}/../${preview}`;
@@ -105,7 +117,7 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         onClick: (e)=>e.stopPropagation()
     }, /*#__PURE__*/ S.React.createElement("div", {
         className: "main-type-balladBold"
-    }, titleise(name))), /*#__PURE__*/ S.React.createElement("div", {
+    }, startCase(name))), /*#__PURE__*/ S.React.createElement("div", {
         className: "text-sm mx-0 whitespace-normal color-[var(--spice-subtext)] flex flex-col gap-2"
     }, /*#__PURE__*/ S.React.createElement(AuthorsDiv, {
         authors: authors

@@ -304,20 +304,12 @@
     border-radius: 0.5rem;
 }
 
-.border {
-    border-width: 1px;
-}
-
 .border-solid {
     border-style: solid;
 }
 
 .border-none {
     border-style: none;
-}
-
-.border-\[var\(--essential-announcement\)\] {
-    border-color: var(--essential-announcement);
 }
 
 .border-\[var\(--essential-warning\)\] {
