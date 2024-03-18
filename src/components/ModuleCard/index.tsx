@@ -2,7 +2,7 @@ import { S } from "/modules/Delusoire/stdlib/index.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
 import type { Metadata } from "/hooks/module.js";
-import { _ } from "/modules/Delusoire/stdlib/deps.js";
+import { _, startCase } from "/modules/Delusoire/stdlib/deps.js";
 import { useModule } from "../../pages/Module.js";
 import Dropdown from "/modules/Delusoire/stdlib/lib/components/Dropdown.js";
 
@@ -15,25 +15,35 @@ interface UseMetaSelectorOpts {
 }
 
 const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOpts) => {
-	const prettifyMeta = (metaURL: string) => {
+	const parseMeta = (metaURL: string) => {
 		const moduleURL = metaURL.replace(/\/metadata\.json$/, "");
+		{
+			const match = moduleURL.match(/^\/modules(?<modulePath>\/.*)$/);
+			if (match) {
+				const { modulePath } = match.groups ?? {};
+				return { type: "local", path: modulePath };
+			}
+		}
 		try {
 			const url = new URL(moduleURL);
 			switch (url.hostname) {
 				case "raw.githubusercontent.com": {
-					return `@github: ${url.pathname}`;
+					return { type: "github", path: url.pathname };
 				}
 			}
-		} catch (e) {
-			const match = moduleURL.match(/^\/modules(?<modulePath>\/.*)$/);
-			const { modulePath } = match.groups ?? {};
-			return `@local: ${modulePath}`;
-		}
+		} catch (_) {}
 
-		return moduleURL;
+		return { type: "unknown", path: moduleURL };
 	};
 
+	const prettifyMeta = (metaURL: string, short = true) => {
+		const { type, path } = parseMeta(metaURL);
+		return `@${type}${short ? "" : ` ${path}`}`;
+	};
+
+	// TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop
 	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, prettifyMeta(metaURL)] as const)) as { [K in string]: K };
+	console.log(options);
 
 	const dropdown = (
 		<div className="min-w-fit">
@@ -53,6 +63,20 @@ interface ModuleCardProps {
 	showTags: boolean;
 }
 
+const fallbackImage = () => (
+	<svg
+		data-encore-id="icon"
+		role="img"
+		aria-hidden="true"
+		data-testid="card-image-fallback"
+		viewBox="0 0 24 24"
+		class="fill-current"
+		style={{ width: "64px", height: "64px" }}
+	>
+		<path d="M20.929,1.628A1,1,0,0,0,20,1H4a1,1,0,0,0-.929.628l-2,5A1.012,1.012,0,0,0,1,7V22a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V7a1.012,1.012,0,0,0-.071-.372ZM4.677,3H19.323l1.2,3H3.477ZM3,21V8H21V21Zm8-3a1,1,0,0,1-1,1H6a1,1,0,0,1,0-2h4A1,1,0,0,1,11,18Z" />
+	</svg>
+);
+
 export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
 	const { module, installed, enabled, updateEnabled, outdated, localOnly } = useModule(identifier);
 	const metaSelector = useMetaSelector({ metaURL, setMetaURL, metaURLList });
@@ -60,8 +84,6 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 	const { name, description, tags, authors, preview } = metadata;
 
 	const cardClasses = S.classnames("main-card-card", {
-		"border border-solid": installed,
-		"border-[var(--essential-announcement)]": localOnly,
 		"border-[var(--essential-warning)]": !localOnly && outdated,
 	});
 
@@ -73,77 +95,51 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 
 	return (
 		<div className={cardClasses}>
-			<div className="flex flex-col" draggable="true">
-				<div>
-					<div className="main-cardImage-imageWrapper">
-						<div
-							onClick={() => {
-								History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
-							}}
-							style={{ pointerEvents: "all", cursor: "pointer" }}
-						>
-							<img
-								alt=""
-								aria-hidden="false"
-								draggable="false"
-								loading="lazy"
-								src={previewHref}
-								className="main-cardImage-image"
-								onError={e => {
-									// https://png-pixel.com
-									e.currentTarget.setAttribute(
-										"src",
-										"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII",
-									);
-
-									e.currentTarget.closest(".main-cardImage-imageWrapper")?.classList.add("main-cardImage-imageWrapper--error");
-								}}
-							/>
-						</div>
-					</div>
+			<div className="flex flex-col h-full" draggable="true">
+				<div
+					onClick={() => {
+						History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
+					}}
+					style={{ pointerEvents: "all", cursor: "pointer", marginBottom: "16px" }}
+				>
+					<S.ReactComponents.Cards.CardImage images={[{ url: previewHref }]} FallbackComponent={fallbackImage} />
 				</div>
-				<div className="flex-grow flex flex-col">
-					<div
-						style={{
-							display: "flex",
-							alignItems: "center",
-							flexDirection: "row",
-						}}
+				<div className="flex flex-col gap-2 flex-grow">
+					<a
+						draggable="false"
+						title={name}
+						className="hover:underline"
+						dir="auto"
+						href={href}
+						target="_blank"
+						rel="noopener noreferrer"
+						onClick={e => e.stopPropagation()}
 					>
-						<a
-							draggable="false"
-							title={name}
-							className="hover:underline"
-							dir="auto"
-							href={href}
-							target="_blank"
-							rel="noopener noreferrer"
-							onClick={e => e.stopPropagation()}
-						>
-							<div className="main-type-balladBold">{name}</div>
-						</a>
-						{metaSelector}
-					</div>
-					<div className="main-type-mestoBold mt-1 whitespace-normal color-[var(--spice-subtext)] flex flex-col gap-2">
+						<div className="main-type-balladBold">{startCase(name)}</div>
+					</a>
+					<div className="text-sm mx-0 whitespace-normal color-[var(--spice-subtext)] flex flex-col gap-2">
 						<AuthorsDiv authors={authors} />
 					</div>
-					{installed && (
-						<S.ReactComponents.SettingToggle
-							className="x-settings-button"
-							value={enabled}
-							onSelected={(checked: boolean) => {
-								if (checked) {
-									module.enable();
-								} else {
-									module.disable();
-								}
-								updateEnabled();
-							}}
-						/>
-					)}
-					<p className="text-sm my-3 mx-0 overflow-hidden line-clamp-3">{description}</p>
-					<div className="text-[var(--spice-subtext)] whitespace-normal main-type-mestoBold mt-auto mb-0 ">
+					<p className="text-sm mx-0 overflow-hidden line-clamp-3 mb-auto">{description || "No description for this package"}</p>
+					<div className="text-[var(--spice-subtext)] whitespace-normal main-type-mestoBold">
 						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />
+					</div>
+					<div className="flex justify-between">
+						{metaSelector}
+						{installed && (
+							<S.ReactComponents.SettingToggle
+								className="x-settings-button justify-end"
+								value={enabled}
+								onSelected={(checked: boolean) => {
+									if (checked) {
+										module.enable();
+									} else {
+										module.disable();
+									}
+									updateEnabled();
+								}}
+							/>
+						)}
 					</div>
 				</div>
 			</div>
