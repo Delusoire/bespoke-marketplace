@@ -5,18 +5,17 @@
         "paths": {
             "/*": ["./*"],
             "https://esm.sh/v135/*": [
-                "modules/Delusoire/spicetify-marketplace/node_modules/@types/*",
-                "modules/Delusoire/spicetify-marketplace/node_modules/*",
+                "modules/Delusoire/marketplace/node_modules/@types/*",
+                "modules/Delusoire/marketplace/node_modules/*",
                 "node_modules/@types/*",
                 "node_modules/*"
             ],
             "https://esm.sh/*": [
-                "modules/Delusoire/spicetify-marketplace/node_modules/@types/*",
-                "modules/Delusoire/spicetify-marketplace/node_modules/*",
+                "modules/Delusoire/marketplace/node_modules/@types/*",
+                "modules/Delusoire/marketplace/node_modules/*",
                 "node_modules/@types/*",
                 "node_modules/*"
             ]
         }
-    },
-    "references": [{ "path": "../../../modules/Delusoire/stdlib/" }]
+    }
 }

@@ -91,9 +91,9 @@ export const useMetas = (identifiersToMetadataLists)=>{
 const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 const mergeObjectsWithArraysConcatenated = (a, b)=>_.mergeWith(a, b, (objValue, srcValue)=>_.isArray(objValue) ? objValue.concat(srcValue) : undefined);
 const SortOptions = {
-    default: t("sort.default"),
-    "a-z": t("sort.a-z"),
-    "z-a": t("sort.z-a")
+    default: ()=>t("sort.default"),
+    "a-z": ()=>t("sort.a-z"),
+    "z-a": ()=>t("sort.z-a")
 };
 const SortFns = {
     default: undefined,
