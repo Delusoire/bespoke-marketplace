@@ -104,19 +104,18 @@ const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.github
 const mergeObjectsWithArraysConcatenated = (a, b) =>
 	_.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
-const SortOptions = { default: () => t("sort.default"), "a-z": () => t("sort.a-z"), "z-a": () => t("sort.z-a") } as const;
+const SortOptions = { default: () => t("sort.default"), "a-z": () => t("sort.a-z"), "z-a": () => t("sort.z-a"), random: () => t("sort.random") };
 const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => number | boolean> = {
 	default: undefined,
 	"a-z": (a, b) => (b.name > a.name ? 1 : a.name > b.name ? -1 : 0),
 	"z-a": (a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0),
+	random: () => Math.random() - 0.5,
 };
 
 const filters = {
-	extensions: { "": t("Extensions") },
-	themes: {
-		"": t("Themes"),
-		random: { "": t("Random") },
-	},
+	"": undefined,
+	extensions: { "": t("filter.extensions") },
+	themes: { "": t("filter.themes") },
 };
 
 const filterFNs = {
@@ -124,7 +123,6 @@ const filterFNs = {
 	extensions: { "": mod => mod.metadata.tags.includes("extension") },
 	themes: {
 		"": mod => mod.metadata.tags.includes("theme"),
-		random: { "": () => Math.round(Math.random()) },
 	},
 };
 

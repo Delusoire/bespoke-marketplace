@@ -4,7 +4,7 @@ import TagsDiv from "./TagsDiv.js";
 import type { Metadata } from "/hooks/module.js";
 import { _, startCase } from "/modules/Delusoire/stdlib/deps.js";
 import { useModule } from "../../pages/Module.js";
-import Dropdown, { OptionProps } from "/modules/Delusoire/stdlib/lib/components/Dropdown.js";
+import Dropdown, { type OptionProps } from "/modules/Delusoire/stdlib/lib/components/Dropdown.js";
 
 const History = S.Platform.getHistory();
 
@@ -38,7 +38,11 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOp
 
 	const prettifyMeta = (metaURL: string, short = true) => {
 		const { type, path } = parseMeta(metaURL);
-		return `@${type}${short ? "" : `: ${path}`}`;
+		if (short) {
+			return `@${type}`;
+		}
+
+		return <S.ReactComponents.ScrollableText title="abc">{`@${type}: ${path}`}</S.ReactComponents.ScrollableText>;
 	};
 
 	// TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop

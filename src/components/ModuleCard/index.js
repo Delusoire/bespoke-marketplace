@@ -37,7 +37,12 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
     };
     const prettifyMeta = (metaURL, short = true)=>{
         const { type, path } = parseMeta(metaURL);
-        return `@${type}${short ? "" : `: ${path}`}`;
+        if (short) {
+            return `@${type}`;
+        }
+        return /*#__PURE__*/ S.React.createElement(S.ReactComponents.ScrollableText, {
+            title: "abc"
+        }, `@${type}: ${path}`);
     };
     // TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop
     const options = Object.fromEntries(metaURLList.map((metaURL)=>[

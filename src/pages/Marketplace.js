@@ -94,22 +94,22 @@ const mergeObjectsWithArraysConcatenated = (a, b)=>_.mergeWith(a, b, (objValue, 
 const SortOptions = {
     default: ()=>t("sort.default"),
     "a-z": ()=>t("sort.a-z"),
-    "z-a": ()=>t("sort.z-a")
+    "z-a": ()=>t("sort.z-a"),
+    random: ()=>t("sort.random")
 };
 const SortFns = {
     default: undefined,
     "a-z": (a, b)=>b.name > a.name ? 1 : a.name > b.name ? -1 : 0,
-    "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+    "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+    random: ()=>Math.random() - 0.5
 };
 const filters = {
+    "": undefined,
     extensions: {
-        "": t("Extensions")
+        "": t("filter.extensions")
     },
     themes: {
-        "": t("Themes"),
-        random: {
-            "": t("Random")
-        }
+        "": t("filter.themes")
     }
 };
 const filterFNs = {
@@ -118,10 +118,7 @@ const filterFNs = {
         "": (mod)=>mod.metadata.tags.includes("extension")
     },
     themes: {
-        "": (mod)=>mod.metadata.tags.includes("theme"),
-        random: {
-            "": ()=>Math.round(Math.random())
-        }
+        "": (mod)=>mod.metadata.tags.includes("theme")
     }
 };
 export default function() {

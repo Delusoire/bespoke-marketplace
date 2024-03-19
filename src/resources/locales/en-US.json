@@ -20,7 +20,12 @@
 		"sort": {
 			"default": "Default",
 			"a-z": "A-Z",
-			"z-a": "Z-A"
+			"z-a": "Z-A",
+			"random": "Random"
+		},
+		"filter": {
+			"extensions": "Extensions",
+			"themes": "Themes"
 		}
 	}
 }
