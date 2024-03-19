@@ -8,6 +8,7 @@ import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
 import { useDropdown } from "/modules/Delusoire/stdlib/lib/components/index.js";
 import { getProp, useChipFilter } from "../components/ChipFilter/index.js";
+import { useSearchbar } from "../components/Searchbar/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL)=>cachedMetaURLs.get(metaURL);
 export const fetchMetaURL = async (metaURL)=>{
@@ -89,32 +90,6 @@ export const useMetas = (identifiersToMetadataLists)=>{
                     }))
         }));
 };
-const Searchbar = ({ value, onChange })=>{
-    return /*#__PURE__*/ S.React.createElement("div", {
-        className: "flex flex-col flex-grow items-end"
-    }, /*#__PURE__*/ S.React.createElement("input", {
-        className: "!bg-[var(--backdrop)] border-[var(--spice-sidebar)] !text-[var(--spice-text)] border-solid h-8 py-2 px-3 rounded-lg",
-        type: "text",
-        placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`,
-        value: value,
-        onChange: (event)=>{
-            onChange(event.target.value);
-        }
-    }));
-};
-const useSearchbar = ()=>{
-    const [value, setValue] = React.useState("");
-    const searchbar = /*#__PURE__*/ S.React.createElement(Searchbar, {
-        value: value,
-        onChange: (str)=>{
-            setValue(str);
-        }
-    });
-    return [
-        searchbar,
-        value
-    ];
-};
 const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 const mergeObjectsWithArraysConcatenated = (a, b)=>_.mergeWith(a, b, (objValue, srcValue)=>_.isArray(objValue) ? objValue.concat(srcValue) : undefined);
 const SortOptions = {
@@ -127,8 +102,38 @@ const SortFns = {
     "a-z": (a, b)=>b.name > a.name ? 1 : a.name > b.name ? -1 : 0,
     "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0
 };
+const filters = {
+    extensions: {
+        "": t("Extensions")
+    },
+    themes: {
+        "": t("Themes"),
+        random: {
+            "": t("Random")
+        }
+    }
+};
+const filterFNs = {
+    "": ()=>true,
+    extensions: {
+        "": (mod)=>mod.metadata.tags.includes("extension")
+    },
+    themes: {
+        "": (mod)=>mod.metadata.tags.includes("theme"),
+        random: {
+            "": ()=>Math.round(Math.random())
+        }
+    }
+};
 export default function() {
     const [refreshCount, refresh] = React.useReducer((x)=>x + 1, 0);
+    const [sortbox, sortOption] = useDropdown({
+        options: SortOptions
+    });
+    const sortFn = SortFns[sortOption];
+    const [chipFilter, selectedFilters] = useChipFilter(filters);
+    const selectedFilterFNs = selectedFilters.map(({ key })=>getProp(filterFNs, key));
+    const [searchbar, search] = useSearchbar(`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`);
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
         const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map((module)=>[
@@ -150,35 +155,6 @@ export default function() {
         identifiersToMetadataURLsLists,
         identifiersToMetadataProps
     ]);
-    const [sortbox, sortOption] = useDropdown({
-        options: SortOptions
-    });
-    const sortFn = SortFns[sortOption];
-    const [searchbar, search] = useSearchbar();
-    const filters = {
-        extensions: {
-            "": t("Extensions")
-        },
-        themes: {
-            "": t("Themes"),
-            random: {
-                "": t("Random")
-            }
-        }
-    };
-    const filterFNs = {
-        "": ()=>true,
-        extensions: {
-            "": (mod)=>mod.metadata.tags.includes("extension")
-        },
-        themes: {
-            "": (mod)=>mod.metadata.tags.includes("theme"),
-            random: {
-                "": ()=>Math.round(Math.random())
-            }
-        }
-    };
-    const [chipFilter, selectedFilters] = useChipFilter(filters);
     return /*#__PURE__*/ S.React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ S.React.createElement("div", {
@@ -191,7 +167,7 @@ export default function() {
         className: "marketplace-header__right flex gap-2"
     }, searchbar, settingsButton)), /*#__PURE__*/ S.React.createElement(S.React.Fragment, null, /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd"
-    }, selectedFilters.reduce((acc, { key })=>acc.filter(getProp(filterFNs, key)), propsList).filter((props)=>{
+    }, selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn), propsList).filter((props)=>{
         const { metadata } = props;
         const { name, tags, authors } = metadata;
         const searchFiels = [
