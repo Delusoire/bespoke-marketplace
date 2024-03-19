@@ -6,8 +6,7 @@ import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
-import { getProp, useChipFilter, useDropdown } from "/modules/Delusoire/stdlib/lib/components/index.js";
-import { useSearchbar } from "../components/Searchbar/index.js";
+import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL)=>cachedMetaURLs.get(metaURL);
 export const fetchMetaURL = async (metaURL)=>{
@@ -123,13 +122,16 @@ const filterFNs = {
 };
 export default function() {
     const [refreshCount, refresh] = React.useReducer((x)=>x + 1, 0);
+    const [search, searchbar] = useSearchBar({
+        placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}`,
+        expanded: true
+    });
     const [sortbox, sortOption] = useDropdown({
         options: SortOptions
     });
     const sortFn = SortFns[sortOption];
     const [chipFilter, selectedFilters] = useChipFilter(filters);
     const selectedFilterFNs = selectedFilters.map(({ key })=>getProp(filterFNs, key));
-    const [searchbar, search] = useSearchbar(`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`);
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
         const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map((module)=>[
@@ -157,11 +159,11 @@ export default function() {
         className: "marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10"
     }, /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-header__left flex gap-2"
-    }, /*#__PURE__*/ S.React.createElement("h2", {
-        className: "inline-flex self-center"
-    }, t("pages.marketplace.sort.label")), sortbox, chipFilter), /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header__right flex gap-2"
-    }, searchbar, settingsButton)), /*#__PURE__*/ S.React.createElement(S.React.Fragment, null, /*#__PURE__*/ S.React.createElement("div", {
+    }, chipFilter), /*#__PURE__*/ S.React.createElement("div", {
+        className: "marketplace-header__right flex gap-2 items-center"
+    }, /*#__PURE__*/ S.React.createElement("p", {
+        className: "inline-flex self-center font-bold text-sm"
+    }, t("pages.marketplace.sort.label")), sortbox, searchbar, settingsButton)), /*#__PURE__*/ S.React.createElement(S.React.Fragment, null, /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd"
     }, selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn), propsList).filter((props)=>{
         const { metadata } = props;
