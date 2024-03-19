@@ -6,8 +6,7 @@ import { type Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
-import { getProp, useChipFilter, useDropdown } from "/modules/Delusoire/stdlib/lib/components/index.js";
-import { useSearchbar } from "../components/Searchbar/index.js";
+import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
 export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
@@ -129,13 +128,13 @@ const filterFNs = {
 export default function () {
 	const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
 
+	const [search, searchbar] = useSearchBar({ placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}`, expanded: true });
+
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 
 	const [chipFilter, selectedFilters] = useChipFilter(filters);
 	const selectedFilterFNs = selectedFilters.map(({ key }) => getProp(filterFNs, key));
-
-	const [searchbar, search] = useSearchbar(`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`);
 
 	const identifiersToMetadataURLsLists = React.useMemo(() => {
 		const localModules = Module.getModules();
