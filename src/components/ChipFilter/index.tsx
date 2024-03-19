@@ -1,81 +1,78 @@
+import { _ } from "/modules/Delusoire/stdlib/deps.js";
 import { S } from "/modules/Delusoire/stdlib/index.js";
+const { React } = S;
 
-const ChipComponentW = ({
-	filterId,
-	isPrimaryFilter,
-	resetFilterIds,
-	toggleFilterId,
-	className,
-	ChipComponent = S.ReactComponents.Chip,
-	innerRef,
-	...props
-}) => {
-	const selected = props.selected;
-	const onClick = S.React.useCallback(() => {
-		!filterId || (selected && isPrimaryFilter) ? resetFilterIds() : toggleFilterId(filterId);
-	}, [filterId, selected, isPrimaryFilter, resetFilterIds, toggleFilterId]);
-
-	return (
-		<ChipComponent
-			{...props}
-			aria-label={props["aria-label"]}
-			className={S.classnames(className)}
-			onClick={onClick}
+export const ChipFilter = React.memo(({ availableFilters, selectedFilters, toggleFilter, className }) => {
+	const XXX = isSelected => (filter, index) => (
+		<S.ReactComponents.Chip
+			onClick={() => toggleFilter(filter)}
 			selectedColorSet="invertedLight"
-			secondary={selected && !isPrimaryFilter}
+			selected={isSelected}
+			secondary={isSelected && index > 0}
 			style={{ marginBlockEnd: 0, willChange: "transform, opacity" }}
-			ref={innerRef}
 			tabIndex={-1}
-		/>
+			index={index}
+			key={filter.key}
+		>
+			{filter.filter[""]}
+		</S.ReactComponents.Chip>
 	);
-};
 
-export const ChipFilter = S.React.memo(({ availableFilters, selectedFilters, toggleFilterId, resetFilterIds, className }) => {
-	const filters = [selectedFilters, availableFilters].flat();
-	// const innerRef = S.React.useRef(null)
-	// const resetFilterIdsAndSaveFocus = S.React.useCallback(() => {
-	//     const nextElementSibling = innerRef.current?.nextElementSibling
-	//     if (nextElementSibling instanceof HTMLElement) {
-	//         if (innerRef.current) {
-	//             innerRef.current.removeAttribute("data-roving-interactive")
-	//             innerRef.current.tabIndex = -1
-	//         }
-	//         nextElementSibling.tabIndex = 0
-	//         nextElementSibling.setAttribute("data-roving-interactive", "1")
-	//         nextElementSibling.focus({
-	//             preventScroll: false,
-	//         })
-	//     }
-
-	//     resetFilterIds()
-	// }, [resetFilterIds])
 	return (
-		filters.length > 0 && (
+		selectedFilters.length + availableFilters.length > 0 && (
 			<S.ReactComponents.ScrollableContainer className={className} ariaLabel={"Filter options"}>
-				{/* {selectedFilters?.length > 0 && (
-                    <ChipComponentW
-                        resetFilterIds={resetFilterIdsAndSaveFocus}
-                        toggleFilterId={toggleFilterId}
-                        allowedDropTargetMimeTypes={[]}
-                        ChipComponent={S.ReactComponents.ChipClear}
-                        aria-label="Clear filters"
-                        innerRef={innerRef}
-                    />
-                )} */}
-				{filters.map((filter, i) => (
-					<ChipComponentW
-						filterId={filter.id}
-						isPrimaryFilter={i === 0}
-						resetFilterIds={resetFilterIds}
-						toggleFilterId={toggleFilterId}
-						selected={selectedFilters.includes(filter)}
-						index={i}
-						key={filter.id}
-					>
-						{filter.name}
-					</ChipComponentW>
-				))}
+				{selectedFilters.map(XXX(true))}
+				{availableFilters.map(XXX(false))}
 			</S.ReactComponents.ScrollableContainer>
 		)
 	);
 });
+
+export const getProp = (obj: any, path: string) => {
+	if (path.startsWith(".")) {
+		return _.get(obj, path.slice(1));
+	}
+	return obj;
+};
+
+export const useChipFilter = filters => {
+	const [selectedFilterFullKey, setSelectedFilterFullKey] = React.useState(".");
+
+	const selectedFilters = React.useMemo(
+		() =>
+			selectedFilterFullKey
+				.split(".")
+				.slice(1, -1)
+				.reduce(
+					(selectedFilters, selectedFilterFullKeyPart) => {
+						const prevSelectedFilter = selectedFilters.at(-1);
+						const selectedFilter = {
+							key: `${prevSelectedFilter.key}${selectedFilterFullKeyPart}.`,
+							filter: prevSelectedFilter.filter[selectedFilterFullKeyPart],
+						};
+						selectedFilters.push(selectedFilter);
+						return selectedFilters;
+					},
+					[{ key: ".", filter: filters }],
+				),
+		[filters, selectedFilterFullKey],
+	);
+
+	const lastSelectedFilter = selectedFilters.at(-1);
+	const availableFilters = [];
+	for (const [k, v] of Object.entries(lastSelectedFilter.filter)) {
+		if (k === "") continue;
+		availableFilters.push({ key: `${lastSelectedFilter.key}${k}.`, filter: v });
+	}
+
+	const exclusiveSelectedFilters = selectedFilters.slice(1);
+
+	const toggleFilter = React.useCallback(
+		filter => setSelectedFilterFullKey(filter.key === selectedFilterFullKey ? "." : filter.key),
+		[selectedFilterFullKey],
+	);
+
+	const chipFilter = <ChipFilter selectedFilters={exclusiveSelectedFilters} availableFilters={availableFilters} toggleFilter={toggleFilter} />;
+
+	return [chipFilter, exclusiveSelectedFilters, selectedFilterFullKey, setSelectedFilterFullKey] as const;
+};

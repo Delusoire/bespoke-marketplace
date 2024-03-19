@@ -7,6 +7,7 @@ import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
 import { useDropdown } from "/modules/Delusoire/stdlib/lib/components/index.js";
+import { ChipFilter, getProp, useChipFilter } from "../components/ChipFilter/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
 export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
@@ -98,6 +99,37 @@ export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) =
 	}));
 };
 
+const Searchbar = ({ value, onChange }) => {
+	return (
+		<div className="flex flex-col flex-grow items-end">
+			<input
+				className="!bg-[var(--backdrop)] border-[var(--spice-sidebar)] !text-[var(--spice-text)] border-solid h-8 py-2 px-3 rounded-lg"
+				type="text"
+				placeholder={`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`}
+				value={value}
+				onChange={event => {
+					onChange(event.target.value);
+				}}
+			/>
+		</div>
+	);
+};
+
+const useSearchbar = () => {
+	const [value, setValue] = React.useState("");
+
+	const searchbar = (
+		<Searchbar
+			value={value}
+			onChange={str => {
+				setValue(str);
+			}}
+		/>
+	);
+
+	return [searchbar, value] as const;
+};
+
 const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
 
 const mergeObjectsWithArraysConcatenated = (a, b) =>
@@ -133,12 +165,32 @@ export default function () {
 	const sortFn = SortFns[sortOption];
 	const [searchbar, search] = useSearchbar();
 
+	const filters = {
+		extensions: { "": t("Extensions") },
+		themes: {
+			"": t("Themes"),
+			random: { "": t("Random") },
+		},
+	};
+
+	const filterFNs = {
+		"": () => true,
+		extensions: { "": mod => mod.metadata.tags.includes("extension") },
+		themes: {
+			"": mod => mod.metadata.tags.includes("theme"),
+			random: { "": () => Math.round(Math.random()) },
+		},
+	};
+
+	const [chipFilter, selectedFilters] = useChipFilter(filters);
+
 	return (
 		<section className="contentSpacing">
 			<div className="marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10">
 				<div className="marketplace-header__left flex gap-2">
 					<h2 className="inline-flex self-center">{t("pages.marketplace.sort.label")}</h2>
 					{sortbox}
+					{chipFilter}
 				</div>
 				<div className="marketplace-header__right flex gap-2">
 					{searchbar}
@@ -147,11 +199,12 @@ export default function () {
 			</div>
 			<>
 				<div className="marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth">
-					{propsList
+					{selectedFilters
+						.reduce((acc, { key }) => acc.filter(getProp(filterFNs, key)), propsList)
 						.filter(props => {
 							const { metadata } = props;
-							const { authors, name, tags } = metadata;
-							const searchFiels = [...authors, name, ...tags];
+							const { name, tags, authors } = metadata;
+							const searchFiels = [name, ...tags, ...authors];
 							return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
 						})
 						.sort((a, b) => sortFn?.(a.metadata, b.metadata) as number)
@@ -163,34 +216,3 @@ export default function () {
 		</section>
 	);
 }
-
-const Searchbar = ({ value, onChange }) => {
-	return (
-		<div className="flex flex-col flex-grow items-end">
-			<input
-				className="!bg-[var(--backdrop)] border-[var(--spice-sidebar)] !text-[var(--spice-text)] border-solid h-8 py-2 px-3 rounded-lg"
-				type="text"
-				placeholder={`${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}...`}
-				value={value}
-				onChange={event => {
-					onChange(event.target.value);
-				}}
-			/>
-		</div>
-	);
-};
-
-const useSearchbar = () => {
-	const [value, setValue] = React.useState("");
-
-	const searchbar = (
-		<Searchbar
-			value={value}
-			onChange={str => {
-				setValue(str);
-			}}
-		/>
-	);
-
-	return [searchbar, value] as const;
-};
