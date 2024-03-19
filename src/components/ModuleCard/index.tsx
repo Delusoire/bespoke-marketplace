@@ -45,7 +45,6 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOp
 	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, ({ preview }) => prettifyMeta(metaURL, preview ?? false)] as const)) as {
 		[K in string]: React.FC<OptionProps>;
 	};
-	console.log(options);
 
 	const dropdown = (
 		<div className="min-w-fit">
@@ -72,7 +71,7 @@ const fallbackImage = () => (
 		aria-hidden="true"
 		data-testid="card-image-fallback"
 		viewBox="0 0 24 24"
-		class="fill-current"
+		className="fill-current"
 		style={{ width: "64px", height: "64px" }}
 	>
 		<path d="M20.929,1.628A1,1,0,0,0,20,1H4a1,1,0,0,0-.929.628l-2,5A1.012,1.012,0,0,0,1,7V22a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V7a1.012,1.012,0,0,0-.071-.372ZM4.677,3H19.323l1.2,3H3.477ZM3,21V8H21V21Zm8-3a1,1,0,0,1-1,1H6a1,1,0,0,1,0-2h4A1,1,0,0,1,11,18Z" />

@@ -5,7 +5,7 @@ export default function() {
     const match = S.useMatch("/marketplace/:murl");
     const murl = match?.params?.murl;
     return /*#__PURE__*/ S.React.createElement("div", {
-        id: "stats-app"
+        id: "marketplace"
     }, /*#__PURE__*/ S.React.createElement(S.ReactComponents.Routes, null, /*#__PURE__*/ S.React.createElement(S.ReactComponents.Route, {
         path: "/",
         element: /*#__PURE__*/ S.React.createElement(Marketplace, null)

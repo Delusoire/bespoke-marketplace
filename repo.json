@@ -3,7 +3,7 @@
 	"Delusoire/delulib": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/delulib/metadata.json"],
 	"Delusoire/dexie-react-hooks": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/dexie-react-hooks/metadata.json"],
 	"Delusoire/filter-duplicates": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/filter-duplicates/metadata.json"],
-	"Delusoire/hazy-theme": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/hazy-theme/metadata.json"],
+	"Delusoire/hazy": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/hazy/metadata.json"],
 	"Delusoire/keyboard-shortcuts": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/keyboard-shortcuts/metadata.json"],
 	"Delusoire/library-db": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/library-db/metadata.json"],
 	"Delusoire/playlist-labels": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/playlist-labels/metadata.json"],
@@ -13,7 +13,7 @@
 	"Delusoire/marketplace": ["https://raw.githubusercontent.com/Delusoire/bespoke-marketplace/main/metadata.json"],
 	"Delusoire/spoqify-radios": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/spoqify-radios/metadata.json"],
 	"Delusoire/star-ratings": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/star-ratings/metadata.json"],
-	"Delusoire/stats-app": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/stats-app/metadata.json"],
+	"Delusoire/statistics": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/statistics/metadata.json"],
 	"Delusoire/stdlib": ["https://raw.githubusercontent.com/Delusoire/bespoke-stdlib/main/metadata.json"],
 	"Delusoire/vaultify": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/vaultify/metadata.json"]
 }

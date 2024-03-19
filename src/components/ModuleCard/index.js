@@ -44,7 +44,6 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
             metaURL,
             ({ preview })=>prettifyMeta(metaURL, preview ?? false)
         ]));
-    console.log(options);
     const dropdown = /*#__PURE__*/ S.React.createElement("div", {
         className: "min-w-fit"
     }, /*#__PURE__*/ S.React.createElement(Dropdown, {
@@ -60,7 +59,7 @@ const fallbackImage = ()=>/*#__PURE__*/ S.React.createElement("svg", {
         "aria-hidden": "true",
         "data-testid": "card-image-fallback",
         viewBox: "0 0 24 24",
-        class: "fill-current",
+        className: "fill-current",
         style: {
             width: "64px",
             height: "64px"

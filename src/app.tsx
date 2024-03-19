@@ -8,7 +8,7 @@ export default function () {
 	const murl = match?.params?.murl;
 
 	return (
-		<div id="stats-app">
+		<div id="marketplace">
 			<S.ReactComponents.Routes>
 				<S.ReactComponents.Route path="/" element={<Marketplace />} />
 				<S.ReactComponents.Route path=":murl" element={<ModulePage murl={murl} />} />
