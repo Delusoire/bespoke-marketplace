@@ -122,7 +122,7 @@ const filterFNs = {
 };
 export default function() {
     const [refreshCount, refresh] = React.useReducer((x)=>x + 1, 0);
-    const [search, searchbar] = useSearchBar({
+    const [searchbar, search] = useSearchBar({
         placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}`,
         expanded: true
     });
