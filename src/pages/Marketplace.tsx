@@ -120,9 +120,7 @@ const filters = {
 const filterFNs = {
 	"": () => true,
 	extensions: { "": mod => mod.metadata.tags.includes("extension") },
-	themes: {
-		"": mod => mod.metadata.tags.includes("theme"),
-	},
+	themes: { "": mod => mod.metadata.tags.includes("theme") },
 };
 
 export default function () {
