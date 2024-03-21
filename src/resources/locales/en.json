@@ -25,7 +25,8 @@
 		},
 		"filter": {
 			"extensions": "Extensions",
-			"themes": "Themes"
+			"themes": "Themes",
+			"apps": "Apps"
 		}
 	}
 }

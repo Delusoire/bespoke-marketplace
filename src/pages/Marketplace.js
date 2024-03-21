@@ -105,6 +105,9 @@ const filters = {
     },
     themes: {
         "": t("filter.themes")
+    },
+    apps: {
+        "": t("filter.apps")
     }
 };
 const filterFNs = {
@@ -114,6 +117,9 @@ const filterFNs = {
     },
     themes: {
         "": (mod)=>mod.metadata.tags.includes("theme")
+    },
+    apps: {
+        "": (mod)=>mod.metadata.tags.includes("app")
     }
 };
 export default function() {

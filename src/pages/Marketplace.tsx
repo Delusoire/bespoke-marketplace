@@ -111,12 +111,14 @@ const filters = {
 	"": undefined,
 	extensions: { "": t("filter.extensions") },
 	themes: { "": t("filter.themes") },
+	apps: { "": t("filter.apps") },
 };
 
 const filterFNs = {
 	"": () => true,
 	extensions: { "": mod => mod.metadata.tags.includes("extension") },
 	themes: { "": mod => mod.metadata.tags.includes("theme") },
+	apps: { "": mod => mod.metadata.tags.includes("app") },
 };
 
 export default function () {
