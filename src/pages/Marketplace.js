@@ -26,11 +26,7 @@ const dummyMetadata = {
     authors: [],
     description: "",
     readme: "",
-    entries: {
-        js: false,
-        css: false,
-        mixin: false
-    },
+    entries: {},
     dependencies: []
 };
 export const useMetas = (identifiersToMetadataLists)=>{

@@ -8,8 +8,7 @@
 	"readme": "./README.md",
 	"entries": {
 		"js": "index.js",
-		"css": "src/app.css",
-		"mixin": false
+		"css": "src/app.css"
 	},
 	"dependencies": ["Delusoire/stdlib", "Delusoire/delulib"]
 }

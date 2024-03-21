@@ -30,11 +30,7 @@ const dummyMetadata: Metadata = {
 	authors: [],
 	description: "",
 	readme: "",
-	entries: {
-		js: false,
-		css: false,
-		mixin: false,
-	},
+	entries: {},
 	dependencies: [],
 };
 

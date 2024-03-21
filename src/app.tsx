@@ -5,7 +5,7 @@ import ModulePage from "./pages/Module.js";
 
 export default function () {
 	const match = S.ReactRouter.useMatch("/marketplace/:murl");
-	const murl = match?.params?.murl;
+	const murl = decodeURIComponent(match?.params?.murl);
 
 	return (
 		<div id="marketplace">
