@@ -138,11 +138,11 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
     }, metaSelector, installed && /*#__PURE__*/ S.React.createElement(S.ReactComponents.SettingToggle, {
         className: "rFFJg1UIumqUUFDgo6n7 justify-end",
         value: enabled,
-        onSelected: (checked)=>{
+        onSelected: async (checked)=>{
             if (checked) {
-                module.enable();
+                await module.enable();
             } else {
-                module.disable();
+                await module.disable();
             }
             updateEnabled();
         }
