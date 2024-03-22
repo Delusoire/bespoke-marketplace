@@ -6,6 +6,7 @@ import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
+import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL)=>cachedMetaURLs.get(metaURL);
@@ -98,22 +99,22 @@ const SortFns = {
     "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
     random: ()=>Math.random() - 0.5
 };
-const filters = {
+const baseFilters = {
     "": undefined,
     themes: {
         "": t("filter.themes")
     },
-    apps: {
-        "": t("filter.apps")
-    },
     extensions: {
         "": t("filter.extensions")
+    },
+    apps: {
+        "": t("filter.apps")
     },
     snippets: {
         "": t("filter.snippets")
     }
 };
-const filterFNs = {
+const baseFilterFNs = {
     "": ()=>true,
     themes: {
         "": (mod)=>mod.metadata.tags.includes("theme")
@@ -125,8 +126,25 @@ const filterFNs = {
         "": (mod)=>mod.metadata.tags.includes("extension")
     },
     snippets: {
-        "": (mod)=>mod.metadata.tags.includes("snippets")
+        "": (mod)=>mod.metadata.tags.includes("snippet")
+    },
+    libs: {
+        "": (mod)=>/lib|internal/.test(mod.metadata.tags.join(" "))
     }
+};
+const getFilterObjs = (libs)=>{
+    const filterFNs = libs ? baseFilterFNs : Object.assign({}, baseFilterFNs, {
+        "": (mod)=>!/lib|e-lib|internal/.test(mod.metadata.tags.join(" "))
+    });
+    const filters = libs ? Object.assign({}, baseFilters, {
+        libs: {
+            "": "Libs"
+        }
+    }) : baseFilters;
+    return [
+        filterFNs,
+        filters
+    ];
 };
 export default function() {
     const [refreshCount, refresh] = React.useReducer((x)=>x + 1, 0);
@@ -138,8 +156,11 @@ export default function() {
         options: SortOptions
     });
     const sortFn = SortFns[sortOption];
+    const [filterFNs, filters] = getFilterObjs(CONFIG.showLibs);
     const [chipFilter, selectedFilters] = useChipFilter(filters);
-    const selectedFilterFNs = selectedFilters.map(({ key })=>getProp(filterFNs, key));
+    const selectedFilterFNs = selectedFilters.length ? selectedFilters.map(({ key })=>getProp(filterFNs, key)) : [
+        filterFNs[""]
+    ];
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
         const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map((module)=>[
