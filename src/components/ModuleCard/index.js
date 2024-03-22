@@ -140,9 +140,9 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         value: enabled,
         onSelected: async (checked)=>{
             if (checked) {
-                await module.enable();
+                await module.enable(true);
             } else {
-                await module.disable();
+                await module.disable(true);
             }
             updateEnabled();
         }
