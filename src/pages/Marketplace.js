@@ -135,7 +135,6 @@ const getFilterObjs = (libs)=>{
             "": "Libs"
         }
     }) : baseFilters;
-    console.log(filterFNs, filters);
     return [
         filterFNs,
         filters
@@ -156,8 +155,6 @@ export default function() {
     const selectedFilterFNs = selectedFilters.length ? selectedFilters.map(({ key })=>getProp(filterFNs, key)) : [
         filterFNs[""]
     ];
-    console.log(selectedFilters);
-    console.log(selectedFilterFNs);
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
         const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map((module)=>[
