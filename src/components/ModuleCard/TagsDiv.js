@@ -15,9 +15,10 @@ export default function({ tags, importantTags, showTags }) {
     const baseTags = [
         importantTags,
         showTags && tags.filter((tag)=>![
-                "extension",
                 "theme",
-                "app"
+                "app",
+                "extension",
+                "snippets"
             ].includes(tag))
     ].flat();
     let extraTags = new Array();

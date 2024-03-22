@@ -24,9 +24,10 @@
 			"random": "Random"
 		},
 		"filter": {
-			"extensions": "Extensions",
 			"themes": "Themes",
-			"apps": "Apps"
+			"apps": "Apps",
+			"extensions": "Extensions",
+			"snippets": "Snippets"
 		}
 	}
 }

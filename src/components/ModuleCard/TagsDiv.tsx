@@ -22,7 +22,7 @@ interface TagsDivProps {
 export default function ({ tags, importantTags, showTags }: TagsDivProps) {
 	const [expanded, setExpanded] = React.useState(false);
 
-	const baseTags = [importantTags, showTags && tags.filter(tag => !["extension", "theme", "app"].includes(tag))].flat();
+	const baseTags = [importantTags, showTags && tags.filter(tag => !["theme", "app", "extension", "snippets"].includes(tag))].flat();
 
 	let extraTags = new Array<string>();
 	// If there are more than one extra tags, slice them and add an expand button
