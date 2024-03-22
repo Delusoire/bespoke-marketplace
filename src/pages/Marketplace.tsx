@@ -6,6 +6,7 @@ import { type Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
+import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
@@ -107,18 +108,25 @@ const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => nu
 	random: () => Math.random() - 0.5,
 };
 
-const filters = {
+const baseFilters = {
 	"": undefined,
 	extensions: { "": t("filter.extensions") },
 	themes: { "": t("filter.themes") },
 	apps: { "": t("filter.apps") },
 };
 
-const filterFNs = {
+const baseFilterFNs = {
 	"": () => true,
 	extensions: { "": mod => mod.metadata.tags.includes("extension") },
 	themes: { "": mod => mod.metadata.tags.includes("theme") },
 	apps: { "": mod => mod.metadata.tags.includes("app") },
+	libs: { "": mod => /lib|e-lib|internal/.test(mod.metadata.tags.join(" ")) },
+};
+
+const getFilterObjs = (libs: boolean) => {
+	const filterFNs = libs ? baseFilterFNs : Object.assign({}, baseFilterFNs, { "": mod => !/lib|e-lib|internal/.test(mod.metadata.tags.join(" ")) });
+	const filters = libs ? Object.assign({}, baseFilters, { libs: { "": "Libs" } }) : baseFilters;
+	return [filterFNs, filters];
 };
 
 export default function () {
@@ -129,8 +137,9 @@ export default function () {
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 
+	const [filterFNs, filters] = getFilterObjs(CONFIG.showLibs);
 	const [chipFilter, selectedFilters] = useChipFilter(filters);
-	const selectedFilterFNs = selectedFilters.map(({ key }) => getProp(filterFNs, key));
+	const selectedFilterFNs = selectedFilters.length ? selectedFilters.map(({ key }) => getProp(filterFNs, key)) : [filterFNs[""]];
 
 	const identifiersToMetadataURLsLists = React.useMemo(() => {
 		const localModules = Module.getModules();
