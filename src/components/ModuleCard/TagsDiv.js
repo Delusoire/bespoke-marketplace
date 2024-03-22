@@ -14,7 +14,11 @@ export default function({ tags, importantTags, showTags }) {
     const [expanded, setExpanded] = React.useState(false);
     const baseTags = [
         importantTags,
-        showTags && tags
+        showTags && tags.filter((tag)=>![
+                "extension",
+                "theme",
+                "app"
+            ].includes(tag))
     ].flat();
     let extraTags = new Array();
     // If there are more than one extra tags, slice them and add an expand button

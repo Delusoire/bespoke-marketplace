@@ -44,7 +44,6 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
             title: "abc"
         }, `@${type}: ${path}`);
     };
-    // TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop
     const options = Object.fromEntries(metaURLList.map((metaURL)=>[
             metaURL,
             ({ preview })=>prettifyMeta(metaURL, preview ?? false)
