@@ -6,3 +6,17 @@
         }
     }
 }
+
+.tags-wrapper {
+    max-height: 56px;
+    overflow-y: scroll;
+    
+    &::-webkit-scrollbar {
+        width: 2px;
+    }
+}
+
+/* overwrite stupid spotify styling */
+html {
+    scrollbar-color: auto !important;
+}
