@@ -157,7 +157,7 @@ export default function({ murl }) {
                 updateModule();
             } else {
                 ModuleManager.add(murl);
-                new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
+                new Module(metadata, `/modules/${identifier}/metadata.json`, murl);
                 updateModule();
             }
         },
