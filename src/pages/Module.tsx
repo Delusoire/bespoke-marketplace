@@ -137,7 +137,7 @@ export default function ({ murl }: { murl: string }) {
 
 	return (
 		<section className="contentSpacing">
-			<div className="marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10">
+			<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
 				<div className="marketplace-header__left flex gap-2">
 					<h1>{t("pages.module.title")}</h1>
 				</div>

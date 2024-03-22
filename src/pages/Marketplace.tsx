@@ -151,7 +151,7 @@ export default function () {
 
 	return (
 		<section className="contentSpacing">
-			<div className="marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10">
+			<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
 				<div className="marketplace-header__left flex gap-2">{chipFilter}</div>
 				<div className="marketplace-header__right flex gap-2 items-center">
 					<p className="inline-flex self-center font-bold text-sm">{t("pages.marketplace.sort.label")}</p>

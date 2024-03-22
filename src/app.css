@@ -199,10 +199,6 @@
     position: sticky;
 }
 
-.top-16 {
-    top: 4rem;
-}
-
 .isolate {
     isolation: isolate;
 }
