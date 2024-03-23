@@ -18,7 +18,8 @@ export default function({ tags, importantTags, showTags }) {
                 "theme",
                 "app",
                 "extension",
-                "snippets"
+                "snippet",
+                "lib"
             ].includes(tag))
     ].flat();
     let extraTags = new Array();
