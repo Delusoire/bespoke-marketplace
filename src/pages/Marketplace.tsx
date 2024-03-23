@@ -108,27 +108,24 @@ const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => nu
 	random: () => Math.random() - 0.5,
 };
 
-const baseFilters = {
-	"": undefined,
+const getFilters = () => ({
+	"": null,
 	themes: { "": t("filter.themes") },
 	extensions: { "": t("filter.extensions") },
 	apps: { "": t("filter.apps") },
 	snippets: { "": t("filter.snippets") },
-};
+	libs: { "": CONFIG.showLibs && t("filter.libs") },
+});
 
-const baseFilterFNs = {
-	"": () => true,
+const isModLib = (mod: Metadata) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
+
+const filterFNs = {
+	"": mod => CONFIG.showLibs || !isModLib(mod),
 	themes: { "": mod => mod.metadata.tags.includes("theme") },
 	apps: { "": mod => mod.metadata.tags.includes("app") },
 	extensions: { "": mod => mod.metadata.tags.includes("extension") },
 	snippets: { "": mod => mod.metadata.tags.includes("snippet") },
-	libs: { "": mod => /lib|internal/.test(mod.metadata.tags.join(" ")) },
-};
-
-const getFilterObjs = (libs: boolean) => {
-	const filterFNs = libs ? baseFilterFNs : Object.assign({}, baseFilterFNs, { "": mod => !/lib|e-lib|internal/.test(mod.metadata.tags.join(" ")) });
-	const filters = libs ? Object.assign({}, baseFilters, { libs: { "": "Libs" } }) : baseFilters;
-	return [filterFNs, filters];
+	libs: { "": isModLib },
 };
 
 export default function () {
@@ -139,9 +136,8 @@ export default function () {
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 
-	const [filterFNs, filters] = getFilterObjs(CONFIG.showLibs);
-	const [chipFilter, selectedFilters] = useChipFilter(filters);
-	const selectedFilterFNs = selectedFilters.length ? selectedFilters.map(({ key }) => getProp(filterFNs, key)) : [filterFNs[""]];
+	const [chipFilter, selectedFilters] = useChipFilter(getFilters());
+	const selectedFilterFNs = selectedFilters.map(({ key }) => getProp(filterFNs, key));
 
 	const identifiersToMetadataURLsLists = React.useMemo(() => {
 		const localModules = Module.getModules();

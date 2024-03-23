@@ -99,23 +99,31 @@ const SortFns = {
     "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
     random: ()=>Math.random() - 0.5
 };
-const baseFilters = {
-    "": undefined,
-    themes: {
-        "": t("filter.themes")
-    },
-    extensions: {
-        "": t("filter.extensions")
-    },
-    apps: {
-        "": t("filter.apps")
-    },
-    snippets: {
-        "": t("filter.snippets")
-    }
-};
-const baseFilterFNs = {
-    "": ()=>true,
+const getFilters = ()=>({
+        "": null,
+        themes: {
+            "": t("filter.themes")
+        },
+        extensions: {
+            "": t("filter.extensions")
+        },
+        apps: {
+            "": t("filter.apps")
+        },
+        snippets: {
+            "": t("filter.snippets")
+        },
+        libs: {
+            "": CONFIG.showLibs && t("filter.libs")
+        }
+    });
+const isModLib = (mod)=>_.intersection(mod.metadata.tags, [
+        "lib",
+        "npm",
+        "internal"
+    ]).length > 0;
+const filterFNs = {
+    "": (mod)=>CONFIG.showLibs || !isModLib(mod),
     themes: {
         "": (mod)=>mod.metadata.tags.includes("theme")
     },
@@ -129,22 +137,8 @@ const baseFilterFNs = {
         "": (mod)=>mod.metadata.tags.includes("snippet")
     },
     libs: {
-        "": (mod)=>/lib|internal/.test(mod.metadata.tags.join(" "))
+        "": isModLib
     }
-};
-const getFilterObjs = (libs)=>{
-    const filterFNs = libs ? baseFilterFNs : Object.assign({}, baseFilterFNs, {
-        "": (mod)=>!/lib|e-lib|internal/.test(mod.metadata.tags.join(" "))
-    });
-    const filters = libs ? Object.assign({}, baseFilters, {
-        libs: {
-            "": "Libs"
-        }
-    }) : baseFilters;
-    return [
-        filterFNs,
-        filters
-    ];
 };
 export default function() {
     const [refreshCount, refresh] = React.useReducer((x)=>x + 1, 0);
@@ -156,11 +150,8 @@ export default function() {
         options: SortOptions
     });
     const sortFn = SortFns[sortOption];
-    const [filterFNs, filters] = getFilterObjs(CONFIG.showLibs);
-    const [chipFilter, selectedFilters] = useChipFilter(filters);
-    const selectedFilterFNs = selectedFilters.length ? selectedFilters.map(({ key })=>getProp(filterFNs, key)) : [
-        filterFNs[""]
-    ];
+    const [chipFilter, selectedFilters] = useChipFilter(getFilters());
+    const selectedFilterFNs = selectedFilters.map(({ key })=>getProp(filterFNs, key));
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
         const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map((module)=>[
