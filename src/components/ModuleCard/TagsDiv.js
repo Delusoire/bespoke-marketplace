@@ -1,5 +1,4 @@
 import { S } from "/modules/Delusoire/stdlib/index.js";
-const { React } = S;
 import { t } from "../../i18n.js";
 const knownTags = {
     [t("module.archived")]: "archived"
@@ -20,9 +19,7 @@ export default function({ tags, importantTags, showTags }) {
                 "lib"
             ].includes(tag))
     ].flat();
-    return /*#__PURE__*/ S.React.createElement("div", {
-        className: "tags-wrapper"
-    }, /*#__PURE__*/ S.React.createElement("ul", {
-        className: "flex flex-wrap gap-2 text-sm"
+    return /*#__PURE__*/ S.React.createElement(S.ReactComponents.ScrollableContainer, null, /*#__PURE__*/ S.React.createElement("ul", {
+        className: "flex gap-2 text-sm"
     }, baseTags.map(Tag)));
 }

@@ -1,7 +1,4 @@
 import { S } from "/modules/Delusoire/stdlib/index.js";
-const { React } = S;
-
-import { MAX_TAGS } from "../../static.js";
 import { t } from "../../i18n.js";
 
 const knownTags = {
@@ -23,8 +20,8 @@ export default function ({ tags, importantTags, showTags }: TagsDivProps) {
 	const baseTags = [importantTags, showTags && tags.filter(tag => !["theme", "app", "extension", "snippet", "lib"].includes(tag))].flat();
 
 	return (
-		<div className="tags-wrapper">
-			<ul className="flex flex-wrap gap-2 text-sm">{baseTags.map(Tag)}</ul>
-		</div>
+		<S.ReactComponents.ScrollableContainer>
+			<ul className="flex gap-2 text-sm">{baseTags.map(Tag)}</ul>
+		</S.ReactComponents.ScrollableContainer>
 	);
 }
