@@ -27,7 +27,9 @@
 			"themes": "Themes",
 			"apps": "Apps",
 			"extensions": "Extensions",
-			"snippets": "Snippets"
+			"snippets": "Snippets",
+			"libs": "Libraries",
+			"enabled": "Enabled"
 		}
 	}
 }

@@ -6,6 +6,7 @@ import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
+import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL)=>cachedMetaURLs.get(metaURL);
@@ -98,34 +99,63 @@ const SortFns = {
     "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
     random: ()=>Math.random() - 0.5
 };
-const filters = {
-    "": undefined,
-    themes: {
-        "": t("filter.themes")
-    },
-    apps: {
-        "": t("filter.apps")
-    },
-    extensions: {
-        "": t("filter.extensions")
-    },
-    snippets: {
-        "": t("filter.snippets")
+const enabled = {
+    enabled: {
+        "": t("filter.enabled")
+    }
+};
+const getFilters = ()=>({
+        "": null,
+        themes: {
+            "": t("filter.themes"),
+            ...enabled
+        },
+        extensions: {
+            "": t("filter.extensions"),
+            ...enabled
+        },
+        apps: {
+            "": t("filter.apps"),
+            ...enabled
+        },
+        snippets: {
+            "": t("filter.snippets"),
+            ...enabled
+        },
+        libs: {
+            "": CONFIG.showLibs && t("filter.libs")
+        }
+    });
+const isModLib = (mod)=>_.intersection(mod.metadata.tags, [
+        "lib",
+        "npm",
+        "internal"
+    ]).length > 0;
+const enabledFn = {
+    enabled: {
+        "": (mod)=>Module.registry.get(mod.identifier).isEnabled()
     }
 };
 const filterFNs = {
-    "": ()=>true,
+    "": (mod)=>CONFIG.showLibs || !isModLib(mod),
     themes: {
-        "": (mod)=>mod.metadata.tags.includes("theme")
+        "": (mod)=>mod.metadata.tags.includes("theme"),
+        ...enabledFn
     },
     apps: {
-        "": (mod)=>mod.metadata.tags.includes("app")
+        "": (mod)=>mod.metadata.tags.includes("app"),
+        ...enabledFn
     },
     extensions: {
-        "": (mod)=>mod.metadata.tags.includes("extension")
+        "": (mod)=>mod.metadata.tags.includes("extension"),
+        ...enabledFn
     },
     snippets: {
-        "": (mod)=>mod.metadata.tags.includes("snippets")
+        "": (mod)=>mod.metadata.tags.includes("snippet"),
+        ...enabledFn
+    },
+    libs: {
+        "": isModLib
     }
 };
 export default function() {
@@ -138,7 +168,7 @@ export default function() {
         options: SortOptions
     });
     const sortFn = SortFns[sortOption];
-    const [chipFilter, selectedFilters] = useChipFilter(filters);
+    const [chipFilter, selectedFilters] = useChipFilter(getFilters());
     const selectedFilterFNs = selectedFilters.map(({ key })=>getProp(filterFNs, key));
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
