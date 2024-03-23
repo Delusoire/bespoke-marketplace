@@ -119,7 +119,7 @@ const getFilters = () => ({
 	libs: { "": CONFIG.showLibs && t("filter.libs") },
 });
 
-const isModLib = (mod: Metadata) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
+const isModLib = (mod: Module) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
 const enabledFn = { enabled: { "": mod => Module.registry.get(mod.identifier).isEnabled() } };
 
 const filterFNs = {
@@ -134,7 +134,7 @@ const filterFNs = {
 export default function () {
 	const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
 
-	const [searchbar, search] = useSearchBar({ placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}`, expanded: true });
+	const [searchbar, search] = useSearchBar({ placeholder: t("pages.marketplace.search_modules"), expanded: true });
 
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];

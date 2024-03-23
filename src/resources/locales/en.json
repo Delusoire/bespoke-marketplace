@@ -5,8 +5,7 @@
 		},
 		"pages": {
 			"marketplace": {
-				"search": "Search",
-				"modules": "Modules",
+				"search_modules": "Search Modules",
 				"sort": {
 					"label": "Sort by:"
 				}

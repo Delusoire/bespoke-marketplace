@@ -161,7 +161,7 @@ const filterFNs = {
 export default function() {
     const [refreshCount, refresh] = React.useReducer((x)=>x + 1, 0);
     const [searchbar, search] = useSearchBar({
-        placeholder: `${t("pages.marketplace.search")} ${t("pages.marketplace.modules")}`,
+        placeholder: t("pages.marketplace.search_modules"),
         expanded: true
     });
     const [sortbox, sortOption] = useDropdown({
