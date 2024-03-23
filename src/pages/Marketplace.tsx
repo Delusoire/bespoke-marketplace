@@ -6,6 +6,7 @@ import { type Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
+import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
@@ -107,20 +108,24 @@ const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => nu
 	random: () => Math.random() - 0.5,
 };
 
-const filters = {
-	"": undefined,
+const getFilters = () => ({
+	"": null,
 	themes: { "": t("filter.themes") },
 	apps: { "": t("filter.apps") },
 	extensions: { "": t("filter.extensions") },
 	snippets: { "": t("filter.snippets") },
-};
+	libs: { "": CONFIG.showLibs && t("filter.libs") },
+});
+
+const isModLib = (mod: Metadata) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
 
 const filterFNs = {
-	"": () => true,
+	"": mod => CONFIG.showLibs || !isModLib(mod),
 	themes: { "": mod => mod.metadata.tags.includes("theme") },
 	apps: { "": mod => mod.metadata.tags.includes("app") },
 	extensions: { "": mod => mod.metadata.tags.includes("extension") },
-	snippets: { "": mod => mod.metadata.tags.includes("snippets") },
+	snippets: { "": mod => mod.metadata.tags.includes("snippet") },
+	libs: { "": isModLib },
 };
 
 export default function () {
@@ -131,7 +136,7 @@ export default function () {
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 
-	const [chipFilter, selectedFilters] = useChipFilter(filters);
+	const [chipFilter, selectedFilters] = useChipFilter(getFilters());
 	const selectedFilterFNs = selectedFilters.map(({ key }) => getProp(filterFNs, key));
 
 	const identifiersToMetadataURLsLists = React.useMemo(() => {
