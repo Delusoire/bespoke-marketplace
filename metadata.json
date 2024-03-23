@@ -1,6 +1,6 @@
 {
 	"name": "marketplace",
-	"tags": [],
+	"tags": ["app"],
 	"preview": "./PREVIEW.png",
 	"version": "beta",
 	"authors": ["Delusoire"],

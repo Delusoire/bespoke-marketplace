@@ -45,7 +45,6 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOp
 		return <S.ReactComponents.ScrollableText title="abc">{`@${type}: ${path}`}</S.ReactComponents.ScrollableText>;
 	};
 
-	// TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop
 	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, ({ preview }) => prettifyMeta(metaURL, preview ?? false)] as const)) as {
 		[K in string]: React.FC<OptionProps>;
 	};
@@ -136,12 +135,8 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 								className="x-settings-button justify-end"
 								value={enabled}
 								onSelected={async (checked: boolean) => {
-									if (checked) {
-										await module.enable(true);
-									} else {
-										await module.disable(true);
-									}
-									updateEnabled();
+									const hasChanged = module[checked ? "enable" : "disable"](true);
+									hasChanged && updateEnabled();
 								}}
 							/>
 						)}

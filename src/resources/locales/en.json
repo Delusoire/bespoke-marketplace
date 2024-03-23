@@ -24,8 +24,12 @@
 			"random": "Random"
 		},
 		"filter": {
+			"themes": "Themes",
+			"apps": "Apps",
 			"extensions": "Extensions",
-			"themes": "Themes"
+			"snippets": "Snippets",
+			"libs": "Libraries",
+			"enabled": "Enabled"
 		}
 	}
 }

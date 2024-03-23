@@ -214,10 +214,6 @@ html {
     position: sticky;
 }
 
-.top-16 {
-    top: 4rem;
-}
-
 .isolate {
     isolation: isolate;
 }
@@ -497,6 +493,10 @@ html {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
+}
+
+.main-view-container {
+    z-index: 1;
 }
 
 .hover\:underline:hover {

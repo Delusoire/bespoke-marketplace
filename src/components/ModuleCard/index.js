@@ -44,7 +44,6 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList })=>{
             title: "abc"
         }, `@${type}: ${path}`);
     };
-    // TODO: convert Dropdown to use React FCs instead of Nodes and pass a "small" boolean prop
     const options = Object.fromEntries(metaURLList.map((metaURL)=>[
             metaURL,
             ({ preview })=>prettifyMeta(metaURL, preview ?? false)
@@ -139,12 +138,8 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         className: "rFFJg1UIumqUUFDgo6n7 justify-end",
         value: enabled,
         onSelected: async (checked)=>{
-            if (checked) {
-                await module.enable(true);
-            } else {
-                await module.disable(true);
-            }
-            updateEnabled();
+            const hasChanged = module[checked ? "enable" : "disable"](true);
+            hasChanged && updateEnabled();
         }
     })))));
 }

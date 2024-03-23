@@ -12,7 +12,13 @@ const Tag = (tag)=>/*#__PURE__*/ S.React.createElement("li", {
 export default function({ tags, importantTags, showTags }) {
     const baseTags = [
         importantTags,
-        showTags && tags
+        showTags && tags.filter((tag)=>![
+                "theme",
+                "app",
+                "extension",
+                "snippet",
+                "lib"
+            ].includes(tag))
     ].flat();
     return /*#__PURE__*/ S.React.createElement("div", {
         className: "tags-wrapper"

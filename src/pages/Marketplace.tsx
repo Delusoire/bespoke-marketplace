@@ -6,6 +6,7 @@ import { type Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
+import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 
 const cachedMetaURLs = new Map<string, Metadata>();
@@ -107,16 +108,27 @@ const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => nu
 	random: () => Math.random() - 0.5,
 };
 
-const filters = {
-	"": undefined,
-	extensions: { "": t("filter.extensions") },
-	themes: { "": t("filter.themes") },
-};
+const enabled = { enabled: { "": t("filter.enabled") } };
+
+const getFilters = () => ({
+	"": null,
+	themes: { "": t("filter.themes"), ...enabled },
+	extensions: { "": t("filter.extensions"), ...enabled },
+	apps: { "": t("filter.apps"), ...enabled },
+	snippets: { "": t("filter.snippets"), ...enabled },
+	libs: { "": CONFIG.showLibs && t("filter.libs") },
+});
+
+const isModLib = (mod: Metadata) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
+const enabledFn = { enabled: { "": mod => Module.registry.get(mod.identifier).isEnabled() } };
 
 const filterFNs = {
-	"": () => true,
-	extensions: { "": mod => mod.metadata.tags.includes("extension") },
-	themes: { "": mod => mod.metadata.tags.includes("theme") },
+	"": mod => CONFIG.showLibs || !isModLib(mod),
+	themes: { "": mod => mod.metadata.tags.includes("theme"), ...enabledFn },
+	apps: { "": mod => mod.metadata.tags.includes("app"), ...enabledFn },
+	extensions: { "": mod => mod.metadata.tags.includes("extension"), ...enabledFn },
+	snippets: { "": mod => mod.metadata.tags.includes("snippet"), ...enabledFn },
+	libs: { "": isModLib },
 };
 
 export default function () {
@@ -127,7 +139,7 @@ export default function () {
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 
-	const [chipFilter, selectedFilters] = useChipFilter(filters);
+	const [chipFilter, selectedFilters] = useChipFilter(getFilters());
 	const selectedFilterFNs = selectedFilters.map(({ key }) => getProp(filterFNs, key));
 
 	const identifiersToMetadataURLsLists = React.useMemo(() => {
@@ -147,7 +159,7 @@ export default function () {
 
 	return (
 		<section className="contentSpacing">
-			<div className="marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10">
+			<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
 				<div className="marketplace-header__left flex gap-2">{chipFilter}</div>
 				<div className="marketplace-header__right flex gap-2 items-center">
 					<p className="inline-flex self-center font-bold text-sm">{t("pages.marketplace.sort.label")}</p>

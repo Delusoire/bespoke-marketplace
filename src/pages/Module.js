@@ -143,7 +143,7 @@ export default function({ murl }) {
     return /*#__PURE__*/ S.React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10"
+        className: "marketplace-header items-center flex justify-between pb-2 flex-row z-10"
     }, /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-header__left flex gap-2"
     }, /*#__PURE__*/ S.React.createElement("h1", null, t("pages.module.title"))), /*#__PURE__*/ S.React.createElement("div", {
@@ -157,7 +157,7 @@ export default function({ murl }) {
                 updateModule();
             } else {
                 ModuleManager.add(murl);
-                new Module(metadata, `/modules/${identifier}/metadata.json`, murl, false);
+                new Module(metadata, `/modules/${identifier}/metadata.json`, murl);
                 updateModule();
             }
         },

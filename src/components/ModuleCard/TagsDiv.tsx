@@ -20,7 +20,7 @@ interface TagsDivProps {
 	showTags: boolean;
 }
 export default function ({ tags, importantTags, showTags }: TagsDivProps) {
-	const baseTags = [importantTags, showTags && tags].flat();
+	const baseTags = [importantTags, showTags && tags.filter(tag => !["theme", "app", "extension", "snippet", "lib"].includes(tag))].flat();
 
 	return (
 		<div className="tags-wrapper">

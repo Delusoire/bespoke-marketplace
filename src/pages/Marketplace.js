@@ -6,6 +6,7 @@ import { Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
+import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/Delusoire/stdlib/lib/components/index.js";
 const cachedMetaURLs = new Map();
 export const fetchMetaURLSync = (metaURL)=>cachedMetaURLs.get(metaURL);
@@ -98,22 +99,63 @@ const SortFns = {
     "z-a": (a, b)=>a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
     random: ()=>Math.random() - 0.5
 };
-const filters = {
-    "": undefined,
-    extensions: {
-        "": t("filter.extensions")
-    },
-    themes: {
-        "": t("filter.themes")
+const enabled = {
+    enabled: {
+        "": t("filter.enabled")
+    }
+};
+const getFilters = ()=>({
+        "": null,
+        themes: {
+            "": t("filter.themes"),
+            ...enabled
+        },
+        extensions: {
+            "": t("filter.extensions"),
+            ...enabled
+        },
+        apps: {
+            "": t("filter.apps"),
+            ...enabled
+        },
+        snippets: {
+            "": t("filter.snippets"),
+            ...enabled
+        },
+        libs: {
+            "": CONFIG.showLibs && t("filter.libs")
+        }
+    });
+const isModLib = (mod)=>_.intersection(mod.metadata.tags, [
+        "lib",
+        "npm",
+        "internal"
+    ]).length > 0;
+const enabledFn = {
+    enabled: {
+        "": (mod)=>Module.registry.get(mod.identifier).isEnabled()
     }
 };
 const filterFNs = {
-    "": ()=>true,
-    extensions: {
-        "": (mod)=>mod.metadata.tags.includes("extension")
-    },
+    "": (mod)=>CONFIG.showLibs || !isModLib(mod),
     themes: {
-        "": (mod)=>mod.metadata.tags.includes("theme")
+        "": (mod)=>mod.metadata.tags.includes("theme"),
+        ...enabledFn
+    },
+    apps: {
+        "": (mod)=>mod.metadata.tags.includes("app"),
+        ...enabledFn
+    },
+    extensions: {
+        "": (mod)=>mod.metadata.tags.includes("extension"),
+        ...enabledFn
+    },
+    snippets: {
+        "": (mod)=>mod.metadata.tags.includes("snippet"),
+        ...enabledFn
+    },
+    libs: {
+        "": isModLib
     }
 };
 export default function() {
@@ -126,7 +168,7 @@ export default function() {
         options: SortOptions
     });
     const sortFn = SortFns[sortOption];
-    const [chipFilter, selectedFilters] = useChipFilter(filters);
+    const [chipFilter, selectedFilters] = useChipFilter(getFilters());
     const selectedFilterFNs = selectedFilters.map(({ key })=>getProp(filterFNs, key));
     const identifiersToMetadataURLsLists = React.useMemo(()=>{
         const localModules = Module.getModules();
@@ -152,7 +194,7 @@ export default function() {
     return /*#__PURE__*/ S.React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ S.React.createElement("div", {
-        className: "marketplace-header items-center flex justify-between pb-2 flex-row top-16 z-10"
+        className: "marketplace-header items-center flex justify-between pb-2 flex-row z-10"
     }, /*#__PURE__*/ S.React.createElement("div", {
         className: "marketplace-header__left flex gap-2"
     }, chipFilter), /*#__PURE__*/ S.React.createElement("div", {
