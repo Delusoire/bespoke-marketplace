@@ -134,7 +134,10 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 							<S.ReactComponents.SettingToggle
 								className="x-settings-button justify-end"
 								value={enabled}
-								onSelected={async (checked: boolean) => (await (checked ? module.enable : module.disable)(true)) && updateEnabled()}
+								onSelected={async (checked: boolean) => {
+									const hasChanged = module[checked ? "enable" : "disable"](true);
+									hasChanged && updateEnabled();
+								}}
 							/>
 						)}
 					</div>
