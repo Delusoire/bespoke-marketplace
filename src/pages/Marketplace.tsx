@@ -108,23 +108,26 @@ const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => nu
 	random: () => Math.random() - 0.5,
 };
 
+const enabled = { enabled: { "": t("filter.enabled") } };
+
 const getFilters = () => ({
 	"": null,
-	themes: { "": t("filter.themes") },
-	extensions: { "": t("filter.extensions") },
-	apps: { "": t("filter.apps") },
-	snippets: { "": t("filter.snippets") },
+	themes: { "": t("filter.themes"), ...enabled },
+	extensions: { "": t("filter.extensions"), ...enabled },
+	apps: { "": t("filter.apps"), ...enabled },
+	snippets: { "": t("filter.snippets"), ...enabled },
 	libs: { "": CONFIG.showLibs && t("filter.libs") },
 });
 
 const isModLib = (mod: Metadata) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
+const enabledFn = { enabled: { "": mod => Module.registry.get(mod.identifier).isEnabled() } };
 
 const filterFNs = {
 	"": mod => CONFIG.showLibs || !isModLib(mod),
-	themes: { "": mod => mod.metadata.tags.includes("theme") },
-	apps: { "": mod => mod.metadata.tags.includes("app") },
-	extensions: { "": mod => mod.metadata.tags.includes("extension") },
-	snippets: { "": mod => mod.metadata.tags.includes("snippet") },
+	themes: { "": mod => mod.metadata.tags.includes("theme"), ...enabledFn },
+	apps: { "": mod => mod.metadata.tags.includes("app"), ...enabledFn },
+	extensions: { "": mod => mod.metadata.tags.includes("extension"), ...enabledFn },
+	snippets: { "": mod => mod.metadata.tags.includes("snippet"), ...enabledFn },
 	libs: { "": isModLib },
 };
 
