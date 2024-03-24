@@ -138,7 +138,7 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         className: "rFFJg1UIumqUUFDgo6n7 justify-end",
         value: enabled,
         onSelected: async (checked)=>{
-            const hasChanged = module[checked ? "enable" : "disable"](true);
+            const hasChanged = checked ? module.enable(true, true) : module.disable(true);
             hasChanged && updateEnabled();
         }
     })))));

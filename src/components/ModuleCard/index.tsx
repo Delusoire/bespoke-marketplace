@@ -135,7 +135,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 								className="x-settings-button justify-end"
 								value={enabled}
 								onSelected={async (checked: boolean) => {
-									const hasChanged = module[checked ? "enable" : "disable"](true);
+									const hasChanged = checked ? module.enable(true, true) : module.disable(true);
 									hasChanged && updateEnabled();
 								}}
 							/>
