@@ -488,10 +488,6 @@
     transition-duration: 150ms;
 }
 
-.main-view-container {
-    /*z-index: 1;*/
-}
-
 .hover\:underline:hover {
     text-decoration-line: underline;
 }
