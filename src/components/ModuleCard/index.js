@@ -93,7 +93,7 @@ export default function({ identifier, metadata, metaURL, setMetaURL, metaURLList
         draggable: "true"
     }, /*#__PURE__*/ S.React.createElement("div", {
         onClick: ()=>{
-            History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
+            History.push(`/bespoke/marketplace/${encodeURIComponent(metaURL)}`);
         },
         style: {
             pointerEvents: "all",

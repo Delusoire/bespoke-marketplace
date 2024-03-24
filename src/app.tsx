@@ -4,7 +4,7 @@ import Marketplace from "./pages/Marketplace.js";
 import ModulePage from "./pages/Module.js";
 
 export default function () {
-	const match = S.ReactRouter.useMatch("/marketplace/:murl");
+	const match = S.ReactRouter.useMatch("/bespoke/marketplace/:murl");
 	const murl = decodeURIComponent(match?.params?.murl);
 
 	return (

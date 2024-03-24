@@ -102,7 +102,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 			<div className="flex flex-col h-full" draggable="true">
 				<div
 					onClick={() => {
-						History.push(`/marketplace/${encodeURIComponent(metaURL)}`);
+						History.push(`/bespoke/marketplace/${encodeURIComponent(metaURL)}`);
 					}}
 					style={{ pointerEvents: "all", cursor: "pointer", marginBottom: "16px" }}
 				>

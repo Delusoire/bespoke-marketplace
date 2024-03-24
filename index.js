@@ -13,12 +13,12 @@ export default function(mod) {
     const registrar = createRegistrar(mod);
     const LazyApp = S.React.lazy(()=>import("./src/app.js"));
     registrar.register("route", /*#__PURE__*/ S.React.createElement(S.ReactComponents.Route, {
-        path: "/marketplace/*",
+        path: "/bespoke/marketplace/*",
         element: /*#__PURE__*/ S.React.createElement(LazyApp, null)
     }));
     registrar.register("navlink", ()=>/*#__PURE__*/ S.React.createElement(NavLink, {
             localizedApp: "Marketplace",
-            appRoutePath: "/marketplace",
+            appRoutePath: "/bespoke/marketplace",
             icon: ICON,
             activeIcon: ACTIVE_ICON
         }));
