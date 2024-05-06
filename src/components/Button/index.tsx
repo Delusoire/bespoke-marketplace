@@ -1,4 +1,4 @@
-import { S } from "/modules/Delusoire/stdlib/index.js";
+import { S } from "/modules/official/stdlib/index.js";
 
 type ButtonType = "round" | "circle";
 
@@ -14,7 +14,10 @@ interface ButtonProps {
 export default function ({ onClick, className, label = "", type = "round", children, disabled = false }: ButtonProps) {
 	const btnClass = S.classnames(
 		"spicetify-marketplace-button",
-		{ "[&_svg]:absolute [&_svg]:top-1/2 [&_svg]:left-1/2 [&_svg]:-translate-y-1/2 [&_svg]:-translate-x-1/2 ps-4 pe-4 w-12 h-12": type === "circle" },
+		{
+			"[&_svg]:absolute [&_svg]:top-1/2 [&_svg]:left-1/2 [&_svg]:-translate-y-1/2 [&_svg]:-translate-x-1/2 ps-4 pe-4 w-12 h-12":
+				type === "circle",
+		},
 		className,
 	);
 

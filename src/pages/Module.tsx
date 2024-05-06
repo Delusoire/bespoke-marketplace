@@ -1,4 +1,4 @@
-import { S } from "/modules/Delusoire/stdlib/index.js";
+import { S } from "/modules/official/stdlib/index.js";
 const { React, ReactDOM } = S;
 import Button from "../components/Button/index.js";
 import DownloadIcon from "../components/icons/DownloadIcon.js";

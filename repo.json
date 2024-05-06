@@ -13,6 +13,6 @@
 	"Delusoire/marketplace": ["https://raw.githubusercontent.com/Delusoire/bespoke-marketplace/main/metadata.json"],
 	"Delusoire/spoqify-radios": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/spoqify-radios/metadata.json"],
 	"Delusoire/statistics": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/statistics/metadata.json"],
-	"Delusoire/stdlib": ["https://raw.githubusercontent.com/Delusoire/bespoke-stdlib/main/metadata.json"],
+	"official/stdlib": ["https://raw.githubusercontent.com/Delusoire/bespoke-stdlib/main/metadata.json"],
 	"Delusoire/vaultify": ["https://raw.githubusercontent.com/Delusoire/bespoke-modules/main/vaultify/metadata.json"]
 }
