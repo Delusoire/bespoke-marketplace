@@ -85,7 +85,6 @@ export default function ({ murl }: { murl: string }) {
 
 	const author = metadata.authors[0];
 	const name = metadata.name;
-	const version = metadata.version;
 
 	const moduleIdentifier = `${author}/${name}`;
 
@@ -95,7 +94,7 @@ export default function ({ murl }: { murl: string }) {
 		return { module, loadableModule };
 	};
 
-	const [{ module, loadableModule }, updateLoadableModule] = useUpdate(getLoadableModule);
+	const [{ loadableModule }, updateLoadableModule] = useUpdate(getLoadableModule);
 
 	const installed = Boolean(loadableModule?.installed);
 	const hasRemote = Boolean(loadableModule?.remoteMetadataURL);
@@ -122,7 +121,7 @@ export default function ({ murl }: { murl: string }) {
 
 								const hasChanged = installedAndUpdated
 									? loadableModule.remove(true)
-									: new LoadableModule(metadata, true, murl).add(true);
+									: new LoadableModule(metadata.authors[0], metadata.name, metadata.version, metadata, true, murl).add(true);
 								if (await hasChanged) {
 									updateLoadableModule();
 								}

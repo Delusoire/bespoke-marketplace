@@ -2,7 +2,7 @@ import { S } from "/modules/official/stdlib/index.js";
 const { React } = S;
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
-import type { LoadableModule, Module } from "/hooks/module.js";
+import type { LoadableModule, Metadata, Module } from "/hooks/module.js";
 import { _, startCase } from "/modules/official/stdlib/deps.js";
 import Dropdown, { type OptionProps } from "/modules/official/stdlib/lib/components/Dropdown.js";
 import { useUpdate } from "../../util/index.js";
@@ -86,13 +86,23 @@ export default function ({ module, loadableModule: initialLoadableModule, showTa
 
 	const loadableModuleSelector = useLoadableModuleSelector({ loadableModule, setLoadableModule, module });
 
-	const isEnabled = () => loadableModule.isLoaded();
+	const isEnabled = () => loadableModule.isEnabled();
 	const [enabled, updateEnabled] = useUpdate(isEnabled);
 
 	const installed = loadableModule.installed;
 	const hasRemote = Boolean(loadableModule.remoteMetadataURL);
 
 	const outdated = installed && hasRemote && false;
+
+	const { data, isSuccess } = S.ReactQuery.useQuery({
+		queryKey: ["moduleCard", loadableModule.remoteMetadataURL],
+		queryFn: () => fetchJSON<Metadata>(loadableModule.remoteMetadataURL),
+		enabled: loadableModule.metadata.isDummy && hasRemote,
+	});
+
+	if (isSuccess) {
+		loadableModule.updateMetadata(data);
+	}
 
 	const { name, description, tags, authors, preview } = loadableModule.metadata;
 
