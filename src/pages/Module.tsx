@@ -7,9 +7,9 @@ import TrashIcon from "../components/icons/TrashIcon.js";
 import { t } from "../i18n.js";
 import { renderMarkdown } from "../api/github.js";
 import { logger } from "../../index.js";
-import { type Metadata, Module, ModuleManager } from "/hooks/module.js";
+import { LoadableModule, type Metadata, Module } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
-import { fetchMetaURL } from "./Marketplace.js";
+import { useUpdate } from "../util/index.js";
 
 const ShadowContent = ({ root, children }) => ReactDOM.createPortal(children, root);
 
@@ -77,57 +77,30 @@ const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 	}
 });
 
-const useUpdate = <S,>(updater: () => S) => {
-	const [state, setState] = React.useState(updater);
-	const update = React.useCallback(() => setState(updater), [updater]);
-	React.useEffect(update, [update]);
-	return [state, update] as const;
-};
-
-export const useModule = (identifier: string) => {
-	const moduleUpdater = React.useCallback(() => Module.registry.get(identifier), [identifier]);
-
-	const [module, updateModule] = useUpdate(moduleUpdater);
-
-	const enabledUpdater = React.useCallback(() => installed && module.isEnabled(), [module]);
-
-	const installed = module !== undefined;
-	const [enabled, updateEnabled] = useUpdate(enabledUpdater);
-	const [outdated, setOutdated] = React.useState(false);
-	const localOnly = installed && module.remoteMetadataURL === undefined;
-
-	React.useEffect(() => {
-		let expired = false;
-		const updateOutdated = async (remoteMetadataURL: string) => {
-			const remoteMetadata = await fetchMetaURL(remoteMetadataURL);
-			if (expired) {
-				return;
-			}
-			const outdated = module.metadata.version !== remoteMetadata.version;
-			setOutdated(outdated);
-		};
-
-		if (installed && !localOnly) {
-			updateOutdated(module.remoteMetadataURL!);
-		}
-		return () => {
-			expired = true;
-		};
-	}, [module]);
-
-	return { module, updateModule, installed, enabled, updateEnabled, outdated, localOnly };
-};
-
 export default function ({ murl }: { murl: string }) {
 	const { data: metadata } = S.ReactQuery.useSuspenseQuery({
 		queryKey: ["modulePage", murl],
 		queryFn: () => fetchJSON<Metadata>(murl),
 	});
 
-	const identifier = `${metadata.authors[0]}/${metadata.name}`;
+	const author = metadata.authors[0];
+	const name = metadata.name;
+	const version = metadata.version;
 
-	// TODO: add visual indicator & toggle for enabled
-	const { module, updateModule, installed, enabled, outdated, localOnly } = useModule(identifier);
+	const moduleIdentifier = `${author}/${name}`;
+
+	const getLoadableModule = () => {
+		const module = Module.registry.get(moduleIdentifier);
+		const loadableModule = module?.loadableModuleByVersion[metadata.version];
+		return { module, loadableModule };
+	};
+
+	const [{ module, loadableModule }, updateLoadableModule] = useUpdate(getLoadableModule);
+
+	const installed = Boolean(loadableModule?.installed);
+	const hasRemote = Boolean(loadableModule?.remoteMetadataURL);
+
+	const outdated = installed && hasRemote && false;
 
 	const readmeURL = `${murl}/../${metadata.readme}`;
 
@@ -142,19 +115,16 @@ export default function ({ murl }: { murl: string }) {
 					<h1>{t("pages.module.title")}</h1>
 				</div>
 				<div className="marketplace-header__right flex gap-2">
-					{!localOnly && (
+					{hasRemote && (
 						<Button
-							onClick={e => {
+							onClick={async e => {
 								e.preventDefault();
 
-								// TODO: these are optimistic updates, they may cause de-sync
-								if (installedAndUpdated) {
-									module.dispose(true);
-									updateModule();
-								} else {
-									ModuleManager.add(murl);
-									new Module(metadata, `/modules/${identifier}/metadata.json`, murl);
-									updateModule();
+								const hasChanged = installedAndUpdated
+									? loadableModule.remove(true)
+									: new LoadableModule(metadata, true, murl).add(true);
+								if (await hasChanged) {
+									updateLoadableModule();
 								}
 							}}
 							label={label}

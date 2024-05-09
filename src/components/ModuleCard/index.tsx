@@ -1,20 +1,22 @@
 import { S } from "/modules/official/stdlib/index.js";
+const { React } = S;
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
-import type { Metadata } from "/hooks/module.js";
+import type { LoadableModule, Module } from "/hooks/module.js";
 import { _, startCase } from "/modules/official/stdlib/deps.js";
-import { useModule } from "../../pages/Module.js";
 import Dropdown, { type OptionProps } from "/modules/official/stdlib/lib/components/Dropdown.js";
+import { useUpdate } from "../../util/index.js";
+import { fetchJSON } from "/hooks/util.js";
 
 const History = S.Platform.getHistory();
 
 interface UseMetaSelectorOpts {
-	metaURL: string;
-	setMetaURL: (metaURL: string) => void;
-	metaURLList: string[];
+	module: Module;
+	loadableModule: LoadableModule;
+	setLoadableModule: (loadableModule: LoadableModule) => void;
 }
 
-const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOpts) => {
+const useLoadableModuleSelector = ({ loadableModule, setLoadableModule, module }: UseMetaSelectorOpts) => {
 	const parseMeta = (metaURL: string) => {
 		const moduleURL = metaURL.replace(/\/metadata\.json$/, "");
 		{
@@ -36,22 +38,23 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOp
 		return { type: "unknown", path: moduleURL };
 	};
 
-	const prettifyMeta = (metaURL: string, short = true) => {
-		const { type, path } = parseMeta(metaURL);
-		if (short) {
-			return `@${type}`;
-		}
-
-		return <S.ReactComponents.ScrollableText title="abc">{`@${type}: ${path}`}</S.ReactComponents.ScrollableText>;
+	const prettifyMeta = (loadableModule: LoadableModule) => {
+		const { type, path } = parseMeta(loadableModule.remoteMetadataURL ?? "");
+		const { version } = loadableModule.metadata;
+		return <S.ReactComponents.ScrollableText title={`@${type}: ${path}`}>{version}</S.ReactComponents.ScrollableText>;
 	};
 
-	const options = Object.fromEntries(metaURLList.map(metaURL => [metaURL, ({ preview }) => prettifyMeta(metaURL, preview ?? false)] as const)) as {
+	const options = _.mapValues(module.loadableModuleByVersion, prettifyMeta) as {
 		[K in string]: React.FC<OptionProps>;
 	};
 
 	const dropdown = (
 		<div className="min-w-fit">
-			<Dropdown options={options} activeOption={metaURL} onSwitch={metaURL => setMetaURL(metaURL)} />
+			<Dropdown
+				options={options}
+				activeOption={loadableModule.metadata.version}
+				onSwitch={version => setLoadableModule(module.loadableModuleByVersion[version])}
+			/>
 		</div>
 	);
 
@@ -59,11 +62,8 @@ const useMetaSelector = ({ metaURL, setMetaURL, metaURLList }: UseMetaSelectorOp
 };
 
 interface ModuleCardProps {
-	identifier: string;
-	metadata: Metadata;
-	metaURL: string;
-	setMetaURL: (metaURL: string) => void;
-	metaURLList: string[];
+	module: Module;
+	loadableModule: LoadableModule;
 	showTags: boolean;
 }
 
@@ -81,18 +81,28 @@ const fallbackImage = () => (
 	</svg>
 );
 
-export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLList, showTags }: ModuleCardProps) {
-	const { module, installed, enabled, updateEnabled, outdated, localOnly } = useModule(identifier);
-	const metaSelector = useMetaSelector({ metaURL, setMetaURL, metaURLList });
+export default function ({ module, loadableModule: initialLoadableModule, showTags }: ModuleCardProps) {
+	const [loadableModule, setLoadableModule] = React.useState(initialLoadableModule);
 
-	const { name, description, tags, authors, preview } = metadata;
+	const loadableModuleSelector = useLoadableModuleSelector({ loadableModule, setLoadableModule, module });
+
+	const isEnabled = () => loadableModule.isLoaded();
+	const [enabled, updateEnabled] = useUpdate(isEnabled);
+
+	const installed = loadableModule.installed;
+	const hasRemote = Boolean(loadableModule.remoteMetadataURL);
+
+	const outdated = installed && hasRemote && false;
+
+	const { name, description, tags, authors, preview } = loadableModule.metadata;
 
 	const cardClasses = S.classnames("main-card-card", {
-		"border-[var(--essential-warning)]": !localOnly && outdated,
+		"border-[var(--essential-warning)]": outdated,
 	});
 
-	const href = metaURL.startsWith("http") ? metaURL : null;
-	const previewHref = `${metaURL}/../${preview}`;
+	const externalHref = loadableModule.remoteMetadataURL;
+	const metadataURL = loadableModule.installed ? `/modules/${loadableModule.getModuleIdentifier()}/metadata.json` : externalHref;
+	const previewHref = `${metadataURL}/../${preview}`;
 
 	// TODO: add more important tags
 	const importantTags = [].filter(Boolean);
@@ -114,7 +124,7 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						title={name}
 						className="hover:underline"
 						dir="auto"
-						href={href}
+						href={externalHref}
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
@@ -129,14 +139,16 @@ export default function ({ identifier, metadata, metaURL, setMetaURL, metaURLLis
 						<TagsDiv tags={tags} showTags={showTags} importantTags={importantTags} />
 					</div>
 					<div className="flex justify-between">
-						{metaSelector}
+						{loadableModuleSelector}
 						{installed && (
 							<S.ReactComponents.SettingToggle
 								className="x-settings-button justify-end"
 								value={enabled}
 								onSelected={async (checked: boolean) => {
-									const hasChanged = checked ? module.enable(true, true) : module.disable(true);
-									hasChanged && updateEnabled();
+									const hasChanged = checked ? loadableModule.enable(true) : loadableModule.disable(true);
+									if (await hasChanged) {
+										updateEnabled();
+									}
 								}}
 							/>
 						)}
