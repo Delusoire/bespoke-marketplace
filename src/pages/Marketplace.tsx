@@ -2,103 +2,11 @@ import { S } from "/modules/official/stdlib/index.js";
 const { React } = S;
 import { _ } from "/modules/official/stdlib/deps.js";
 import { t } from "../i18n.js";
-import { type Metadata, Module } from "/hooks/module.js";
-import { fetchJSON } from "/hooks/util.js";
+import { type LoadableModule, type Metadata, Module } from "/hooks/module.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { settingsButton } from "../../index.js";
 import { CONFIG } from "../settings.js";
 import { getProp, useChipFilter, useDropdown, useSearchBar } from "/modules/official/stdlib/lib/components/index.js";
-
-const cachedMetaURLs = new Map<string, Metadata>();
-export const fetchMetaURLSync = (metaURL: string) => cachedMetaURLs.get(metaURL);
-
-export const fetchMetaURL = async (metaURL: string) => {
-	const cachedMetadata = fetchMetaURLSync(metaURL);
-	if (cachedMetadata) {
-		return cachedMetadata;
-	}
-
-	const metadata = await fetchJSON<Metadata>(metaURL);
-	cachedMetaURLs.set(metaURL, metadata);
-	return metadata;
-};
-
-const dummyMetadata: Metadata = {
-	name: "",
-	tags: [],
-	preview: "",
-	version: "",
-	authors: [],
-	description: "",
-	readme: "",
-	entries: {},
-	dependencies: [],
-};
-
-export const useMetas = (identifiersToMetadataLists: Record<string, string[]>) => {
-	const updateIdentifiersToMetaURLs = () =>
-		_.mapValues(identifiersToMetadataLists, (metaList, identifier) => {
-			const module = Module.registry.get(identifier);
-			const installed = module !== undefined;
-
-			return installed ? module.getLocalMeta() : metaList[0];
-		});
-
-	const updateIdentifiersToMetadatas = () =>
-		_.mapValues(identifiersToMetaURLs, (metaURL, identifier) => {
-			const module = Module.registry.get(identifier);
-			const installed = module !== undefined;
-			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
-
-			return isLocalMetadata ? module.metadata : dummyMetadata;
-		});
-
-	const [identifiersToMetaURLs, setIdentifiersToMetaURLs] = React.useState(updateIdentifiersToMetaURLs);
-	const [identifiersToMetadatas, setIdentifiersToMetadatas] = React.useState(updateIdentifiersToMetadatas);
-
-	React.useEffect(() => {
-		const identifiersToMetaURLs = updateIdentifiersToMetaURLs();
-		setIdentifiersToMetaURLs(identifiersToMetaURLs);
-	}, [identifiersToMetadataLists]);
-
-	React.useEffect(() => {
-		const identifiersToMetadatas = updateIdentifiersToMetadatas();
-		setIdentifiersToMetadatas(identifiersToMetadatas);
-	}, [identifiersToMetaURLs]);
-
-	React.useEffect(() => {
-		let expired = false;
-		for (const [identifier, metaURL] of Object.entries(identifiersToMetaURLs)) {
-			const module = Module.registry.get(identifier);
-			const installed = module !== undefined;
-			const isLocalMetadata = installed && metaURL === module.getLocalMeta();
-
-			if (!isLocalMetadata) {
-				fetchMetaURL(metaURL).then(metadata => {
-					if (expired) return;
-					const identifiersToMetadatasCopy = Object.assign({}, identifiersToMetadatas);
-					identifiersToMetadatasCopy[identifier] = metadata;
-					setIdentifiersToMetadatas(identifiersToMetadatasCopy);
-				});
-			}
-		}
-		return () => {
-			expired = true;
-		};
-	}, [identifiersToMetaURLs]);
-
-	return _.mapValues(identifiersToMetadataLists, (_, identifier) => ({
-		metadata: identifiersToMetadatas[identifier],
-		metaURL: identifiersToMetaURLs[identifier],
-		setMetaURL: (metaURL: string) =>
-			setIdentifiersToMetaURLs(identifiersToMetaURLs => Object.assign({}, identifiersToMetaURLs, { [identifier]: metaURL })),
-	}));
-};
-
-const identifiersToRemoteMetadataURLsLists = await fetchJSON("https://raw.githubusercontent.com/Delusoire/spicetify-marketplace/main/repo.json");
-
-const mergeObjectsWithArraysConcatenated = (a, b) =>
-	_.mergeWith(a, b, (objValue, srcValue) => (_.isArray(objValue) ? objValue.concat(srcValue) : undefined));
 
 const SortOptions = { default: () => t("sort.default"), "a-z": () => t("sort.a-z"), "z-a": () => t("sort.z-a"), random: () => t("sort.random") };
 const SortFns: Record<keyof typeof SortOptions, (a: Metadata, b: Metadata) => number | boolean> = {
@@ -119,21 +27,20 @@ const getFilters = () => ({
 	libs: { "": CONFIG.showLibs && t("filter.libs") },
 });
 
-const isModLib = (mod: Module) => _.intersection(mod.metadata.tags, ["lib", "npm", "internal"]).length > 0;
-const enabledFn = { enabled: { "": mod => Module.registry.get(mod.identifier).isEnabled() } };
+const libTags = new Set(["lib", "npm", "internal"]);
+const isModLib = (mod: LoadableModule) => new Set(mod.metadata.tags).intersection(libTags).size > 0;
+const enabledFn = { enabled: { "": ({ loadableModule: mod }) => mod.isLoaded() } };
 
 const filterFNs = {
-	"": mod => CONFIG.showLibs || !isModLib(mod),
-	themes: { "": mod => mod.metadata.tags.includes("theme"), ...enabledFn },
-	apps: { "": mod => mod.metadata.tags.includes("app"), ...enabledFn },
-	extensions: { "": mod => mod.metadata.tags.includes("extension"), ...enabledFn },
-	snippets: { "": mod => mod.metadata.tags.includes("snippet"), ...enabledFn },
+	"": ({ loadableModule: mod }) => CONFIG.showLibs || !isModLib(mod),
+	themes: { "": ({ loadableModule: mod }) => mod.metadata.tags.includes("theme"), ...enabledFn },
+	apps: { "": ({ loadableModule: mod }) => mod.metadata.tags.includes("app"), ...enabledFn },
+	extensions: { "": ({ loadableModule: mod }) => mod.metadata.tags.includes("extension"), ...enabledFn },
+	snippets: { "": ({ loadableModule: mod }) => mod.metadata.tags.includes("snippet"), ...enabledFn },
 	libs: { "": isModLib },
 };
 
 export default function () {
-	const [refreshCount, refresh] = React.useReducer(x => x + 1, 0);
-
 	const [searchbar, search] = useSearchBar({ placeholder: t("pages.marketplace.search_modules"), expanded: true });
 
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
@@ -142,19 +49,14 @@ export default function () {
 	const [chipFilter, selectedFilters] = useChipFilter(getFilters());
 	const selectedFilterFNs = selectedFilters.map(({ key }) => getProp(filterFNs, key));
 
-	const identifiersToMetadataURLsLists = React.useMemo(() => {
-		const localModules = Module.getModules();
-		const identifiersToLocalMetadataURLsLists = Object.fromEntries(localModules.map(module => [module.getIdentifier(), [module.getLocalMeta()]]));
-		return mergeObjectsWithArraysConcatenated(identifiersToLocalMetadataURLsLists, identifiersToRemoteMetadataURLsLists);
-	}, [refreshCount]);
-
-	const identifiersToMetadataProps = useMetas(identifiersToMetadataURLsLists);
 	const propsList = React.useMemo(
 		() =>
-			Object.entries(identifiersToMetadataProps).map(([identifier, metadataProps]) =>
-				Object.assign({ identifier, showTags: true, metaURLList: identifiersToMetadataURLsLists[identifier] }, metadataProps),
-			),
-		[identifiersToMetadataURLsLists, identifiersToMetadataProps],
+			Module.getModules().map(module => {
+				const selectedVersion = module.enabled ?? Object.keys(module.loadableModuleByVersion)[0];
+				const loadableModule = module.loadableModuleByVersion[selectedVersion];
+				return { module, loadableModule, showTags: true };
+			}),
+		[],
 	);
 
 	return (
@@ -172,13 +74,12 @@ export default function () {
 				<div className="marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth">
 					{selectedFilterFNs
 						.reduce((acc, fn) => acc.filter(fn), propsList)
-						.filter(props => {
-							const { metadata } = props;
-							const { name, tags, authors } = metadata;
+						.filter(({ loadableModule }: (typeof propsList)[number]) => {
+							const { name, tags, authors } = loadableModule.metadata;
 							const searchFiels = [name, ...tags, ...authors];
 							return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
 						})
-						.sort((a, b) => sortFn?.(a.metadata, b.metadata) as number)
+						.sort((a, b) => sortFn?.(a.loadableModule.metadata, b.loadableModule.metadata) as number)
 						.map(props => (
 							<ModuleCard key={props.identifier} {...props} />
 						))}
