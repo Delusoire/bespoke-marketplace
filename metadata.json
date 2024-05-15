@@ -1,14 +1,21 @@
 {
 	"name": "marketplace",
-	"tags": ["app"],
+	"tags": [
+		"app"
+	],
 	"preview": "./PREVIEW.png",
-	"version": "beta",
-	"authors": ["Delusoire"],
+	"version": "0.1.0-beta",
+	"authors": [
+		"Delusoire"
+	],
 	"description": "The marketplace for bespoke modules.",
 	"readme": "./README.md",
 	"entries": {
 		"js": "index.js",
 		"css": "src/app.css"
 	},
-	"dependencies": ["official/stdlib", "Delusoire/delulib"]
+	"dependencies": {
+		"official/stdlib": "0.1.0-beta",
+		"Delusoire/delulib": "0.1.0-beta"
+	}
 }

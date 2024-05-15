@@ -1,4 +1,4 @@
-import { S } from "/modules/official/stdlib/index.js";
+import { React } from "/modules/official/stdlib/src/expose/React.js";
 
 // Export GitHub icon SVG as a React component
 export default function () {

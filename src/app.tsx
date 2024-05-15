@@ -1,18 +1,21 @@
-import { S } from "/modules/official/stdlib/index.js";
 
 import Marketplace from "./pages/Marketplace.js";
 import ModulePage from "./pages/Module.js";
+import { Routes, Route } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
+import { useMatch } from "/modules/official/stdlib/src/webpack/ReactRouter.js";
+import { React } from "/modules/official/stdlib/src/expose/React.js";
+
 
 export default function () {
-	const match = S.ReactRouter.useMatch("/bespoke/marketplace/:murl");
-	const murl = decodeURIComponent(match?.params?.murl);
+	const match = useMatch( "/bespoke/marketplace/:murl" );
+	const murl = decodeURIComponent( match?.params?.murl );
 
 	return (
 		<div id="marketplace">
-			<S.ReactComponents.Routes>
-				<S.ReactComponents.Route path="/" element={<Marketplace />} />
-				<S.ReactComponents.Route path=":murl" element={<ModulePage murl={murl} />} />
-			</S.ReactComponents.Routes>
+			<Routes>
+				<Route path="/" element={ <Marketplace /> } />
+				<Route path=":murl" element={ <ModulePage murl={ murl } /> } />
+			</Routes>
 		</div>
 	);
 }

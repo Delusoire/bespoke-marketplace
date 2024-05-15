@@ -1,8 +1,8 @@
 .marketplace-card__author {
-    /* Add comma before authors that have a sibling */
-    & ~ .marketplace-card__author {
-        &::before {
-            content: ", ";
-        }
-    }
+   /* Add comma before authors that have a sibling */
+   & ~ .marketplace-card__author {
+      &::before {
+         content: ", ";
+      }
+   }
 }

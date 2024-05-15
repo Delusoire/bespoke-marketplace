@@ -1,27 +1,20 @@
-import { S } from "/modules/official/stdlib/index.js";
 import Marketplace from "./pages/Marketplace.js";
 import ModulePage from "./pages/Module.js";
-export default function () {
-	const match = S.ReactRouter.useMatch("/bespoke/marketplace/:murl");
-	const murl = decodeURIComponent(match?.params?.murl);
-	return /*#__PURE__*/ S.React.createElement(
-		"div",
-		{
-			id: "marketplace",
-		},
-		/*#__PURE__*/ S.React.createElement(
-			S.ReactComponents.Routes,
-			null,
-			/*#__PURE__*/ S.React.createElement(S.ReactComponents.Route, {
-				path: "/",
-				element: /*#__PURE__*/ S.React.createElement(Marketplace, null),
-			}),
-			/*#__PURE__*/ S.React.createElement(S.ReactComponents.Route, {
-				path: ":murl",
-				element: /*#__PURE__*/ S.React.createElement(ModulePage, {
-					murl: murl,
-				}),
-			}),
-		),
-	);
+import { Routes, Route } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
+import { useMatch } from "/modules/official/stdlib/src/webpack/ReactRouter.js";
+import { React } from "/modules/official/stdlib/src/expose/React.js";
+export default function() {
+    const match = useMatch("/bespoke/marketplace/:murl");
+    const murl = decodeURIComponent(match?.params?.murl);
+    return /*#__PURE__*/ React.createElement("div", {
+        id: "marketplace"
+    }, /*#__PURE__*/ React.createElement(Routes, null, /*#__PURE__*/ React.createElement(Route, {
+        path: "/",
+        element: /*#__PURE__*/ React.createElement(Marketplace, null)
+    }), /*#__PURE__*/ React.createElement(Route, {
+        path: ":murl",
+        element: /*#__PURE__*/ React.createElement(ModulePage, {
+            murl: murl
+        })
+    })));
 }
