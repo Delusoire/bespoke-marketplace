@@ -96,7 +96,7 @@ export default function ( { moduleInst: initialModuleInst, showTags }: ModuleCar
 	const [ enabled, updateEnabled ] = useUpdate( isEnabled );
 
 	const installed = moduleInst.isInstalled();
-	const hasRemote = Boolean( moduleInst.remotes.length );
+	const hasRemote = Boolean( moduleInst.artifacts.length );
 
 	const outdated = installed && hasRemote && false;
 
@@ -112,7 +112,7 @@ export default function ( { moduleInst: initialModuleInst, showTags }: ModuleCar
 
 	const { name, description, tags, authors, preview } = moduleInst.metadata;
 
-	const cardClasses = classnames( "main-card-card", {
+	const cardClasses = classnames( "LunqxlFIupJw_Dkx6mNx", {
 		"border-[var(--essential-warning)]": outdated,
 	} );
 

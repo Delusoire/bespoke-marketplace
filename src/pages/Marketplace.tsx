@@ -70,7 +70,7 @@ export default function () {
 				</div>
 			</div>
 			<>
-				<div className="marketplace-grid main-gridContainer-gridContainer main-gridContainer-fixedWidth">
+				<div className="marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd">
 					{ selectedFilterFNs
 						.reduce( ( acc, fn ) => acc.filter( fn ), propsList )
 						.filter( ( { moduleInst }: ( typeof propsList )[ number ] ) => {
@@ -80,7 +80,7 @@ export default function () {
 						} )
 						.sort( ( a, b ) => sortFn?.( a.moduleInst.metadata, b.moduleInst.metadata ) as number )
 						.map( props => (
-							<ModuleCard key={ props.identifier } { ...props } />
+							<ModuleCard key={ props.moduleInst.getModuleIdentifier() } { ...props } />
 						) ) }
 				</div>
 			</>

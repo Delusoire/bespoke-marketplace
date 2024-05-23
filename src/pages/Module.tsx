@@ -7,7 +7,7 @@ import TrashIcon from "../components/icons/TrashIcon.js";
 import { t } from "../i18n.js";
 import { renderMarkdown } from "../api/github.js";
 import { logger } from "../../index.js";
-import { type Metadata, Module } from "/hooks/module.js";
+import { type Metadata, Module, type ModuleInstance } from "/hooks/module.js";
 import { fetchJSON } from "/hooks/util.js";
 import { useUpdate } from "../util/index.js";
 import { useQuery, useSuspenseQuery } from "/modules/official/stdlib/src/webpack/ReactQuery.js";
@@ -78,7 +78,8 @@ const RemoteMarkdown = React.memo( ( { url }: { url: string; } ) => {
 	}
 } );
 
-export default function ( { murl }: { murl: string; } ) {
+export default function ( { aurl }: { aurl: string; } ) {
+	const murl = aurl.replace( /\.zip$/, ".metadata.json" );
 	const { data: metadata } = useSuspenseQuery( {
 		queryKey: [ "modulePage", murl ],
 		queryFn: () => fetchJSON<Metadata>( murl ),
@@ -86,27 +87,23 @@ export default function ( { murl }: { murl: string; } ) {
 
 	const author = metadata.authors[ 0 ];
 	const name = metadata.name;
-
 	const moduleIdentifier = `${ author }/${ name }`;
 
-	const getLoadableModule = () => {
+	const getModuleInst = () => {
 		const module = Module.get( moduleIdentifier );
-		const loadableModule = module?.instances.get( metadata.version );
-		return { module, loadableModule };
+		const moduleInst = module?.instances.get( metadata.version );
+		return { module, moduleInst };
 	};
 
-	const [ { loadableModule }, updateLoadableModule ] = useUpdate( getLoadableModule );
+	const [ { moduleInst }, updateModuleInst ] = useUpdate( getModuleInst );
 
-	const installed = loadableModule?.isInstalled();
-	const hasRemote = Boolean( loadableModule?.remotes.length );
+	const installed = moduleInst?.isInstalled();
 
-	const outdated = installed && hasRemote && false;
-
-	const readmeURL = `${ murl }/../${ metadata.readme }`;
+	const outdated = installed && false;
 
 	const label = t( installed ? "pages.module.remove" : "pages.module.install" );
 
-	const installedAndUpdated = installed && !outdated;
+	const Button = installed && !outdated ? TrashButton : DownloadButton;
 
 	return (
 		<section className="contentSpacing">
@@ -115,33 +112,48 @@ export default function ( { murl }: { murl: string; } ) {
 					<h1>{ t( "pages.module.title" ) }</h1>
 				</div>
 				<div className="marketplace-header__right flex gap-2">
-					{ hasRemote && (
-						<Button
-							onClick={ async e => {
-								e.preventDefault();
-
-								let hasChanged: boolean;
-
-								if ( installedAndUpdated ) {
-									hasChanged = await loadableModule!.remove();
-								} else {
-									const module = Module.getOrCreate( `${ metadata.authors[ 0 ] }/${ metadata.name }` );
-									const moduleInst = await module.getInstanceOrCreate( metadata.version );
-									hasChanged = await moduleInst.add();
-								}
-
-								if ( hasChanged ) {
-									updateLoadableModule();
-								}
-							} }
-							label={ label }
-						>
-							{ installedAndUpdated ? <TrashIcon /> : <DownloadIcon /> } { label }
-						</Button>
-					) }
+					<Button label={ label } moduleInst={ moduleInst! } metadata={ metadata } onUpdate={ updateModuleInst } />
 				</div>
 			</div>
 			<RemoteMarkdown url={ readmeURL } />
 		</section>
 	);
 }
+
+interface TrashButtonProps {
+	label: string;
+	moduleInst: ModuleInstance;
+	onUpdate: () => void;
+}
+const TrashButton = ( props: TrashButtonProps ) => {
+	return <Button label={ props.label } onClick={ async e => {
+		e.preventDefault();
+
+		if ( await props.moduleInst!.remove() ) {
+			props.onUpdate();
+		}
+	} }>
+		<TrashIcon />
+		{ props.label }
+	</Button>;
+};
+
+interface DownloadButtonProps {
+	label: string;
+	metadata: Metadata;
+	onUpdate: () => void;
+}
+const DownloadButton = ( props: DownloadButtonProps ) => {
+	return <Button label={ props.label } onClick={ async e => {
+		e.preventDefault();
+
+		const module = Module.getOrCreate( `${ props.metadata.authors[ 0 ] }/${ props.metadata.name }` );
+		const moduleInst = await module.getInstanceOrCreate( props.metadata.version );
+		if ( await moduleInst.add() ) {
+			props.onUpdate();
+		}
+	} }>
+		<TrashIcon />
+		{ props.label }
+	</Button>;
+};
