@@ -85,6 +85,7 @@ export default function ( { aurl }: { aurl: string; } ) {
 		queryFn: () => fetchJSON<Metadata>( murl ),
 	} );
 
+	// !
 	const author = metadata.authors[ 0 ];
 	const name = metadata.name;
 	const moduleIdentifier = `${ author }/${ name }`;
@@ -95,7 +96,7 @@ export default function ( { aurl }: { aurl: string; } ) {
 		return { module, moduleInst };
 	};
 
-	const [ { moduleInst }, updateModuleInst ] = useUpdate( getModuleInst );
+	const [ { moduleInst }, _, updateModuleInst ] = useUpdate( getModuleInst );
 
 	const installed = moduleInst?.isInstalled();
 

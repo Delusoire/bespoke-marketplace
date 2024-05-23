@@ -1,7 +1,7 @@
 import { React } from "/modules/official/stdlib/src/expose/React.js";
 import AuthorsDiv from "./AuthorsDiv.js";
 import TagsDiv from "./TagsDiv.js";
-import type { ModuleInstance, Metadata, Module } from "/hooks/module.js";
+import type { ModuleInstance, Metadata, Version } from "/hooks/module.js";
 import { _, startCase } from "/modules/official/stdlib/deps.js";
 import Dropdown from "/modules/official/stdlib/lib/components/Dropdown.js";
 import { useUpdate } from "../../util/index.js";
@@ -15,10 +15,10 @@ const History = Platform.getHistory();
 
 interface UseMetaSelectorOpts {
 	moduleInst: ModuleInstance;
-	setModuleInst: ( moduleInst: ModuleInstance ) => void;
+	selectVersion: ( v: Version ) => void;
 }
 
-const useLoadableModuleSelector = ( { moduleInst, setModuleInst: setLoadableModule }: UseMetaSelectorOpts ) => {
+const useLoadableModuleSelector = ( { moduleInst, selectVersion }: UseMetaSelectorOpts ) => {
 	const parseMeta = ( metaURL: string ) => {
 		const moduleURL = metaURL.replace( /\/metadata\.json$/, "" );
 		{
@@ -41,7 +41,7 @@ const useLoadableModuleSelector = ( { moduleInst, setModuleInst: setLoadableModu
 	};
 
 	const prettifyMeta = ( moduleInst: ModuleInstance ) => () => {
-		const remote = moduleInst.getRemote();
+		const remote = moduleInst.getRemoteArtifact();
 		if ( !remote ) {
 			return;
 		}
@@ -59,7 +59,7 @@ const useLoadableModuleSelector = ( { moduleInst, setModuleInst: setLoadableModu
 			<Dropdown
 				options={ options }
 				activeOption={ moduleInst.getVersion() }
-				onSwitch={ version => setLoadableModule( instances.get( version )! ) }
+				onSwitch={ version => selectVersion( version ) }
 			/>
 		</div>
 	);
@@ -68,9 +68,9 @@ const useLoadableModuleSelector = ( { moduleInst, setModuleInst: setLoadableModu
 };
 
 interface ModuleCardProps {
-	module: Module;
 	moduleInst: ModuleInstance;
-	showTags: boolean;
+	selectVersion: ( v: Version ) => void;
+	showTags?: boolean;
 }
 
 const fallbackImage = () => (
@@ -87,26 +87,25 @@ const fallbackImage = () => (
 	</svg>
 );
 
-export default function ( { moduleInst: initialModuleInst, showTags }: ModuleCardProps ) {
-	const [ moduleInst, setModuleInst ] = React.useState( initialModuleInst );
-
-	const moduleInstSelector = useLoadableModuleSelector( { moduleInst, setModuleInst } );
+export default function ( { moduleInst, selectVersion, showTags = true }: ModuleCardProps ) {
+	const moduleInstSelector = useLoadableModuleSelector( { moduleInst, selectVersion } );
 
 	const isEnabled = () => moduleInst.isLoaded();
-	const [ enabled, updateEnabled ] = useUpdate( isEnabled );
+	const [ enabled, setEnabled, updateEnabled ] = useUpdate( isEnabled );
 
 	const installed = moduleInst.isInstalled();
 	const hasRemote = Boolean( moduleInst.artifacts.length );
 
 	const outdated = installed && hasRemote && false;
 
+	const remoteMetadata = moduleInst.getRemoteMetadata();
 	const { data, isSuccess } = useQuery( {
-		queryKey: [ "moduleCard", moduleInst.getRemote() ],
-		queryFn: () => fetchJSON<Metadata>( moduleInst.getRemote() ),
+		queryKey: [ "moduleCard", remoteMetadata ],
+		queryFn: () => fetchJSON<Metadata>( remoteMetadata ),
 		enabled: moduleInst.metadata.isDummy && hasRemote,
 	} );
 
-	if ( isSuccess ) {
+	if ( moduleInst.metadata.isDummy && isSuccess ) {
 		moduleInst.updateMetadata( data );
 	}
 
@@ -116,8 +115,8 @@ export default function ( { moduleInst: initialModuleInst, showTags }: ModuleCar
 		"border-[var(--essential-warning)]": outdated,
 	} );
 
-	const externalHref = moduleInst.getRemote();
-	const metadataURL = installed ? moduleInst.getRelPath( "metadata.json" ) : externalHref;
+	const externalHref = moduleInst.getRemoteArtifact();
+	const metadataURL = installed ? moduleInst.getRelPath( "metadata.json" ) : remoteMetadata;
 	const previewHref = `${ metadataURL }/../${ preview }`;
 
 	// TODO: add more important tags
@@ -161,8 +160,9 @@ export default function ( { moduleInst: initialModuleInst, showTags }: ModuleCar
 								className="x-settings-button justify-end"
 								value={ enabled }
 								onSelected={ async ( checked: boolean ) => {
+									setEnabled( checked );
 									const hasChanged = checked ? moduleInst.load() : moduleInst.unload();
-									if ( await hasChanged ) {
+									if ( !await hasChanged ) {
 										updateEnabled();
 									}
 								} }
