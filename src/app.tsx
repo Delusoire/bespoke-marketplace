@@ -7,14 +7,14 @@ import { React } from "/modules/official/stdlib/src/expose/React.js";
 
 
 export default function () {
-	const match = useMatch( "/bespoke/marketplace/:murl" );
-	const murl = decodeURIComponent( match?.params?.murl );
+	const match = useMatch( "/bespoke/marketplace/:aurl" );
+	const aurl = decodeURIComponent( match?.params?.aurl );
 
 	return (
 		<div id="marketplace">
 			<Routes>
 				<Route path="/" element={ <Marketplace /> } />
-				<Route path=":murl" element={ <ModulePage murl={ murl } /> } />
+				<Route path=":murl" element={ <ModulePage aurl={ aurl } /> } />
 			</Routes>
 		</div>
 	);

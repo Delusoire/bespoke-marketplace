@@ -1,4 +1,5 @@
 import { React } from "/modules/official/stdlib/src/expose/React.js";
+import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.js";
 import { _ } from "/modules/official/stdlib/deps.js";
 import { t } from "../i18n.js";
 import {
@@ -76,7 +77,7 @@ export default function () {
 
 	const getModuleInsts = () =>
 		Object.fromEntries(
-			Module.getAll().map( module => {
+			Module.getAll().flatMap( module => {
 				const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
 				const moduleInst = module.instances.get( selectedVersion );
 				return moduleInst ? ( [ [ module.getIdentifier(), moduleInst ] ] as const ) : [];
@@ -93,31 +94,50 @@ export default function () {
 		} )
 		.sort( ( a, b ) => sortFn?.( a.metadata, b.metadata ) as number );
 
+	const [ selectedModule, selectModule ] = React.useState<Module | null>( null );
+
+	const panelTarget: any = document.querySelector( "#MarketplacePanel" );
+	let panel;
+	if ( selectedModule && panelTarget ) {
+		const Warp = () => {
+			return <div>{ selectedModule.getIdentifier() }</div>;
+		};
+		panel = ReactDOM.createPortal( <Warp />, panelTarget );
+	}
+
 	return (
-		<section className="contentSpacing">
-			<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
-				<div className="marketplace-header__left flex gap-2">{ chipFilter }</div>
-				<div className="marketplace-header__right flex gap-2 items-center">
-					<p className="inline-flex self-center font-bold text-sm">{ t( "pages.marketplace.sort.label" ) }</p>
-					{ sortbox }
-					{ searchbar }
-					{ settingsButton }
+		<>
+			<section className="contentSpacing">
+				<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
+					<div className="marketplace-header__left flex gap-2">{ chipFilter }</div>
+					<div className="marketplace-header__right flex gap-2 items-center">
+						<p className="inline-flex self-center font-bold text-sm">{ t( "pages.marketplace.sort.label" ) }</p>
+						{ sortbox }
+						{ searchbar }
+						{ settingsButton }
+					</div>
 				</div>
-			</div>
-			<>
-				<div className="marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd">
-					{ moduleCardProps.map( moduleInst => (
-						<ModuleCard
-							key={ moduleInst.getModuleIdentifier() }
-							moduleInst={ moduleInst }
-							selectVersion={ ( v: Version ) => {
-								const mis = { ...moduleInsts, [ moduleInst.getModuleIdentifier() ]: moduleInst.getModule().instances.get( v )! };
-								setModuleInsts( mis );
-							} }
-						/>
-					) ) }
-				</div>
-			</>
-		</section>
+				<>
+					<div className="marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd">
+						{ moduleCardProps.map( moduleInst => {
+							const module = moduleInst.getModule();
+							const moduleIdentifier = module.getIdentifier();
+							const isSelected = module === selectedModule;
+							return <ModuleCard
+								key={ moduleIdentifier }
+								moduleInst={ moduleInst }
+								isSelected={ isSelected }
+								selectVersion={ ( v: Version ) => {
+									const mis = { ...moduleInsts, [ moduleIdentifier ]: module.instances.get( v )! };
+									setModuleInsts( mis );
+								} }
+								onClick={ () => selectModule( isSelected ? null : module ) }
+							/>;
+						} ) }
+					</div>
+				</>
+			</section>
+			{ panel }
+		</>
 	);
 }

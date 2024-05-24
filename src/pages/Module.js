@@ -1,7 +1,6 @@
 import { React } from "/modules/official/stdlib/src/expose/React.js";
 import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.js";
 import Button from "../components/Button/index.js";
-import DownloadIcon from "../components/Icons/DownloadIcon.js";
 import LoadingIcon from "../components/Icons/LoadingIcon.js";
 import TrashIcon from "../components/Icons/TrashIcon.js";
 import { t } from "../i18n.js";
@@ -73,7 +72,8 @@ const RemoteMarkdown = React.memo(({ url })=>{
             }
     }
 });
-export default function({ murl }) {
+export default function({ aurl }) {
+    const murl = aurl.replace(/\.zip$/, ".metadata.json");
     const { data: metadata } = useSuspenseQuery({
         queryKey: [
             "modulePage",
@@ -81,24 +81,23 @@ export default function({ murl }) {
         ],
         queryFn: ()=>fetchJSON(murl)
     });
+    // !
     const author = metadata.authors[0];
     const name = metadata.name;
     const moduleIdentifier = `${author}/${name}`;
-    const getLoadableModule = ()=>{
+    const getModuleInst = ()=>{
         const module = Module.get(moduleIdentifier);
-        const loadableModule = module?.instances.get(metadata.version);
+        const moduleInst = module?.instances.get(metadata.version);
         return {
             module,
-            loadableModule
+            moduleInst
         };
     };
-    const [{ loadableModule }, updateLoadableModule] = useUpdate(getLoadableModule);
-    const installed = loadableModule?.isInstalled();
-    const hasRemote = Boolean(loadableModule?.remotes.length);
-    const outdated = installed && hasRemote && false;
-    const readmeURL = `${murl}/../${metadata.readme}`;
+    const [{ moduleInst }, _, updateModuleInst] = useUpdate(getModuleInst);
+    const installed = moduleInst?.isInstalled();
+    const outdated = installed && false;
     const label = t(installed ? "pages.module.remove" : "pages.module.install");
-    const installedAndUpdated = installed && !outdated;
+    const Button = installed && !outdated ? TrashButton : DownloadButton;
     return /*#__PURE__*/ React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ React.createElement("div", {
@@ -107,23 +106,36 @@ export default function({ murl }) {
         className: "marketplace-header__left flex gap-2"
     }, /*#__PURE__*/ React.createElement("h1", null, t("pages.module.title"))), /*#__PURE__*/ React.createElement("div", {
         className: "marketplace-header__right flex gap-2"
-    }, hasRemote && /*#__PURE__*/ React.createElement(Button, {
-        onClick: async (e)=>{
-            e.preventDefault();
-            let hasChanged;
-            if (installedAndUpdated) {
-                hasChanged = await loadableModule.remove();
-            } else {
-                const module = Module.getOrCreate(`${metadata.authors[0]}/${metadata.name}`);
-                const moduleInst = await module.getInstanceOrCreate(metadata.version);
-                hasChanged = await moduleInst.add();
-            }
-            if (hasChanged) {
-                updateLoadableModule();
-            }
-        },
-        label: label
-    }, installedAndUpdated ? /*#__PURE__*/ React.createElement(TrashIcon, null) : /*#__PURE__*/ React.createElement(DownloadIcon, null), " ", label))), /*#__PURE__*/ React.createElement(RemoteMarkdown, {
+    }, /*#__PURE__*/ React.createElement(Button, {
+        label: label,
+        moduleInst: moduleInst,
+        metadata: metadata,
+        onUpdate: updateModuleInst
+    }))), /*#__PURE__*/ React.createElement(RemoteMarkdown, {
         url: readmeURL
     }));
 }
+const TrashButton = (props)=>{
+    return /*#__PURE__*/ React.createElement(Button, {
+        label: props.label,
+        onClick: async (e)=>{
+            e.preventDefault();
+            if (await props.moduleInst.remove()) {
+                props.onUpdate();
+            }
+        }
+    }, /*#__PURE__*/ React.createElement(TrashIcon, null), props.label);
+};
+const DownloadButton = (props)=>{
+    return /*#__PURE__*/ React.createElement(Button, {
+        label: props.label,
+        onClick: async (e)=>{
+            e.preventDefault();
+            const module = Module.getOrCreate(`${props.metadata.authors[0]}/${props.metadata.name}`);
+            const moduleInst = await module.getInstanceOrCreate(props.metadata.version);
+            if (await moduleInst.add()) {
+                props.onUpdate();
+            }
+        }
+    }, /*#__PURE__*/ React.createElement(TrashIcon, null), props.label);
+};

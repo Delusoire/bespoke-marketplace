@@ -1,7 +1,9 @@
 {
-  "name": "marketplace",
-  "scripts": {},
+  "scripts": {
+    "tailor": "node node_modules/@delu/tailor/cli.js"
+  },
   "devDependencies": {
+    "@delu/tailor": "npm:@jsr/delu__tailor@^0.1.9",
     "@types/chroma-js": "^2.4.3",
     "@types/semver": "^7.5.6",
     "chroma-js": "^2.4.2",
@@ -14,5 +16,5 @@
     "react-simple-code-editor": "^0.13.1",
     "semver": "^7.6.0"
   },
-  "private": true
+  "type": "module"
 }

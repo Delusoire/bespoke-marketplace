@@ -71,6 +71,8 @@ interface ModuleCardProps {
 	moduleInst: ModuleInstance;
 	selectVersion: ( v: Version ) => void;
 	showTags?: boolean;
+	onClick: () => void;
+	isSelected: boolean;
 }
 
 const fallbackImage = () => (
@@ -87,7 +89,7 @@ const fallbackImage = () => (
 	</svg>
 );
 
-export default function ( { moduleInst, selectVersion, showTags = true }: ModuleCardProps ) {
+export default function ( { moduleInst, selectVersion, showTags = true, onClick, isSelected }: ModuleCardProps ) {
 	const moduleInstSelector = useLoadableModuleSelector( { moduleInst, selectVersion } );
 
 	const isEnabled = () => moduleInst.isLoaded();
@@ -101,7 +103,7 @@ export default function ( { moduleInst, selectVersion, showTags = true }: Module
 	const remoteMetadata = moduleInst.getRemoteMetadata();
 	const { data, isSuccess } = useQuery( {
 		queryKey: [ "moduleCard", remoteMetadata ],
-		queryFn: () => fetchJSON<Metadata>( remoteMetadata ),
+		queryFn: () => fetchJSON<Metadata>( remoteMetadata! ),
 		enabled: moduleInst.metadata.isDummy && hasRemote,
 	} );
 
@@ -113,21 +115,22 @@ export default function ( { moduleInst, selectVersion, showTags = true }: Module
 
 	const cardClasses = classnames( "LunqxlFIupJw_Dkx6mNx", {
 		"border-[var(--essential-warning)]": outdated,
+		"bg-neutral-800": isSelected
 	} );
 
 	const externalHref = moduleInst.getRemoteArtifact();
 	const metadataURL = installed ? moduleInst.getRelPath( "metadata.json" ) : remoteMetadata;
-	const previewHref = `${ metadataURL }/../${ preview }`;
+	const previewHref = metadataURL ? `${ metadataURL }/../${ preview }` : "";
 
 	// TODO: add more important tags
 	const importantTags = [].filter( Boolean );
 
 	return (
 		<div className={ cardClasses }>
-			<div className="flex flex-col h-full" draggable="true">
+			<div className="border-[var(--essential-warning)] flex flex-col h-full" style={ { pointerEvents: "all" } } draggable="true" onClick={ onClick }>
 				<div
 					onClick={ () => {
-						History.push( `/bespoke/marketplace/${ encodeURIComponent( metadataURL ) }` );
+						metadataURL && History.push( `/bespoke/marketplace/${ encodeURIComponent( metadataURL ) }` );
 					} }
 					style={ { pointerEvents: "all", cursor: "pointer", marginBottom: "16px" } }
 				>

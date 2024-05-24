@@ -7,6 +7,10 @@ import type { ModuleInstance } from "/hooks/module.js";
 import type { Settings } from "/modules/official/stdlib/lib/settings.js";
 import { ACTIVE_ICON, ICON } from "./src/static.js";
 import { Route } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
+import { PlaybarButton } from "/modules/official/stdlib/src/registers/playbarButton.js";
+import { usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
+import panelReg from "/modules/official/stdlib/src/registers/panel.js";
+import VersionList from "./src/components/VersionList/./index.js";
 
 export let storage: Storage;
 export let logger: Console;
@@ -22,7 +26,20 @@ export default function ( mod: ModuleInstance ) {
 	const LazyApp = React.lazy( () => import( "./src/app.js" ) );
 	registrar.register( "route", <Route path={ "/bespoke/marketplace/*" } element={ <LazyApp /> } /> );
 
-	registrar.register( "navlink", () => (
-		<NavLink localizedApp="Marketplace" appRoutePath="/bespoke/marketplace" icon={ ICON } activeIcon={ ACTIVE_ICON } />
-	) );
+	registrar.register( "navlink", <MarketplaceLink /> );
+
+	const panel = <VersionList />;
+	registrar.register( "panel", panel );
+	registrar.register( "playbarButton", <VersionListButton { ...panelReg.getHash( panel )! } /> );
 }
+
+const MarketplaceLink = () => (
+	<NavLink localizedApp="Marketplace" appRoutePath="/bespoke/marketplace" icon={ ICON } activeIcon={ ACTIVE_ICON } />
+);
+
+
+const VersionListButton = ( props: { state: string; event: string; } ) => {
+	const { isActive, panelSend } = usePanelAPI( props.state );
+
+	return <PlaybarButton label="Marketplace" isActive={ isActive } icon={ ICON } onClick={ () => panelSend( props.event ) } />;
+};
