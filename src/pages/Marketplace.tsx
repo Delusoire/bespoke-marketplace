@@ -10,7 +10,7 @@ import {
 	type Version,
 } from "/hooks/module.js";
 import ModuleCard from "../components/ModuleCard/index.js";
-import { settingsButton } from "../../index.js";
+import { hash, settingsButton } from "../../index.js";
 import { CONFIG } from "../settings.js";
 import {
 	getProp,
@@ -19,8 +19,9 @@ import {
 	useDropdown,
 	useSearchBar,
 	type RTree,
-	type Tree,
 } from "/modules/official/stdlib/lib/components/index.js";
+import { usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
+import { VersionListContent } from "../components/VersionList/index.js";
 
 const SortOptions = {
 	default: () => t( "sort.default" ),
@@ -59,6 +60,9 @@ const filterFNs: RTree<( m: ModuleInstance ) => boolean> = {
 	libs: { [ TreeNodeVal ]: isModLib },
 };
 
+export let unselect: ( () => void ) | undefined;
+export let refresh: ( () => void ) | undefined;
+
 export default function () {
 	const [ searchbar, search ] = useSearchBar( {
 		placeholder: t( "pages.marketplace.search_modules" ),
@@ -95,18 +99,20 @@ export default function () {
 		.sort( ( a, b ) => sortFn?.( a.metadata, b.metadata ) as number );
 
 	const [ selectedModule, selectModule ] = React.useState<Module | null>( null );
+	unselect = () => selectModule( null );
+	[ , refresh ] = React.useReducer( n => n + 1, 0 );
 
 	const panelTarget: any = document.querySelector( "#MarketplacePanel" );
 	let panel;
 	if ( selectedModule && panelTarget ) {
-		const Warp = () => {
-			return <div>{ selectedModule.getIdentifier() }</div>;
-		};
-		panel = ReactDOM.createPortal( <Warp />, panelTarget );
+		panel = ReactDOM.createPortal( <VersionListContent module={ selectedModule } />, panelTarget, crypto.randomUUID() );
 	}
+
+	const { panelSend } = usePanelAPI();
 
 	return (
 		<>
+			{ panel }
 			<section className="contentSpacing">
 				<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
 					<div className="marketplace-header__left flex gap-2">{ chipFilter }</div>
@@ -131,13 +137,22 @@ export default function () {
 									const mis = { ...moduleInsts, [ moduleIdentifier ]: module.instances.get( v )! };
 									setModuleInsts( mis );
 								} }
-								onClick={ () => selectModule( isSelected ? null : module ) }
+								onClick={ () => {
+									if ( isSelected ) {
+										panelSend( "panel_close_click_or_collapse" );
+									} else {
+										if ( !selectedModule && hash ) {
+											panelSend?.( hash.event );
+										}
+										selectModule( module );
+									}
+								}
+								}
 							/>;
 						} ) }
 					</div>
 				</>
 			</section>
-			{ panel }
 		</>
 	);
 }

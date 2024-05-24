@@ -163,7 +163,7 @@ export default function({ moduleInst, selectVersion, showTags = true, onClick, i
         importantTags: importantTags
     })), /*#__PURE__*/ React.createElement("div", {
         className: "flex justify-between"
-    }, moduleInstSelector, installed && /*#__PURE__*/ React.createElement(SettingToggle, {
+    }, moduleInstSelector, moduleInst.isEnabled() && /*#__PURE__*/ React.createElement(SettingToggle, {
         className: "x-settings-button justify-end",
         value: enabled,
         onSelected: async (checked)=>{

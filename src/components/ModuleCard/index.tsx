@@ -158,7 +158,7 @@ export default function ( { moduleInst, selectVersion, showTags = true, onClick,
 					</div>
 					<div className="flex justify-between">
 						{ moduleInstSelector }
-						{ installed && (
+						{ moduleInst.isEnabled() && (
 							<SettingToggle
 								className="x-settings-button justify-end"
 								value={ enabled }

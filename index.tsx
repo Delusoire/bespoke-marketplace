@@ -7,8 +7,6 @@ import type { ModuleInstance } from "/hooks/module.js";
 import type { Settings } from "/modules/official/stdlib/lib/settings.js";
 import { ACTIVE_ICON, ICON } from "./src/static.js";
 import { Route } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
-import { PlaybarButton } from "/modules/official/stdlib/src/registers/playbarButton.js";
-import { usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
 import panelReg from "/modules/official/stdlib/src/registers/panel.js";
 import VersionList from "./src/components/VersionList/./index.js";
 
@@ -16,6 +14,10 @@ export let storage: Storage;
 export let logger: Console;
 export let settings: Settings;
 export let settingsButton: React.JSX.Element;
+
+export let hash: { state: string; event: string; } | undefined;
+
+
 
 export default function ( mod: ModuleInstance ) {
 	storage = createStorage( mod );
@@ -30,7 +32,8 @@ export default function ( mod: ModuleInstance ) {
 
 	const panel = <VersionList />;
 	registrar.register( "panel", panel );
-	registrar.register( "playbarButton", <VersionListButton { ...panelReg.getHash( panel )! } /> );
+	hash = panelReg.getHash( panel )!;
+	// registrar.register( "playbarButton", <VersionListButton { ...hash } /> );
 }
 
 const MarketplaceLink = () => (
@@ -38,8 +41,13 @@ const MarketplaceLink = () => (
 );
 
 
-const VersionListButton = ( props: { state: string; event: string; } ) => {
-	const { isActive, panelSend } = usePanelAPI( props.state );
+// const VersionListButton = ( props: { state: string; event: string; } ) => {
+// 	const { isActive, panelSend } = usePanelAPI( props.state );
 
-	return <PlaybarButton label="Marketplace" isActive={ isActive } icon={ ICON } onClick={ () => panelSend( props.event ) } />;
-};
+// 	// !
+// 	// if ( Platform.getHistory().location.pathname !== "/bespoke/marketplace" ) {
+// 	// 	return;
+// 	// }
+
+// 	return <PlaybarButton label="Marketplace" isActive={ isActive } icon={ ICON } onClick={ () => panelSend( props.event ) } />;
+// };
