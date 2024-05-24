@@ -17,8 +17,15 @@ export default function(props) {
     }, /*#__PURE__*/ React.createElement(VersionListContentPlaceholder, null))));
 }
 const VersionListContentPlaceholder = ()=>{
-    return "Loading ...";
+    return;
 };
-export const VersionListContent = (props)=>{
-    return /*#__PURE__*/ React.createElement("div", null, "Content for: ", props.module.getIdentifier());
+export const VersionListContent = ({ module })=>{
+    const instEntries = Array.from(module.instances.entries());
+    return /*#__PURE__*/ React.createElement("ul", null, instEntries.map(([version, inst])=>/*#__PURE__*/ React.createElement(Version, {
+            key: version,
+            moduleInst: inst
+        })));
+};
+const Version = ({ moduleInst })=>{
+    return /*#__PURE__*/ React.createElement("li", null, moduleInst.getVersion(), /*#__PURE__*/ React.createElement("button", null, "E/D"), /*#__PURE__*/ React.createElement("button", null, "I/R"));
 };

@@ -1,4 +1,4 @@
-import type { Module } from "/hooks/module.js";
+import type { Module, ModuleInstance } from "/hooks/module.js";
 import { React } from "/modules/official/stdlib/src/expose/React.js";
 import {
    PanelContent,
@@ -28,12 +28,25 @@ export default function ( props: VersionListProps ) {
 };
 
 const VersionListContentPlaceholder = () => {
-   return "Loading ...";
+   return;
 };
 
 export interface VersionListContentProps {
    module: Module;
 }
-export const VersionListContent = ( props: VersionListContentProps ) => {
-   return <div>Content for: { props.module.getIdentifier() }</div>;
+export const VersionListContent = ( { module }: VersionListContentProps ) => {
+   const instEntries = Array.from( module.instances.entries() );
+   return <ul>{ instEntries.map( ( [ version, inst ] ) => <Version key={ version } moduleInst={ inst } /> ) }</ul>;
+};
+
+interface VersionProps {
+   moduleInst: ModuleInstance;
+}
+const Version = ( { moduleInst }: VersionProps ) => {
+
+   return <li>
+      { moduleInst.getVersion() }
+      <button>E/D</button>
+      <button>I/R</button>
+   </li>;
 };
