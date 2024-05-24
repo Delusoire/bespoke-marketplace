@@ -90,11 +90,11 @@ export default function ( { aurl }: { aurl: string; } ) {
 	const name = metadata.name;
 	const moduleIdentifier = `${ author }/${ name }`;
 
-	const getModuleInst = () => {
+	const getModuleInst = React.useCallback( () => {
 		const module = Module.get( moduleIdentifier );
 		const moduleInst = module?.instances.get( metadata.version );
 		return { module, moduleInst };
-	};
+	}, [ moduleIdentifier, metadata.version ] );
 
 	const [ { moduleInst }, _, updateModuleInst ] = useUpdate( getModuleInst );
 

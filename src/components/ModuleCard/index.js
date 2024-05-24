@@ -84,7 +84,9 @@ export default function({ moduleInst, selectVersion, showTags = true, onClick, i
         moduleInst,
         selectVersion
     });
-    const isEnabled = ()=>moduleInst.isLoaded();
+    const isEnabled = React.useCallback(()=>moduleInst.isLoaded(), [
+        moduleInst
+    ]);
     const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
     const installed = moduleInst.isInstalled();
     const hasRemote = Boolean(moduleInst.artifacts.length);

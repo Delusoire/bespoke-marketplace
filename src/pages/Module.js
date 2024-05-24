@@ -85,14 +85,17 @@ export default function({ aurl }) {
     const author = metadata.authors[0];
     const name = metadata.name;
     const moduleIdentifier = `${author}/${name}`;
-    const getModuleInst = ()=>{
+    const getModuleInst = React.useCallback(()=>{
         const module = Module.get(moduleIdentifier);
         const moduleInst = module?.instances.get(metadata.version);
         return {
             module,
             moduleInst
         };
-    };
+    }, [
+        moduleIdentifier,
+        metadata.version
+    ]);
     const [{ moduleInst }, _, updateModuleInst] = useUpdate(getModuleInst);
     const installed = moduleInst?.isInstalled();
     const outdated = installed && false;

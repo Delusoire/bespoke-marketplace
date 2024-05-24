@@ -10,6 +10,8 @@ import { Platform } from "/modules/official/stdlib/src/expose/Platform.js";
 import { Cards, ScrollableText, SettingToggle } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
 import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.js";
 import { useQuery } from "/modules/official/stdlib/src/webpack/ReactQuery.js";
+import { VersionListContent } from "../VersionList/index.js";
+import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.js";
 
 const History = Platform.getHistory();
 
@@ -89,10 +91,12 @@ const fallbackImage = () => (
 	</svg>
 );
 
-export default function ( { moduleInst, selectVersion, showTags = true, onClick, isSelected }: ModuleCardProps ) {
-	const moduleInstSelector = useLoadableModuleSelector( { moduleInst, selectVersion } );
+export let refresh: ( () => void ) | undefined;
 
-	const isEnabled = () => moduleInst.isLoaded();
+export default function ( { moduleInst, selectVersion, showTags = true, onClick, isSelected }: ModuleCardProps ) {
+	// const moduleInstSelector = useLoadableModuleSelector( { moduleInst, selectVersion } );
+
+	const isEnabled = React.useCallback( () => moduleInst.isLoaded(), [ moduleInst ] );
 	const [ enabled, setEnabled, updateEnabled ] = useUpdate( isEnabled );
 
 	const installed = moduleInst.isInstalled();
@@ -125,8 +129,17 @@ export default function ( { moduleInst, selectVersion, showTags = true, onClick,
 	// TODO: add more important tags
 	const importantTags = [].filter( Boolean );
 
+	[ , refresh ] = React.useReducer( n => n + 1, 0 );
+
+	const panelTarget: any = document.querySelector( "#MarketplacePanel" );
+	let panel;
+	if ( isSelected && panelTarget ) {
+		panel = ReactDOM.createPortal( <VersionListContent module={ moduleInst.getModule() } selectVersion={ selectVersion } />, panelTarget, crypto.randomUUID() );
+	}
+
 	return (
 		<div className={ cardClasses }>
+			{ panel }
 			<div className="border-[var(--essential-warning)] flex flex-col h-full" style={ { pointerEvents: "all" } } draggable="true" onClick={ onClick }>
 				<div
 					onClick={ () => {
@@ -157,7 +170,6 @@ export default function ( { moduleInst, selectVersion, showTags = true, onClick,
 						<TagsDiv tags={ tags } showTags={ showTags } importantTags={ importantTags } />
 					</div>
 					<div className="flex justify-between">
-						{ moduleInstSelector }
 						{ moduleInst.isEnabled() && (
 							<SettingToggle
 								className="x-settings-button justify-end"

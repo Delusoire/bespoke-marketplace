@@ -1,5 +1,4 @@
 import { useUpdate } from "../../util/index.js";
-import { ModuleManager } from "/hooks/protocol.js";
 import { React } from "/modules/official/stdlib/src/expose/React.js";
 import { PanelContent, PanelHeader, PanelSkeleton } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
 export default function(props) {
@@ -36,7 +35,10 @@ const Version = (props)=>{
     }));
 };
 const RAB = (props)=>{
-    const [installed, setInstalled, updateInstalled] = useUpdate(()=>props.moduleInst.isInstalled());
+    const isInstalled = React.useCallback(()=>props.moduleInst.isInstalled(), [
+        props.moduleInst
+    ]);
+    const [installed, setInstalled, updateInstalled] = useUpdate(isInstalled);
     const B = installed ? RemoveButton : AddButton;
     return /*#__PURE__*/ React.createElement(B, {
         ...props,
@@ -47,7 +49,7 @@ const RAB = (props)=>{
 const RemoveButton = (props)=>{
     return /*#__PURE__*/ React.createElement("button", {
         onClick: async ()=>{
-            props.setInstalled(true);
+            props.setInstalled(false);
             if (!await props.moduleInst.remove()) {
                 props.updateInstalled();
             }
@@ -57,7 +59,7 @@ const RemoveButton = (props)=>{
 const AddButton = (props)=>{
     return /*#__PURE__*/ React.createElement("button", {
         onClick: async ()=>{
-            props.setInstalled(false);
+            props.setInstalled(true);
             if (!await props.moduleInst.add()) {
                 props.updateInstalled();
             }
@@ -65,19 +67,22 @@ const AddButton = (props)=>{
     }, "ins");
 };
 const DEB = (props)=>{
-    const [enabled, setEnabled, updateEnabled] = useUpdate(()=>props.moduleInst.isEnabled());
+    const isEnabled = React.useCallback(()=>props.moduleInst.isEnabled(), [
+        props.moduleInst
+    ]);
+    const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
     const B = enabled ? DisableButton : EnableButton;
     return /*#__PURE__*/ React.createElement(B, {
         ...props,
-        setEnabled: setEnabled,
+        setEnabled: (enabled)=>setEnabled(enabled),
         updateEnabled: updateEnabled
     });
 };
 const DisableButton = (props)=>{
     return /*#__PURE__*/ React.createElement("button", {
         onClick: async ()=>{
-            props.setEnabled(true);
-            if (!await ModuleManager.disable(props.moduleInst.getModule())) {
+            props.setEnabled(false);
+            if (!await props.moduleInst.getModule().disable()) {
                 props.updateEnabled();
             }
         }
@@ -86,8 +91,8 @@ const DisableButton = (props)=>{
 const EnableButton = (props)=>{
     return /*#__PURE__*/ React.createElement("button", {
         onClick: async ()=>{
-            props.setEnabled(false);
-            if (!await ModuleManager.enable(props.moduleInst)) {
+            props.setEnabled(true);
+            if (!await props.moduleInst.enable()) {
                 props.updateEnabled();
             }
         }

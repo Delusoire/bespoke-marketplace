@@ -61,7 +61,6 @@ const filterFNs: RTree<( m: ModuleInstance ) => boolean> = {
 };
 
 export let unselect: ( () => void ) | undefined;
-export let refresh: ( () => void ) | undefined;
 
 export default function () {
 	const [ searchbar, search ] = useSearchBar( {
@@ -100,19 +99,11 @@ export default function () {
 
 	const [ selectedModule, selectModule ] = React.useState<Module | null>( null );
 	unselect = () => selectModule( null );
-	[ , refresh ] = React.useReducer( n => n + 1, 0 );
-
-	const panelTarget: any = document.querySelector( "#MarketplacePanel" );
-	let panel;
-	if ( selectedModule && panelTarget ) {
-		panel = ReactDOM.createPortal( <VersionListContent module={ selectedModule } />, panelTarget, crypto.randomUUID() );
-	}
 
 	const { panelSend } = usePanelAPI();
 
 	return (
 		<>
-			{ panel }
 			<section className="contentSpacing">
 				<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
 					<div className="marketplace-header__left flex gap-2">{ chipFilter }</div>
