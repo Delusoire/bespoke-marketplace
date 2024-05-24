@@ -120,7 +120,6 @@ export default function() {
     let panel;
     if (selectedModule && panelTarget) {
         const Warp = ()=>{
-            React.useEffect(()=>()=>selectModule(null), []);
             return /*#__PURE__*/ React.createElement("div", null, selectedModule.getIdentifier());
         };
         panel = ReactDOM.createPortal(/*#__PURE__*/ React.createElement(Warp, null), panelTarget);
