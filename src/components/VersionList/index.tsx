@@ -1,8 +1,7 @@
 import { useUpdate } from "../../util/index.js";
-import { refresh } from "../ModuleCard/index.js";
 import { ModuleInstance, type Module, type Version } from "/hooks/module.js";
-import { ModuleManager } from "/hooks/protocol.js";
 import { React } from "/modules/official/stdlib/src/expose/React.js";
+import { useLocation } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
 import {
    PanelContent,
    PanelHeader,
@@ -13,11 +12,16 @@ export interface VersionListProps { }
 export default function ( props: VersionListProps ) {
    const [ ref, setRef ] = React.useState<HTMLDivElement | null>( null );
 
-   const m1 = React.useMemo( () => import( "../../pages/Marketplace.js" ), [] );
-   const m2 = React.useMemo( () => import( "../ModuleCard/index.js" ), [] );
+   const m = React.useMemo( () => import( "../../pages/Marketplace.js" ), [] );
 
-   React.useEffect( () => void m2.then( m => m.refresh?.() ), [ ref ] );
-   React.useEffect( () => () => void m1.then( m => m.unselect?.() ), [] );
+   React.useEffect( () => void m.then( m => m.refresh?.() ), [ ref ] );
+   React.useEffect( () => () => void m.then( m => m.unselect?.() ), [] );
+
+   const location = useLocation();
+
+   if ( location.pathname !== "/bespoke/marketplace" ) {
+      return;
+   }
 
    return (
       <PanelSkeleton label="Marketplace">
@@ -35,8 +39,9 @@ export default function ( props: VersionListProps ) {
 export interface VersionListContentProps {
    module: Module;
    selectVersion: ( version: Version ) => void;
+   cardUpdateEnabled: () => void;
 }
-export const VersionListContent = ( { module }: VersionListContentProps ) => {
+export const VersionListContent = ( { module, cardUpdateEnabled }: VersionListContentProps ) => {
    const instEntries = Array.from( module.instances.entries() );
    return (
       <ul>
@@ -44,6 +49,8 @@ export const VersionListContent = ( { module }: VersionListContentProps ) => {
             <VersionItem
                key={ version }
                moduleInst={ inst }
+               selectVersion={ selectVersion }
+               cardUpdateEnabled={ cardUpdateEnabled }
             />
          ) ) }
       </ul>
@@ -52,19 +59,22 @@ export const VersionListContent = ( { module }: VersionListContentProps ) => {
 
 interface VersionProps {
    moduleInst: ModuleInstance;
+   selectVersion: ( version: Version ) => void;
+   cardUpdateEnabled: () => void;
 }
 const VersionItem = ( props: VersionProps ) => {
    return (
-      <li>
+      <li onClick={ () => props.selectVersion( props.moduleInst.getVersion() ) }>
          { props.moduleInst.getVersion() }
-         <RAB moduleInst={ props.moduleInst } />
-         <DEB moduleInst={ props.moduleInst } />
+         <RAB { ...props } />
+         <DEB { ...props } />
       </li>
    );
 };
 
 interface BProps {
    moduleInst: ModuleInstance;
+   cardUpdateEnabled: () => void;
 }
 
 const RAB = ( props: BProps ) => {
@@ -125,6 +135,7 @@ const DEB = ( props: BProps ) => {
          { ...props }
          setEnabled={ ( enabled: boolean ) => setEnabled( enabled ) }
          updateEnabled={ updateEnabled }
+         cardUpdateEnabled={ props.cardUpdateEnabled }
       />
    );
 };
@@ -133,17 +144,16 @@ interface DEBProps {
    moduleInst: ModuleInstance;
    setEnabled: ( installed: boolean ) => void;
    updateEnabled: () => void;
+   cardUpdateEnabled: () => void;
 }
 
 const DisableButton = ( props: DEBProps ) => {
-   const m2 = React.useMemo( () => import( "../ModuleCard/index.js" ), [] );
-
    return (
       <button
          onClick={ async () => {
             props.setEnabled( false );
             if ( ( await props.moduleInst.getModule().disable() ) ) {
-               ( await m2 ).refresh?.();
+               props.cardUpdateEnabled();
             } else {
                props.updateEnabled();
             }
@@ -155,14 +165,12 @@ const DisableButton = ( props: DEBProps ) => {
 };
 
 const EnableButton = ( props: DEBProps ) => {
-   const m2 = React.useMemo( () => import( "../ModuleCard/index.js" ), [] );
-
    return (
       <button
          onClick={ async () => {
             props.setEnabled( true );
             if ( await props.moduleInst.enable() ) {
-               ( await m2 ).refresh?.();
+               props.cardUpdateEnabled();
             } else {
                props.updateEnabled();
             }

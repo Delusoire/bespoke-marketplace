@@ -1,5 +1,4 @@
 import { React } from "/modules/official/stdlib/src/expose/React.js";
-import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.js";
 import { _ } from "/modules/official/stdlib/deps.js";
 import { t } from "../i18n.js";
 import {
@@ -61,6 +60,7 @@ const filterFNs: RTree<( m: ModuleInstance ) => boolean> = {
 };
 
 export let unselect: ( () => void ) | undefined;
+export let refresh: ( () => void ) | undefined;
 
 export default function () {
 	const [ searchbar, search ] = useSearchBar( {
@@ -99,6 +99,7 @@ export default function () {
 
 	const [ selectedModule, selectModule ] = React.useState<Module | null>( null );
 	unselect = () => selectModule( null );
+	[ , refresh ] = React.useReducer( n => n + 1, 0 );
 
 	const { panelSend } = usePanelAPI();
 

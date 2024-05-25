@@ -283,11 +283,6 @@
    width: 3rem;
 }
 
-.min-w-fit {
-   min-width: -moz-fit-content;
-   min-width: fit-content;
-}
-
 .flex-grow {
    flex-grow: 1;
 }

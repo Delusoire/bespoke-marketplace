@@ -1,5 +1,4 @@
 import { React } from "/modules/official/stdlib/src/expose/React.js";
-import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.js";
 import { t } from "../i18n.js";
 import { Module } from "/hooks/module.js";
 import ModuleCard from "../components/ModuleCard/index.js";
@@ -7,7 +6,6 @@ import { hash, settingsButton } from "../../index.js";
 import { CONFIG } from "../settings.js";
 import { getProp, TreeNodeVal, useChipFilter, useDropdown, useSearchBar } from "/modules/official/stdlib/lib/components/index.js";
 import { usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
-import { VersionListContent } from "../components/VersionList/index.js";
 const SortOptions = {
     default: ()=>t("sort.default"),
     "a-z": ()=>t("sort.a-z"),
@@ -122,15 +120,8 @@ export default function() {
     const [selectedModule, selectModule] = React.useState(null);
     unselect = ()=>selectModule(null);
     [, refresh] = React.useReducer((n)=>n + 1, 0);
-    const panelTarget = document.querySelector("#MarketplacePanel");
-    let panel;
-    if (selectedModule && panelTarget) {
-        panel = ReactDOM.createPortal(/*#__PURE__*/ React.createElement(VersionListContent, {
-            module: selectedModule
-        }), panelTarget, crypto.randomUUID());
-    }
     const { panelSend } = usePanelAPI();
-    return /*#__PURE__*/ React.createElement(React.Fragment, null, panel, /*#__PURE__*/ React.createElement("section", {
+    return /*#__PURE__*/ React.createElement(React.Fragment, null, /*#__PURE__*/ React.createElement("section", {
         className: "contentSpacing"
     }, /*#__PURE__*/ React.createElement("div", {
         className: "marketplace-header items-center flex justify-between pb-2 flex-row z-10"
