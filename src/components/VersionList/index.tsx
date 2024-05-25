@@ -19,7 +19,6 @@ export default function ( props: VersionListProps ) {
 
    const location = useLocation();
    const { panelSend } = usePanelAPI();
-
    if ( location.pathname !== "/bespoke/marketplace" ) {
       panelSend( "panel_close_click_or_collapse" );
    }
@@ -42,16 +41,16 @@ export interface VersionListContentProps {
    selectVersion: ( version: Version ) => void;
    cardUpdateEnabled: () => void;
 }
-export const VersionListContent = ( { module, cardUpdateEnabled }: VersionListContentProps ) => {
-   const instEntries = Array.from( module.instances.entries() );
+export const VersionListContent = ( props: VersionListContentProps ) => {
+   const instEntries = Array.from( props.module.instances.entries() );
    return (
       <ul>
          { instEntries.map( ( [ version, inst ] ) => (
             <VersionItem
                key={ version }
                moduleInst={ inst }
-               selectVersion={ selectVersion }
-               cardUpdateEnabled={ cardUpdateEnabled }
+               selectVersion={ props.selectVersion }
+               cardUpdateEnabled={ props.cardUpdateEnabled }
             />
          ) ) }
       </ul>

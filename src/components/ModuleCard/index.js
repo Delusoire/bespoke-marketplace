@@ -62,7 +62,7 @@ export default function({ moduleInst, selectVersion, showTags = true, onClick, i
             module: moduleInst.getModule(),
             selectVersion: selectVersion,
             cardUpdateEnabled: updateEnabled
-        }), panelTarget, crypto.randomUUID());
+        }), panelTarget);
     }
     return /*#__PURE__*/ React.createElement("div", {
         className: cardClasses

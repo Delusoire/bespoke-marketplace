@@ -80,6 +80,16 @@ const filterFNs = {
 };
 export let unselect;
 export let refresh;
+const getModuleInsts = ()=>Object.fromEntries(Module.getAll().flatMap((module)=>{
+        const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
+        const moduleInst = module.instances.get(selectedVersion);
+        return moduleInst ? [
+            [
+                module.getIdentifier(),
+                moduleInst
+            ]
+        ] : [];
+    }));
 export default function() {
     const [searchbar, search] = useSearchBar({
         placeholder: t("pages.marketplace.search_modules"),
@@ -97,16 +107,6 @@ export default function() {
     const selectedFilterFNs = React.useMemo(getSelectedFilterFNs, [
         selectedFilters
     ]);
-    const getModuleInsts = ()=>Object.fromEntries(Module.getAll().flatMap((module)=>{
-            const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
-            const moduleInst = module.instances.get(selectedVersion);
-            return moduleInst ? [
-                [
-                    module.getIdentifier(),
-                    moduleInst
-                ]
-            ] : [];
-        }));
     const [moduleInsts, setModuleInsts] = React.useState(getModuleInsts);
     const moduleCardProps = selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn[TreeNodeVal]), Array.from(Object.values(moduleInsts))).filter((moduleInst)=>{
         const { name, tags, authors } = moduleInst.metadata;
@@ -118,8 +118,16 @@ export default function() {
         return searchFiels.some((f)=>f.toLowerCase().includes(search.toLowerCase()));
     }).sort((a, b)=>sortFn?.(a.metadata, b.metadata));
     const [selectedModule, selectModule] = React.useState(null);
-    unselect = ()=>selectModule(null);
-    [, refresh] = React.useReducer((n)=>n + 1, 0);
+    const _unselect = ()=>selectModule(null);
+    const [, _refresh] = React.useReducer((n)=>n + 1, 0);
+    React.useEffect(()=>{
+        unselect = _unselect;
+        refresh = _refresh;
+        return ()=>{
+            unselect = undefined;
+            refresh = undefined;
+        };
+    }, []);
     const { panelSend } = usePanelAPI();
     return /*#__PURE__*/ React.createElement(React.Fragment, null, /*#__PURE__*/ React.createElement("section", {
         className: "contentSpacing"
@@ -131,7 +139,7 @@ export default function() {
         className: "marketplace-header__right flex gap-2 items-center"
     }, /*#__PURE__*/ React.createElement("p", {
         className: "inline-flex self-center font-bold text-sm"
-    }, t("pages.marketplace.sort.label")), sortbox, searchbar, settingsButton)), /*#__PURE__*/ React.createElement(React.Fragment, null, /*#__PURE__*/ React.createElement("div", {
+    }, t("pages.marketplace.sort.label")), sortbox, searchbar, settingsButton)), /*#__PURE__*/ React.createElement("div", {
         className: "marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd"
     }, moduleCardProps.map((moduleInst)=>{
         const module = moduleInst.getModule();
@@ -159,5 +167,5 @@ export default function() {
                 }
             }
         });
-    })))));
+    }))));
 }

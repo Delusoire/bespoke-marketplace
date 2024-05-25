@@ -23,13 +23,13 @@ export default function(props) {
         ref: (r)=>setRef(r)
     })));
 }
-export const VersionListContent = ({ module, cardUpdateEnabled })=>{
-    const instEntries = Array.from(module.instances.entries());
+export const VersionListContent = (props)=>{
+    const instEntries = Array.from(props.module.instances.entries());
     return /*#__PURE__*/ React.createElement("ul", null, instEntries.map(([version, inst])=>/*#__PURE__*/ React.createElement(VersionItem, {
             key: version,
             moduleInst: inst,
-            selectVersion: selectVersion,
-            cardUpdateEnabled: cardUpdateEnabled
+            selectVersion: props.selectVersion,
+            cardUpdateEnabled: props.cardUpdateEnabled
         })));
 };
 const VersionItem = (props)=>{

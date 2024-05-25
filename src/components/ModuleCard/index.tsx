@@ -80,7 +80,6 @@ export default function ( { moduleInst, selectVersion, showTags = true, onClick,
 				cardUpdateEnabled={ updateEnabled }
 			/>,
 			panelTarget,
-			crypto.randomUUID(),
 		);
 	}
 

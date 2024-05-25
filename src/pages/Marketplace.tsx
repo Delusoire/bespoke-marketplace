@@ -20,7 +20,6 @@ import {
 	type RTree,
 } from "/modules/official/stdlib/lib/components/index.js";
 import { usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
-import { VersionListContent } from "../components/VersionList/index.js";
 
 const SortOptions = {
 	default: () => t( "sort.default" ),
@@ -62,6 +61,15 @@ const filterFNs: RTree<( m: ModuleInstance ) => boolean> = {
 export let unselect: ( () => void ) | undefined;
 export let refresh: ( () => void ) | undefined;
 
+const getModuleInsts = () =>
+	Object.fromEntries(
+		Module.getAll().flatMap( module => {
+			const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
+			const moduleInst = module.instances.get( selectedVersion );
+			return moduleInst ? ( [ [ module.getIdentifier(), moduleInst ] ] as const ) : [];
+		} ),
+	) as Record<ModuleIdentifier, ModuleInstance>;
+
 export default function () {
 	const [ searchbar, search ] = useSearchBar( {
 		placeholder: t( "pages.marketplace.search_modules" ),
@@ -78,14 +86,6 @@ export default function () {
 		selectedFilters.map( ( { key } ) => getProp( filterFNs, key ) as typeof filterFNs );
 	const selectedFilterFNs = React.useMemo( getSelectedFilterFNs, [ selectedFilters ] );
 
-	const getModuleInsts = () =>
-		Object.fromEntries(
-			Module.getAll().flatMap( module => {
-				const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
-				const moduleInst = module.instances.get( selectedVersion );
-				return moduleInst ? ( [ [ module.getIdentifier(), moduleInst ] ] as const ) : [];
-			} ),
-		) as Record<ModuleIdentifier, ModuleInstance>;
 	const [ moduleInsts, setModuleInsts ] = React.useState( getModuleInsts );
 
 	const moduleCardProps = selectedFilterFNs
@@ -98,8 +98,17 @@ export default function () {
 		.sort( ( a, b ) => sortFn?.( a.metadata, b.metadata ) as number );
 
 	const [ selectedModule, selectModule ] = React.useState<Module | null>( null );
-	unselect = () => selectModule( null );
-	[ , refresh ] = React.useReducer( n => n + 1, 0 );
+	const _unselect = () => selectModule( null );
+	const [ , _refresh ] = React.useReducer( n => n + 1, 0 );
+
+	React.useEffect( () => {
+		unselect = _unselect;
+		refresh = _refresh;
+		return () => {
+			unselect = undefined;
+			refresh = undefined;
+		};
+	}, [] );
 
 	const { panelSend } = usePanelAPI();
 
@@ -115,35 +124,33 @@ export default function () {
 						{ settingsButton }
 					</div>
 				</div>
-				<>
-					<div className="marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd">
-						{ moduleCardProps.map( moduleInst => {
-							const module = moduleInst.getModule();
-							const moduleIdentifier = module.getIdentifier();
-							const isSelected = module === selectedModule;
-							return <ModuleCard
-								key={ moduleIdentifier }
-								moduleInst={ moduleInst }
-								isSelected={ isSelected }
-								selectVersion={ ( v: Version ) => {
-									const mis = { ...moduleInsts, [ moduleIdentifier ]: module.instances.get( v )! };
-									setModuleInsts( mis );
-								} }
-								onClick={ () => {
-									if ( isSelected ) {
-										panelSend( "panel_close_click_or_collapse" );
-									} else {
-										if ( !selectedModule && hash ) {
-											panelSend?.( hash.event );
-										}
-										selectModule( module );
+				<div className="marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd">
+					{ moduleCardProps.map( moduleInst => {
+						const module = moduleInst.getModule();
+						const moduleIdentifier = module.getIdentifier();
+						const isSelected = module === selectedModule;
+						return <ModuleCard
+							key={ moduleIdentifier }
+							moduleInst={ moduleInst }
+							isSelected={ isSelected }
+							selectVersion={ ( v: Version ) => {
+								const mis = { ...moduleInsts, [ moduleIdentifier ]: module.instances.get( v )! };
+								setModuleInsts( mis );
+							} }
+							onClick={ () => {
+								if ( isSelected ) {
+									panelSend( "panel_close_click_or_collapse" );
+								} else {
+									if ( !selectedModule && hash ) {
+										panelSend?.( hash.event );
 									}
+									selectModule( module );
 								}
-								}
-							/>;
-						} ) }
-					</div>
-				</>
+							}
+							}
+						/>;
+					} ) }
+				</div>
 			</section>
 		</>
 	);
