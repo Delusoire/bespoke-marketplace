@@ -1,6 +1,6 @@
 import { useUpdate } from "../../util/index.js";
 import { React } from "/modules/official/stdlib/src/expose/React.js";
-import { useLocation } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
+import { useLocation, usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
 import { PanelContent, PanelHeader, PanelSkeleton } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
 export default function(props) {
     const [ref, setRef] = React.useState(null);
@@ -10,8 +10,9 @@ export default function(props) {
     ]);
     React.useEffect(()=>()=>void m.then((m)=>m.unselect?.()), []);
     const location = useLocation();
+    const { panelSend } = usePanelAPI();
     if (location.pathname !== "/bespoke/marketplace") {
-        return;
+        panelSend("panel_close_click_or_collapse");
     }
     return /*#__PURE__*/ React.createElement(PanelSkeleton, {
         label: "Marketplace"

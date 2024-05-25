@@ -1,7 +1,7 @@
 import { useUpdate } from "../../util/index.js";
 import { ModuleInstance, type Module, type Version } from "/hooks/module.js";
 import { React } from "/modules/official/stdlib/src/expose/React.js";
-import { useLocation } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
+import { useLocation, usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.js";
 import {
    PanelContent,
    PanelHeader,
@@ -18,9 +18,10 @@ export default function ( props: VersionListProps ) {
    React.useEffect( () => () => void m.then( m => m.unselect?.() ), [] );
 
    const location = useLocation();
+   const { panelSend } = usePanelAPI();
 
    if ( location.pathname !== "/bespoke/marketplace" ) {
-      return;
+      panelSend( "panel_close_click_or_collapse" );
    }
 
    return (
