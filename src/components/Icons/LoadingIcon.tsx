@@ -1,4 +1,4 @@
-import { React } from "/modules/official/stdlib/src/expose/React.js";
+import { React } from "/modules/official/stdlib/src/expose/React.ts";
 
 export default function () {
 	return (

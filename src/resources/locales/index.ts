@@ -1,4 +1,4 @@
-import type { ResourceLanguage } from "i18next";
+import type { ResourceLanguage } from "https://esm.sh/v135/i18next";
 import { fetchJSON } from "/hooks/util.js";
 
 export default {

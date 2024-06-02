@@ -1,18 +1,18 @@
-import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.js";
-import { React } from "/modules/official/stdlib/src/expose/React.js";
+import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.ts";
+import { React } from "/modules/official/stdlib/src/expose/React.ts";
 
 type ButtonType = "round" | "circle";
 
 interface ButtonProps {
-	onClick: ( e: React.MouseEvent<HTMLButtonElement> ) => void;
+	onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 	className?: string;
-	label?: string | null;
+	label?: string;
 	type?: ButtonType;
 	children: React.ReactNode;
 	disabled?: boolean;
 }
 
-export default function ( { onClick, className, label = "", type = "round", children, disabled = false }: ButtonProps ) {
+export default function ({ onClick, className, label = "", type = "round", children, disabled = false }: ButtonProps) {
 	const btnClass = classnames(
 		"spicetify-marketplace-button",
 		{
@@ -23,8 +23,8 @@ export default function ( { onClick, className, label = "", type = "round", chil
 	);
 
 	return (
-		<button className={ btnClass } onClick={ onClick } aria-label={ label } disabled={ disabled }>
-			{ children }
+		<button className={btnClass} onClick={onClick} aria-label={label} disabled={disabled}>
+			{children}
 		</button>
 	);
 }
