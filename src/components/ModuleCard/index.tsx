@@ -1,7 +1,7 @@
 import { React } from "/modules/official/stdlib/src/expose/React.ts";
 import AuthorsDiv from "./AuthorsDiv.tsx";
 import TagsDiv from "./TagsDiv.tsx";
-import type { ModuleInstance, Metadata, Version } from "/hooks/module.ts";
+import type { Metadata, ModuleInstance, Version } from "/hooks/module.ts";
 import { _, startCase } from "/modules/official/stdlib/deps.ts";
 import { useUpdate } from "../../util/index.ts";
 import { fetchJSON } from "/hooks/util.ts";
@@ -48,15 +48,21 @@ export default function ({ moduleInst, selectVersion, showTags = true, onClick, 
 	const remoteMetadata = moduleInst.getRemoteMetadata();
 	const { data, isSuccess } = useQuery({
 		queryKey: ["moduleCard", remoteMetadata],
-		queryFn: () => fetchJSON<Metadata,>(remoteMetadata!),
-		enabled: moduleInst.metadata.isDummy && hasRemote,
+		queryFn: () => fetchJSON<Metadata>(remoteMetadata!),
+		enabled: moduleInst.metadata === null && hasRemote,
 	});
 
-	if (moduleInst.metadata.isDummy && isSuccess) {
+	if (moduleInst.metadata === null && isSuccess) {
 		moduleInst.updateMetadata(data);
 	}
 
-	const { name, description, tags, authors, preview } = moduleInst.metadata;
+	const {
+		name = moduleInst.getModuleIdentifier(),
+		description = moduleInst.getVersion(),
+		tags = ["available"],
+		authors = [],
+		preview = "./assets/preview.gif",
+	} = moduleInst.metadata ?? {};
 
 	const cardClasses = classnames("LunqxlFIupJw_Dkx6mNx", {
 		"border-[var(--essential-warning)]": outdated,
@@ -112,7 +118,7 @@ export default function ({ moduleInst, selectVersion, showTags = true, onClick, 
 						href={externalHref}
 						target="_blank"
 						rel="noopener noreferrer"
-						onClick={e => e.stopPropagation()}
+						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="main-type-balladBold">{startCase(name)}</div>
 					</a>
