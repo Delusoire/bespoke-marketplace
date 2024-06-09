@@ -40,12 +40,14 @@ export default function({ moduleInst, selectVersion, showTags = true, onClick, i
             remoteMetadata
         ],
         queryFn: ()=>fetchJSON(remoteMetadata),
-        enabled: moduleInst.metadata.isDummy && hasRemote
+        enabled: moduleInst.metadata === null && hasRemote
     });
-    if (moduleInst.metadata.isDummy && isSuccess) {
+    if (moduleInst.metadata === null && isSuccess) {
         moduleInst.updateMetadata(data);
     }
-    const { name, description, tags, authors, preview } = moduleInst.metadata;
+    const { name = moduleInst.getModuleIdentifier(), description = moduleInst.getVersion(), tags = [
+        "available"
+    ], authors = [], preview = "./assets/preview.gif" } = moduleInst.metadata ?? {};
     const cardClasses = classnames("LunqxlFIupJw_Dkx6mNx", {
         "border-[var(--essential-warning)]": outdated,
         "bg-neutral-800": isSelected

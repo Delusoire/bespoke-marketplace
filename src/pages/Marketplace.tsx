@@ -2,10 +2,10 @@ import { React } from "/modules/official/stdlib/src/expose/React.ts";
 import { _ } from "/modules/official/stdlib/deps.ts";
 import { t } from "../i18n.ts";
 import {
-	type ModuleInstance,
 	type Metadata,
 	Module,
 	type ModuleIdentifier,
+	type ModuleInstance,
 	type Version,
 } from "/hooks/module.ts";
 import ModuleCard from "../components/ModuleCard/index.tsx";
@@ -13,11 +13,11 @@ import { hash, settingsButton } from "../../index.tsx";
 import { CONFIG } from "../settings.ts";
 import {
 	getProp,
+	type RTree,
 	TreeNodeVal,
 	useChipFilter,
 	useDropdown,
 	useSearchBar,
-	type RTree,
 } from "/modules/official/stdlib/lib/components/index.tsx";
 import { usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.ts";
 
@@ -46,15 +46,15 @@ const getFilters = () => ({
 });
 
 const libTags = new Set(["lib", "npm", "internal"]);
-const isModLib = (m: ModuleInstance) => new Set(m.metadata.tags).intersection(libTags).size > 0;
+const isModLib = (m: ModuleInstance) => new Set(m.metadata?.tags).intersection(libTags).size > 0;
 const enabledFn = { enabled: { [TreeNodeVal]: (m: ModuleInstance) => m.isLoaded() } };
 
 const filterFNs: RTree<(m: ModuleInstance) => boolean> = {
-	[TreeNodeVal]: m => CONFIG.showLibs || !isModLib(m),
-	themes: { [TreeNodeVal]: m => m.metadata.tags.includes("theme"), ...enabledFn },
-	apps: { [TreeNodeVal]: m => m.metadata.tags.includes("app"), ...enabledFn },
-	extensions: { [TreeNodeVal]: m => m.metadata.tags.includes("extension"), ...enabledFn },
-	snippets: { [TreeNodeVal]: m => m.metadata.tags.includes("snippet"), ...enabledFn },
+	[TreeNodeVal]: (m) => CONFIG.showLibs || !isModLib(m),
+	themes: { [TreeNodeVal]: (m) => m.metadata?.tags.includes("theme") ?? false, ...enabledFn },
+	apps: { [TreeNodeVal]: (m) => m.metadata?.tags.includes("app") ?? false, ...enabledFn },
+	extensions: { [TreeNodeVal]: (m) => m.metadata?.tags.includes("extension") ?? false, ...enabledFn },
+	snippets: { [TreeNodeVal]: (m) => m.metadata?.tags.includes("snippet") ?? false, ...enabledFn },
 	libs: { [TreeNodeVal]: isModLib },
 };
 
@@ -63,12 +63,24 @@ export let refresh: (() => void) | undefined;
 
 const getModuleInsts = () =>
 	Object.fromEntries(
-		Module.getAll().flatMap(module => {
+		Module.getAll().flatMap((module) => {
 			const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
 			const moduleInst = module.instances.get(selectedVersion);
 			return moduleInst ? ([[module.getIdentifier(), moduleInst]] as const) : [];
 		}),
 	) as Record<ModuleIdentifier, ModuleInstance>;
+
+const dummy_metadata: Metadata = {
+	name: "",
+	tags: [],
+	preview: "",
+	version: "0.0.0",
+	authors: [],
+	description: "",
+	readme: "",
+	entries: {},
+	dependencies: {},
+};
 
 export default function () {
 	const [searchbar, search] = useSearchBar({
@@ -90,16 +102,16 @@ export default function () {
 
 	const moduleCardProps = selectedFilterFNs
 		.reduce((acc, fn) => acc.filter(fn[TreeNodeVal]), Array.from(Object.values(moduleInsts)))
-		.filter(moduleInst => {
-			const { name, tags, authors } = moduleInst.metadata;
+		.filter((moduleInst) => {
+			const { name, tags, authors } = moduleInst.metadata ?? dummy_metadata;
 			const searchFiels = [name, ...tags, ...authors];
-			return searchFiels.some(f => f.toLowerCase().includes(search.toLowerCase()));
+			return searchFiels.some((f) => f.toLowerCase().includes(search.toLowerCase()));
 		})
-		.sort((a, b) => sortFn?.(a.metadata, b.metadata) as number);
+		.sort((a, b) => sortFn?.(a.metadata ?? dummy_metadata, b.metadata ?? dummy_metadata) as number);
 
 	const [selectedModule, selectModule] = React.useState<Module | null>(null);
 	const _unselect = () => selectModule(null);
-	const [, _refresh] = React.useReducer(n => n + 1, 0);
+	const [, _refresh] = React.useReducer((n) => n + 1, 0);
 
 	React.useEffect(() => {
 		unselect = _unselect;
@@ -118,37 +130,40 @@ export default function () {
 				<div className="marketplace-header items-center flex justify-between pb-2 flex-row z-10">
 					<div className="marketplace-header__left flex gap-2">{chipFilter}</div>
 					<div className="marketplace-header__right flex gap-2 items-center">
-						<p className="inline-flex self-center font-bold text-sm">{t("pages.marketplace.sort.label")}</p>
+						<p className="inline-flex self-center font-bold text-sm">
+							{t("pages.marketplace.sort.label")}
+						</p>
 						{sortbox}
 						{searchbar}
 						{settingsButton}
 					</div>
 				</div>
 				<div className="marketplace-grid iKwGKEfAfW7Rkx2_Ba4E soGhxDX6VjS7dBxX9Hbd">
-					{moduleCardProps.map(moduleInst => {
+					{moduleCardProps.map((moduleInst) => {
 						const module = moduleInst.getModule();
 						const moduleIdentifier = module.getIdentifier();
 						const isSelected = module === selectedModule;
-						return <ModuleCard
-							key={moduleIdentifier}
-							moduleInst={moduleInst}
-							isSelected={isSelected}
-							selectVersion={(v: Version) => {
-								const mis = { ...moduleInsts, [moduleIdentifier]: module.instances.get(v)! };
-								setModuleInsts(mis);
-							}}
-							onClick={() => {
-								if (isSelected) {
-									panelSend("panel_close_click_or_collapse");
-								} else {
-									if (!selectedModule && hash) {
-										panelSend?.(hash.event);
+						return (
+							<ModuleCard
+								key={moduleIdentifier}
+								moduleInst={moduleInst}
+								isSelected={isSelected}
+								selectVersion={(v: Version) => {
+									const mis = { ...moduleInsts, [moduleIdentifier]: module.instances.get(v)! };
+									setModuleInsts(mis);
+								}}
+								onClick={() => {
+									if (isSelected) {
+										panelSend("panel_close_click_or_collapse");
+									} else {
+										if (!selectedModule && hash) {
+											panelSend?.(hash.event);
+										}
+										selectModule(module);
 									}
-									selectModule(module);
-								}
-							}
-							}
-						/>;
+								}}
+							/>
+						);
 					})}
 				</div>
 			</section>

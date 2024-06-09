@@ -50,7 +50,7 @@ const libTags = new Set([
     "npm",
     "internal"
 ]);
-const isModLib = (m)=>new Set(m.metadata.tags).intersection(libTags).size > 0;
+const isModLib = (m)=>new Set(m.metadata?.tags).intersection(libTags).size > 0;
 const enabledFn = {
     enabled: {
         [TreeNodeVal]: (m)=>m.isLoaded()
@@ -59,19 +59,19 @@ const enabledFn = {
 const filterFNs = {
     [TreeNodeVal]: (m)=>CONFIG.showLibs || !isModLib(m),
     themes: {
-        [TreeNodeVal]: (m)=>m.metadata.tags.includes("theme"),
+        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("theme") ?? false,
         ...enabledFn
     },
     apps: {
-        [TreeNodeVal]: (m)=>m.metadata.tags.includes("app"),
+        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("app") ?? false,
         ...enabledFn
     },
     extensions: {
-        [TreeNodeVal]: (m)=>m.metadata.tags.includes("extension"),
+        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("extension") ?? false,
         ...enabledFn
     },
     snippets: {
-        [TreeNodeVal]: (m)=>m.metadata.tags.includes("snippet"),
+        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("snippet") ?? false,
         ...enabledFn
     },
     libs: {
@@ -90,6 +90,17 @@ const getModuleInsts = ()=>Object.fromEntries(Module.getAll().flatMap((module)=>
             ]
         ] : [];
     }));
+const dummy_metadata = {
+    name: "",
+    tags: [],
+    preview: "",
+    version: "0.0.0",
+    authors: [],
+    description: "",
+    readme: "",
+    entries: {},
+    dependencies: {}
+};
 export default function() {
     const [searchbar, search] = useSearchBar({
         placeholder: t("pages.marketplace.search_modules"),
@@ -109,14 +120,14 @@ export default function() {
     ]);
     const [moduleInsts, setModuleInsts] = React.useState(getModuleInsts);
     const moduleCardProps = selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn[TreeNodeVal]), Array.from(Object.values(moduleInsts))).filter((moduleInst)=>{
-        const { name, tags, authors } = moduleInst.metadata;
+        const { name, tags, authors } = moduleInst.metadata ?? dummy_metadata;
         const searchFiels = [
             name,
             ...tags,
             ...authors
         ];
         return searchFiels.some((f)=>f.toLowerCase().includes(search.toLowerCase()));
-    }).sort((a, b)=>sortFn?.(a.metadata, b.metadata));
+    }).sort((a, b)=>sortFn?.(a.metadata ?? dummy_metadata, b.metadata ?? dummy_metadata));
     const [selectedModule, selectModule] = React.useState(null);
     const _unselect = ()=>selectModule(null);
     const [, _refresh] = React.useReducer((n)=>n + 1, 0);
