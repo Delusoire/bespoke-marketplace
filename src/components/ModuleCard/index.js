@@ -25,35 +25,35 @@ const fallbackImage = ()=>/*#__PURE__*/ React.createElement("svg", {
     }, /*#__PURE__*/ React.createElement("path", {
         d: "M20.929,1.628A1,1,0,0,0,20,1H4a1,1,0,0,0-.929.628l-2,5A1.012,1.012,0,0,0,1,7V22a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V7a1.012,1.012,0,0,0-.071-.372ZM4.677,3H19.323l1.2,3H3.477ZM3,21V8H21V21Zm8-3a1,1,0,0,1-1,1H6a1,1,0,0,1,0-2h4A1,1,0,0,1,11,18Z"
     }));
-export default function({ moduleInst, selectVersion, showTags = true, onClick, isSelected }) {
-    const isEnabled = React.useCallback(()=>moduleInst.isLoaded(), [
-        moduleInst
+export default function({ moduleInstance: mi, selectVersion, showTags = true, onClick, isSelected }) {
+    const isEnabled = React.useCallback(()=>"isLoaded" in mi && mi.isLoaded(), [
+        mi
     ]);
     const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
-    const installed = moduleInst.isInstalled();
-    const hasRemote = Boolean(moduleInst.artifacts.length);
+    const installed = "isInstalled" in mi && mi.isInstalled();
+    const hasRemote = Boolean(mi.artifacts.length);
     const outdated = installed && hasRemote && false;
-    const remoteMetadata = moduleInst.getRemoteMetadata();
+    const remoteMetadata = mi.getRemoteMetadata();
     const { data, isSuccess } = useQuery({
         queryKey: [
             "moduleCard",
             remoteMetadata
         ],
         queryFn: ()=>fetchJSON(remoteMetadata),
-        enabled: moduleInst.metadata === null && hasRemote
+        enabled: mi.metadata === null && hasRemote
     });
-    if (moduleInst.metadata === null && isSuccess) {
-        moduleInst.updateMetadata(data);
+    if (mi.metadata === null && isSuccess) {
+        mi.updateMetadata(data);
     }
-    const { name = moduleInst.getModuleIdentifier(), description = moduleInst.getVersion(), tags = [
+    const { name = mi.getModuleIdentifier(), description = mi.getVersion(), tags = [
         "available"
-    ], authors = [], preview = "./assets/preview.gif" } = moduleInst.metadata ?? {};
+    ], authors = [], preview = "./assets/preview.gif" } = mi.metadata ?? {};
     const cardClasses = classnames("LunqxlFIupJw_Dkx6mNx", {
         "border-[var(--essential-warning)]": outdated,
         "bg-neutral-800": isSelected
     });
-    const externalHref = moduleInst.getRemoteArtifact();
-    const metadataURL = installed ? moduleInst.getRelPath("metadata.json") : remoteMetadata;
+    const externalHref = mi.getRemoteArtifact();
+    const metadataURL = installed ? mi.getRelPath("metadata.json") : remoteMetadata;
     const previewHref = metadataURL ? `${metadataURL}/../${preview}` : "";
     // TODO: add more important tags
     const importantTags = [].filter(Boolean);
@@ -61,7 +61,7 @@ export default function({ moduleInst, selectVersion, showTags = true, onClick, i
     let panel;
     if (isSelected && panelTarget) {
         panel = ReactDOM.createPortal(/*#__PURE__*/ React.createElement(VersionListContent, {
-            module: moduleInst.getModule(),
+            module: mi.getModule(),
             selectVersion: selectVersion,
             cardUpdateEnabled: updateEnabled
         }), panelTarget);
@@ -118,12 +118,12 @@ export default function({ moduleInst, selectVersion, showTags = true, onClick, i
         importantTags: importantTags
     })), /*#__PURE__*/ React.createElement("div", {
         className: "flex justify-between"
-    }, moduleInst.isEnabled() && /*#__PURE__*/ React.createElement(SettingToggle, {
+    }, installed && enabled && SettingToggle && /*#__PURE__*/ React.createElement(SettingToggle, {
         className: "x-settings-button justify-end",
         value: enabled,
         onSelected: async (checked)=>{
             setEnabled(checked);
-            const hasChanged = checked ? moduleInst.load() : moduleInst.unload();
+            const hasChanged = checked ? mi.load() : mi.unload();
             if (!await hasChanged) {
                 updateEnabled();
             }

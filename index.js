@@ -1,4 +1,4 @@
-import { createStorage, createRegistrar, createLogger } from "/modules/official/stdlib/index.js";
+import { createLogger, createRegistrar, createStorage } from "/modules/official/stdlib/index.js";
 import { createSettings } from "/modules/official/stdlib/lib/settings.js";
 import { React } from "/modules/official/stdlib/src/expose/React.js";
 import { NavLink } from "/modules/official/stdlib/src/registers/navlink.js";

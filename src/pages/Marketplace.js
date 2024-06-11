@@ -1,6 +1,6 @@
 import { React } from "/modules/official/stdlib/src/expose/React.js";
 import { t } from "../i18n.js";
-import { Module } from "/hooks/module.js";
+import { RootModule } from "/hooks/module.js";
 import ModuleCard from "../components/ModuleCard/index.js";
 import { hash, settingsButton } from "../../index.js";
 import { CONFIG } from "../settings.js";
@@ -53,25 +53,25 @@ const libTags = new Set([
 const isModLib = (m)=>new Set(m.metadata?.tags).intersection(libTags).size > 0;
 const enabledFn = {
     enabled: {
-        [TreeNodeVal]: (m)=>m.isLoaded()
+        [TreeNodeVal]: (m)=>"isLoaded" in m && m.isLoaded()
     }
 };
 const filterFNs = {
-    [TreeNodeVal]: (m)=>CONFIG.showLibs || !isModLib(m),
+    [TreeNodeVal]: (mi)=>CONFIG.showLibs || !isModLib(mi),
     themes: {
-        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("theme") ?? false,
+        [TreeNodeVal]: (mi)=>mi.metadata?.tags.includes("theme") ?? false,
         ...enabledFn
     },
     apps: {
-        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("app") ?? false,
+        [TreeNodeVal]: (mi)=>mi.metadata?.tags.includes("app") ?? false,
         ...enabledFn
     },
     extensions: {
-        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("extension") ?? false,
+        [TreeNodeVal]: (mi)=>mi.metadata?.tags.includes("extension") ?? false,
         ...enabledFn
     },
     snippets: {
-        [TreeNodeVal]: (m)=>m.metadata?.tags.includes("snippet") ?? false,
+        [TreeNodeVal]: (mi)=>mi.metadata?.tags.includes("snippet") ?? false,
         ...enabledFn
     },
     libs: {
@@ -80,16 +80,10 @@ const filterFNs = {
 };
 export let unselect;
 export let refresh;
-const getModuleInsts = ()=>Object.fromEntries(Module.getAll().flatMap((module)=>{
+const getModuleInsts = ()=>RootModule.INSTANCE.getAllDescendantsByBreadth().map((module)=>{
         const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
-        const moduleInst = module.instances.get(selectedVersion);
-        return moduleInst ? [
-            [
-                module.getIdentifier(),
-                moduleInst
-            ]
-        ] : [];
-    }));
+        return module.instances.get(selectedVersion);
+    }).filter(Boolean);
 const dummy_metadata = {
     name: "",
     tags: [],
@@ -158,7 +152,7 @@ export default function() {
         const isSelected = module === selectedModule;
         return /*#__PURE__*/ React.createElement(ModuleCard, {
             key: moduleIdentifier,
-            moduleInst: moduleInst,
+            moduleInstance: moduleInst,
             isSelected: isSelected,
             selectVersion: (v)=>{
                 const mis = {

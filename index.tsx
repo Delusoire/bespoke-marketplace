@@ -1,9 +1,9 @@
-import { createStorage, createRegistrar, createLogger } from "/modules/official/stdlib/index.ts";
+import { createLogger, createRegistrar, createStorage } from "/modules/official/stdlib/index.ts";
 import { createSettings } from "/modules/official/stdlib/lib/settings.tsx";
 import { React } from "/modules/official/stdlib/src/expose/React.ts";
 
 import { NavLink } from "/modules/official/stdlib/src/registers/navlink.tsx";
-import type { ModuleInstance } from "/hooks/module.ts";
+import type { Module } from "/hooks/index.ts";
 import type { Settings } from "/modules/official/stdlib/lib/settings.tsx";
 import { ACTIVE_ICON, ICON } from "./src/static.ts";
 import { Route } from "/modules/official/stdlib/src/webpack/ReactComponents.ts";
@@ -15,11 +15,9 @@ export let logger: Console;
 export let settings: Settings;
 export let settingsButton: React.JSX.Element;
 
-export let hash: { state: string; event: string; } | undefined;
+export let hash: { state: string; event: string } | undefined;
 
-
-
-export default function (mod: ModuleInstance) {
+export default function (mod: Module) {
 	storage = createStorage(mod);
 	logger = createLogger(mod);
 	[settings, settingsButton] = createSettings(mod);
@@ -36,5 +34,10 @@ export default function (mod: ModuleInstance) {
 }
 
 const MarketplaceLink = () => (
-	<NavLink localizedApp="Marketplace" appRoutePath="/bespoke/marketplace" icon={ICON} activeIcon={ACTIVE_ICON} />
+	<NavLink
+		localizedApp="Marketplace"
+		appRoutePath="/bespoke/marketplace"
+		icon={ICON}
+		activeIcon={ACTIVE_ICON}
+	/>
 );

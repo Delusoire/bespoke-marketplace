@@ -1,7 +1,7 @@
 import { React } from "/modules/official/stdlib/src/expose/React.ts";
 import AuthorsDiv from "./AuthorsDiv.tsx";
 import TagsDiv from "./TagsDiv.tsx";
-import type { Metadata, ModuleInstance, Version } from "/hooks/module.ts";
+import type { Metadata, Version } from "/hooks/module.ts";
 import { _, startCase } from "/modules/official/stdlib/deps.ts";
 import { useUpdate } from "../../util/index.ts";
 import { fetchJSON } from "/hooks/util.ts";
@@ -11,11 +11,12 @@ import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.ts";
 import { useQuery } from "/modules/official/stdlib/src/webpack/ReactQuery.ts";
 import { VersionListContent } from "../VersionList/index.tsx";
 import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.ts";
+import { MI } from "../../pages/Marketplace.tsx";
 
 const History = Platform.getHistory();
 
 interface ModuleCardProps {
-	moduleInst: ModuleInstance;
+	moduleInstance: MI;
 	selectVersion: (v: Version) => void;
 	showTags?: boolean;
 	onClick: () => void;
@@ -36,41 +37,43 @@ const fallbackImage = () => (
 	</svg>
 );
 
-export default function ({ moduleInst, selectVersion, showTags = true, onClick, isSelected }: ModuleCardProps) {
-	const isEnabled = React.useCallback(() => moduleInst.isLoaded(), [moduleInst]);
+export default function (
+	{ moduleInstance: mi, selectVersion, showTags = true, onClick, isSelected }: ModuleCardProps,
+) {
+	const isEnabled = React.useCallback(() => "isLoaded" in mi && mi.isLoaded(), [mi]);
 	const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
 
-	const installed = moduleInst.isInstalled();
-	const hasRemote = Boolean(moduleInst.artifacts.length);
+	const installed = "isInstalled" in mi && mi.isInstalled();
+	const hasRemote = Boolean(mi.artifacts.length);
 
 	const outdated = installed && hasRemote && false;
 
-	const remoteMetadata = moduleInst.getRemoteMetadata();
+	const remoteMetadata = mi.getRemoteMetadata();
 	const { data, isSuccess } = useQuery({
 		queryKey: ["moduleCard", remoteMetadata],
 		queryFn: () => fetchJSON<Metadata>(remoteMetadata!),
-		enabled: moduleInst.metadata === null && hasRemote,
+		enabled: mi.metadata === null && hasRemote,
 	});
 
-	if (moduleInst.metadata === null && isSuccess) {
-		moduleInst.updateMetadata(data);
+	if (mi.metadata === null && isSuccess) {
+		mi.updateMetadata(data);
 	}
 
 	const {
-		name = moduleInst.getModuleIdentifier(),
-		description = moduleInst.getVersion(),
+		name = mi.getModuleIdentifier(),
+		description = mi.getVersion(),
 		tags = ["available"],
 		authors = [],
 		preview = "./assets/preview.gif",
-	} = moduleInst.metadata ?? {};
+	} = mi.metadata ?? {};
 
 	const cardClasses = classnames("LunqxlFIupJw_Dkx6mNx", {
 		"border-[var(--essential-warning)]": outdated,
 		"bg-neutral-800": isSelected,
 	});
 
-	const externalHref = moduleInst.getRemoteArtifact();
-	const metadataURL = installed ? moduleInst.getRelPath("metadata.json") : remoteMetadata;
+	const externalHref = mi.getRemoteArtifact();
+	const metadataURL = installed ? mi.getRelPath("metadata.json") : remoteMetadata;
 	const previewHref = metadataURL ? `${metadataURL}/../${preview}` : "";
 
 	// TODO: add more important tags
@@ -81,7 +84,7 @@ export default function ({ moduleInst, selectVersion, showTags = true, onClick, 
 	if (isSelected && panelTarget) {
 		panel = ReactDOM.createPortal(
 			<VersionListContent
-				module={moduleInst.getModule()}
+				module={mi.getModule()}
 				selectVersion={selectVersion}
 				cardUpdateEnabled={updateEnabled}
 			/>,
@@ -136,13 +139,13 @@ export default function ({ moduleInst, selectVersion, showTags = true, onClick, 
 						/>
 					</div>
 					<div className="flex justify-between">
-						{moduleInst.isEnabled() && (
+						{installed && enabled && SettingToggle && (
 							<SettingToggle
 								className="x-settings-button justify-end"
 								value={enabled}
 								onSelected={async (checked: boolean) => {
 									setEnabled(checked);
-									const hasChanged = checked ? moduleInst.load() : moduleInst.unload();
+									const hasChanged = checked ? mi.load() : mi.unload();
 									if (!(await hasChanged)) {
 										updateEnabled();
 									}
