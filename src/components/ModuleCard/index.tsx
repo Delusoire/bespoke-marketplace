@@ -1,7 +1,7 @@
 import { React } from "/modules/official/stdlib/src/expose/React.ts";
 import AuthorsDiv from "./AuthorsDiv.tsx";
 import TagsDiv from "./TagsDiv.tsx";
-import type { Metadata, Version } from "/hooks/module.ts";
+import type { Metadata, Module } from "/hooks/module.ts";
 import { _, startCase } from "/modules/official/stdlib/deps.ts";
 import { useUpdate } from "../../util/index.ts";
 import { fetchJSON } from "/hooks/util.ts";
@@ -16,8 +16,9 @@ import { MI } from "../../pages/Marketplace.tsx";
 const History = Platform.getHistory();
 
 interface ModuleCardProps {
+	modules: Array<Module<Module<any>>>;
 	moduleInstance: MI;
-	selectVersion: (v: Version) => void;
+	selectInstance: (v: MI) => void;
 	showTags?: boolean;
 	onClick: () => void;
 	isSelected: boolean;
@@ -38,42 +39,44 @@ const fallbackImage = () => (
 );
 
 export default function (
-	{ moduleInstance: mi, selectVersion, showTags = true, onClick, isSelected }: ModuleCardProps,
+	props: ModuleCardProps,
 ) {
-	const isEnabled = React.useCallback(() => "isLoaded" in mi && mi.isLoaded(), [mi]);
+	const { modules, moduleInstance: inst, selectInstance, showTags = true, onClick, isSelected } = props;
+
+	const isEnabled = React.useCallback(() => "isLoaded" in inst && inst.isLoaded(), [inst]);
 	const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
 
-	const installed = "isInstalled" in mi && mi.isInstalled();
-	const hasRemote = Boolean(mi.artifacts.length);
+	const installed = "isInstalled" in inst && inst.isInstalled();
+	const hasRemote = Boolean(inst.artifacts.length);
 
 	const outdated = installed && hasRemote && false;
 
-	const remoteMetadata = mi.getRemoteMetadata();
+	const remoteMetadata = inst.getRemoteMetadata();
 	const { data, isSuccess } = useQuery({
 		queryKey: ["moduleCard", remoteMetadata],
 		queryFn: () => fetchJSON<Metadata>(remoteMetadata!),
-		enabled: mi.metadata === null && hasRemote,
+		enabled: inst.metadata === null && hasRemote,
 	});
 
-	if (mi.metadata === null && isSuccess) {
-		mi.updateMetadata(data);
+	if (inst.metadata === null && isSuccess) {
+		inst.updateMetadata(data);
 	}
 
 	const {
-		name = mi.getModuleIdentifier(),
-		description = mi.getVersion(),
+		name = inst.getModuleIdentifier(),
+		description = inst.getVersion(),
 		tags = ["available"],
 		authors = [],
 		preview = "./assets/preview.gif",
-	} = mi.metadata ?? {};
+	} = inst.metadata ?? {};
 
 	const cardClasses = classnames("LunqxlFIupJw_Dkx6mNx", {
 		"border-[var(--essential-warning)]": outdated,
 		"bg-neutral-800": isSelected,
 	});
 
-	const externalHref = mi.getRemoteArtifact();
-	const metadataURL = installed ? mi.getRelPath("metadata.json") : remoteMetadata;
+	const externalHref = inst.getRemoteArtifact();
+	const metadataURL = installed ? inst.getRelPath("metadata.json") : remoteMetadata;
 	const previewHref = metadataURL ? `${metadataURL}/../${preview}` : "";
 
 	// TODO: add more important tags
@@ -84,8 +87,9 @@ export default function (
 	if (isSelected && panelTarget) {
 		panel = ReactDOM.createPortal(
 			<VersionListContent
-				module={mi.getModule()}
-				selectVersion={selectVersion}
+				modules={modules}
+				selectedInstance={inst}
+				selectInstance={selectInstance}
 				cardUpdateEnabled={updateEnabled}
 			/>,
 			panelTarget,
@@ -145,7 +149,7 @@ export default function (
 								value={enabled}
 								onSelected={async (checked: boolean) => {
 									setEnabled(checked);
-									const hasChanged = checked ? mi.load() : mi.unload();
+									const hasChanged = checked ? inst.load() : inst.unload();
 									if (!(await hasChanged)) {
 										updateEnabled();
 									}

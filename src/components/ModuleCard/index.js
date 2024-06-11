@@ -25,35 +25,36 @@ const fallbackImage = ()=>/*#__PURE__*/ React.createElement("svg", {
     }, /*#__PURE__*/ React.createElement("path", {
         d: "M20.929,1.628A1,1,0,0,0,20,1H4a1,1,0,0,0-.929.628l-2,5A1.012,1.012,0,0,0,1,7V22a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V7a1.012,1.012,0,0,0-.071-.372ZM4.677,3H19.323l1.2,3H3.477ZM3,21V8H21V21Zm8-3a1,1,0,0,1-1,1H6a1,1,0,0,1,0-2h4A1,1,0,0,1,11,18Z"
     }));
-export default function({ moduleInstance: mi, selectVersion, showTags = true, onClick, isSelected }) {
-    const isEnabled = React.useCallback(()=>"isLoaded" in mi && mi.isLoaded(), [
-        mi
+export default function(props) {
+    const { modules, moduleInstance: inst, selectInstance, showTags = true, onClick, isSelected } = props;
+    const isEnabled = React.useCallback(()=>"isLoaded" in inst && inst.isLoaded(), [
+        inst
     ]);
     const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
-    const installed = "isInstalled" in mi && mi.isInstalled();
-    const hasRemote = Boolean(mi.artifacts.length);
+    const installed = "isInstalled" in inst && inst.isInstalled();
+    const hasRemote = Boolean(inst.artifacts.length);
     const outdated = installed && hasRemote && false;
-    const remoteMetadata = mi.getRemoteMetadata();
+    const remoteMetadata = inst.getRemoteMetadata();
     const { data, isSuccess } = useQuery({
         queryKey: [
             "moduleCard",
             remoteMetadata
         ],
         queryFn: ()=>fetchJSON(remoteMetadata),
-        enabled: mi.metadata === null && hasRemote
+        enabled: inst.metadata === null && hasRemote
     });
-    if (mi.metadata === null && isSuccess) {
-        mi.updateMetadata(data);
+    if (inst.metadata === null && isSuccess) {
+        inst.updateMetadata(data);
     }
-    const { name = mi.getModuleIdentifier(), description = mi.getVersion(), tags = [
+    const { name = inst.getModuleIdentifier(), description = inst.getVersion(), tags = [
         "available"
-    ], authors = [], preview = "./assets/preview.gif" } = mi.metadata ?? {};
+    ], authors = [], preview = "./assets/preview.gif" } = inst.metadata ?? {};
     const cardClasses = classnames("LunqxlFIupJw_Dkx6mNx", {
         "border-[var(--essential-warning)]": outdated,
         "bg-neutral-800": isSelected
     });
-    const externalHref = mi.getRemoteArtifact();
-    const metadataURL = installed ? mi.getRelPath("metadata.json") : remoteMetadata;
+    const externalHref = inst.getRemoteArtifact();
+    const metadataURL = installed ? inst.getRelPath("metadata.json") : remoteMetadata;
     const previewHref = metadataURL ? `${metadataURL}/../${preview}` : "";
     // TODO: add more important tags
     const importantTags = [].filter(Boolean);
@@ -61,8 +62,9 @@ export default function({ moduleInstance: mi, selectVersion, showTags = true, on
     let panel;
     if (isSelected && panelTarget) {
         panel = ReactDOM.createPortal(/*#__PURE__*/ React.createElement(VersionListContent, {
-            module: mi.getModule(),
-            selectVersion: selectVersion,
+            modules: modules,
+            selectedInstance: inst,
+            selectInstance: selectInstance,
             cardUpdateEnabled: updateEnabled
         }), panelTarget);
     }
@@ -123,7 +125,7 @@ export default function({ moduleInstance: mi, selectVersion, showTags = true, on
         value: enabled,
         onSelected: async (checked)=>{
             setEnabled(checked);
-            const hasChanged = checked ? mi.load() : mi.unload();
+            const hasChanged = checked ? inst.load() : inst.unload();
             if (!await hasChanged) {
                 updateEnabled();
             }

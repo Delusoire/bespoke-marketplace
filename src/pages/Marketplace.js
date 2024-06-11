@@ -23,28 +23,30 @@ const enabled = {
         [TreeNodeVal]: t("filter.enabled")
     }
 };
-const getFilters = ()=>({
-        [TreeNodeVal]: null,
-        themes: {
-            [TreeNodeVal]: t("filter.themes"),
-            ...enabled
-        },
-        extensions: {
-            [TreeNodeVal]: t("filter.extensions"),
-            ...enabled
-        },
-        apps: {
-            [TreeNodeVal]: t("filter.apps"),
-            ...enabled
-        },
-        snippets: {
-            [TreeNodeVal]: t("filter.snippets"),
-            ...enabled
-        },
-        libs: {
-            [TreeNodeVal]: CONFIG.showLibs && t("filter.libs")
-        }
-    });
+const getFilters = ()=>React.useMemo(()=>({
+            [TreeNodeVal]: null,
+            themes: {
+                [TreeNodeVal]: t("filter.themes"),
+                ...enabled
+            },
+            extensions: {
+                [TreeNodeVal]: t("filter.extensions"),
+                ...enabled
+            },
+            apps: {
+                [TreeNodeVal]: t("filter.apps"),
+                ...enabled
+            },
+            snippets: {
+                [TreeNodeVal]: t("filter.snippets"),
+                ...enabled
+            },
+            libs: {
+                [TreeNodeVal]: CONFIG.showLibs && t("filter.libs")
+            }
+        }), [
+        CONFIG.showLibs
+    ]);
 const libTags = new Set([
     "lib",
     "npm",
@@ -80,10 +82,11 @@ const filterFNs = {
 };
 export let unselect;
 export let refresh;
-const getModuleInsts = ()=>RootModule.INSTANCE.getAllDescendantsByBreadth().map((module)=>{
-        const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
-        return module.instances.get(selectedVersion);
-    }).filter(Boolean);
+const getModuleInsts = ()=>{
+    const modules = RootModule.INSTANCE.getAllDescendantsByBreadth();
+    const moduleInstances = Object.groupBy(modules, (module)=>module.getIdentifier());
+    return moduleInstances;
+};
 const dummy_metadata = {
     name: "",
     tags: [],
@@ -104,16 +107,36 @@ export default function() {
         options: SortOptions
     });
     const sortFn = SortFns[sortOption];
-    const filters = React.useMemo(getFilters, [
-        CONFIG.showLibs
-    ]);
-    const [chipFilter, selectedFilters] = useChipFilter(filters);
+    const [chipFilter, selectedFilters] = useChipFilter(getFilters());
     const getSelectedFilterFNs = ()=>selectedFilters.map(({ key })=>getProp(filterFNs, key));
     const selectedFilterFNs = React.useMemo(getSelectedFilterFNs, [
         selectedFilters
     ]);
-    const [moduleInsts, setModuleInsts] = React.useState(getModuleInsts);
-    const moduleCardProps = selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn[TreeNodeVal]), Array.from(Object.values(moduleInsts))).filter((moduleInst)=>{
+    const [modules] = React.useState(getModuleInsts);
+    const getModulesToInst = (modules)=>Object.fromEntries(Object.entries(modules).flatMap(([identifier, modules])=>{
+            let selected = null;
+            for (const module of modules){
+                const version = module.getEnabledVersion() ?? module.instances.keys().next();
+                if (version) {
+                    selected = module.instances.get(version);
+                    break;
+                }
+            }
+            return selected ? [
+                [
+                    identifier,
+                    selected
+                ]
+            ] : [];
+        }));
+    const [moduleToInst, selectInst] = React.useReducer((moduleToInst, moduleInstance)=>({
+            ...moduleToInst,
+            [moduleInstance.getModuleIdentifier()]: moduleInstance
+        }), modules, getModulesToInst);
+    const insts = React.useMemo(()=>Array.from(Object.values(moduleToInst)), [
+        moduleToInst
+    ]);
+    const moduleCardProps = selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn[TreeNodeVal]), insts).filter((moduleInst)=>{
         const { name, tags, authors } = moduleInst.metadata ?? dummy_metadata;
         const searchFiels = [
             name,
@@ -149,18 +172,13 @@ export default function() {
     }, moduleCardProps.map((moduleInst)=>{
         const module = moduleInst.getModule();
         const moduleIdentifier = module.getIdentifier();
-        const isSelected = module === selectedModule;
+        const isSelected = moduleIdentifier === selectedModule;
         return /*#__PURE__*/ React.createElement(ModuleCard, {
             key: moduleIdentifier,
+            modules: modules[moduleIdentifier],
             moduleInstance: moduleInst,
             isSelected: isSelected,
-            selectVersion: (v)=>{
-                const mis = {
-                    ...moduleInsts,
-                    [moduleIdentifier]: module.instances.get(v)
-                };
-                setModuleInsts(mis);
-            },
+            selectInstance: (moduleInstance)=>selectInst(moduleInstance),
             onClick: ()=>{
                 if (isSelected) {
                     panelSend("panel_close_click_or_collapse");
@@ -168,7 +186,7 @@ export default function() {
                     if (!selectedModule && hash) {
                         panelSend?.(hash.event);
                     }
-                    selectModule(module);
+                    selectModule(module.getIdentifier());
                 }
             }
         });

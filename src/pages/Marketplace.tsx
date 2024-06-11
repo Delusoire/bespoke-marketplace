@@ -5,6 +5,7 @@ import {
 	LocalModuleInstance,
 	type Metadata,
 	Module,
+	ModuleIdentifier,
 	RemoteModuleInstance,
 	RootModule,
 	type Version,
@@ -37,14 +38,15 @@ const SortFns: Record<keyof typeof SortOptions, null | ((a: Metadata, b: Metadat
 
 const enabled = { enabled: { [TreeNodeVal]: t("filter.enabled") } };
 
-const getFilters = () => ({
-	[TreeNodeVal]: null,
-	themes: { [TreeNodeVal]: t("filter.themes"), ...enabled },
-	extensions: { [TreeNodeVal]: t("filter.extensions"), ...enabled },
-	apps: { [TreeNodeVal]: t("filter.apps"), ...enabled },
-	snippets: { [TreeNodeVal]: t("filter.snippets"), ...enabled },
-	libs: { [TreeNodeVal]: CONFIG.showLibs && t("filter.libs") },
-});
+const getFilters = () =>
+	React.useMemo(() => ({
+		[TreeNodeVal]: null,
+		themes: { [TreeNodeVal]: t("filter.themes"), ...enabled },
+		extensions: { [TreeNodeVal]: t("filter.extensions"), ...enabled },
+		apps: { [TreeNodeVal]: t("filter.apps"), ...enabled },
+		snippets: { [TreeNodeVal]: t("filter.snippets"), ...enabled },
+		libs: { [TreeNodeVal]: CONFIG.showLibs && t("filter.libs") },
+	}), [CONFIG.showLibs]);
 
 const libTags = new Set(["lib", "npm", "internal"]);
 const isModLib = (m: MI) => new Set(m.metadata?.tags).intersection(libTags).size > 0;
@@ -64,11 +66,15 @@ export let refresh: (() => void) | undefined;
 
 export type MI = LocalModuleInstance | RemoteModuleInstance;
 
-const getModuleInsts = () =>
-	RootModule.INSTANCE.getAllDescendantsByBreadth().map((module) => {
-		const selectedVersion = module.getEnabledVersion() || module.instances.keys().next().value;
-		return module.instances.get(selectedVersion);
-	}).filter(Boolean) as Array<MI>;
+type Req<T> = {
+	[P in keyof T]-?: T[P] & {};
+};
+
+const getModuleInsts = () => {
+	const modules = RootModule.INSTANCE.getAllDescendantsByBreadth();
+	const moduleInstances = Object.groupBy(modules, (module) => module.getIdentifier());
+	return moduleInstances as Req<typeof moduleInstances>;
+};
 
 const dummy_metadata: Metadata = {
 	name: "",
@@ -91,17 +97,42 @@ export default function () {
 	const [sortbox, sortOption] = useDropdown({ options: SortOptions });
 	const sortFn = SortFns[sortOption];
 
-	const filters = React.useMemo(getFilters, [CONFIG.showLibs]);
-	const [chipFilter, selectedFilters] = useChipFilter(filters);
+	const [chipFilter, selectedFilters] = useChipFilter(getFilters());
 
 	const getSelectedFilterFNs = () =>
 		selectedFilters.map(({ key }) => getProp(filterFNs, key) as typeof filterFNs);
 	const selectedFilterFNs = React.useMemo(getSelectedFilterFNs, [selectedFilters]);
 
-	const [moduleInsts, setModuleInsts] = React.useState(getModuleInsts);
+	const [modules] = React.useState(getModuleInsts);
+	const getModulesToInst = (modules: Record<ModuleIdentifier, Array<Module<Module<any>>>>) =>
+		Object.fromEntries(
+			Object.entries(modules).flatMap(([identifier, modules]) => {
+				let selected: MI | null = null;
+
+				for (const module of modules) {
+					const version = module.getEnabledVersion() ?? module.instances.keys().next();
+					if (version) {
+						selected = module.instances.get(version) as MI;
+						break;
+					}
+				}
+
+				return selected ? [[identifier, selected]] : [];
+			}),
+		);
+
+	const [moduleToInst, selectInst] = React.useReducer(
+		(moduleToInst: Record<ModuleIdentifier, MI>, moduleInstance: MI) => ({
+			...moduleToInst,
+			[moduleInstance.getModuleIdentifier()]: moduleInstance,
+		}),
+		modules,
+		getModulesToInst,
+	);
+	const insts = React.useMemo(() => Array.from(Object.values(moduleToInst)), [moduleToInst]);
 
 	const moduleCardProps = selectedFilterFNs
-		.reduce((acc, fn) => acc.filter(fn[TreeNodeVal]), Array.from(Object.values(moduleInsts)))
+		.reduce((acc, fn) => acc.filter(fn[TreeNodeVal]), insts)
 		.filter((moduleInst) => {
 			const { name, tags, authors } = moduleInst.metadata ?? dummy_metadata;
 			const searchFiels = [name, ...tags, ...authors];
@@ -109,7 +140,7 @@ export default function () {
 		})
 		.sort((a, b) => sortFn?.(a.metadata ?? dummy_metadata, b.metadata ?? dummy_metadata) as number);
 
-	const [selectedModule, selectModule] = React.useState<Module<Module<any>> | null>(null);
+	const [selectedModule, selectModule] = React.useState<ModuleIdentifier | null>(null);
 	const _unselect = () => selectModule(null);
 	const [, _refresh] = React.useReducer((n) => n + 1, 0);
 
@@ -142,16 +173,14 @@ export default function () {
 					{moduleCardProps.map((moduleInst) => {
 						const module = moduleInst.getModule();
 						const moduleIdentifier = module.getIdentifier();
-						const isSelected = module === selectedModule;
+						const isSelected = moduleIdentifier === selectedModule;
 						return (
 							<ModuleCard
 								key={moduleIdentifier}
+								modules={modules[moduleIdentifier]}
 								moduleInstance={moduleInst}
 								isSelected={isSelected}
-								selectVersion={(v: Version) => {
-									const mis = { ...moduleInsts, [moduleIdentifier]: module.instances.get(v)! };
-									setModuleInsts(mis);
-								}}
+								selectInstance={(moduleInstance: MI) => selectInst(moduleInstance)}
 								onClick={() => {
 									if (isSelected) {
 										panelSend("panel_close_click_or_collapse");
@@ -159,7 +188,7 @@ export default function () {
 										if (!selectedModule && hash) {
 											panelSend?.(hash.event);
 										}
-										selectModule(module);
+										selectModule(module.getIdentifier());
 									}
 								}}
 							/>
