@@ -1,8 +1,9 @@
+import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.ts";
 import { MI } from "../../pages/Marketplace.tsx";
 import { useUpdate } from "../../util/index.ts";
-import { LocalModuleInstance } from "/hooks/module.ts";
+import { LocalModuleInstance, Version } from "/hooks/module.ts";
 import { RemoteModuleInstance } from "/hooks/module.ts";
-import { type Module, ModuleInstance } from "/hooks/module.ts";
+import { type Module } from "/hooks/module.ts";
 import { React } from "/modules/official/stdlib/src/expose/React.ts";
 import { useLocation, usePanelAPI } from "/modules/official/stdlib/src/webpack/CustomHooks.ts";
 import {
@@ -10,6 +11,7 @@ import {
 	PanelHeader,
 	PanelSkeleton,
 } from "/modules/official/stdlib/src/webpack/ReactComponents.ts";
+import { ScrollableText } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
 
 export interface VersionListProps {}
 export default function (props: VersionListProps) {
@@ -29,7 +31,6 @@ export default function (props: VersionListProps) {
 	return (
 		<PanelSkeleton label="Marketplace">
 			<PanelContent>
-				<PanelHeader title="greetings" />
 				<div
 					id="MarketplacePanel"
 					ref={(r) => setRef(r)}
@@ -46,33 +47,74 @@ export interface VersionListContentProps {
 	cardUpdateEnabled: () => void;
 }
 export const VersionListContent = (props: VersionListContentProps) => {
-	const { selectedInstance } = props;
+	return (
+		<>
+			<PanelHeader title={props.selectedInstance.getModuleIdentifier()} />
+			<div className="p-4 flex flex-col rounded-lg shadow-md">
+				{props.modules.map((module) => (
+					<ModuleSection
+						key={module.getHeritage().join("\x00")}
+						module={module}
+						selectedInstance={props.selectedInstance}
+						selectInstance={props.selectInstance}
+						cardUpdateEnabled={props.cardUpdateEnabled}
+					/>
+				))}
+			</div>
+		</>
+	);
+};
 
-	return props.modules.map((module) => (
-		<ul key={module.getHeritage().join("\x00")}>
-			{Array.from(module.instances).map(([version, inst]) => (
-				<VersionItem
-					key={version}
-					moduleInstance={inst as MI}
-					selectInstance={props.selectInstance}
-					cardUpdateEnabled={props.cardUpdateEnabled}
-				/>
-			))}
-		</ul>
-	));
+interface ModuleSectionProps {
+	module: Module<Module<any>>;
+	selectedInstance: MI;
+	selectInstance: (moduleInstance: MI) => void;
+	cardUpdateEnabled: () => void;
+}
+const ModuleSection = (props: ModuleSectionProps) => {
+	const { module, selectedInstance } = props;
+	const heritage = module.getHeritage().join("▶");
+
+	return (
+		<div className="mb-4">
+			<h3 className="text-lg font-semibold mb-2 overflow-x-auto whitespace-nowrap">{heritage}</h3>
+			<ul>
+				{Array.from(module.instances).map(([version, inst]) => (
+					<ModuleInstance
+						key={version}
+						isSelected={inst === selectedInstance}
+						moduleInstance={inst as MI}
+						selectInstance={props.selectInstance}
+						cardUpdateEnabled={props.cardUpdateEnabled}
+					/>
+				))}
+			</ul>
+		</div>
+	);
 };
 
 interface VersionProps {
+	isSelected: boolean;
 	moduleInstance: MI;
 	selectInstance: (moduleInstance: MI) => void;
 	cardUpdateEnabled: () => void;
 }
-const VersionItem = (props: VersionProps) => {
+const ModuleInstance = (props: VersionProps) => {
 	return (
-		<li onClick={() => props.selectInstance(props.moduleInstance)}>
-			{props.moduleInstance.getVersion()}
-			<RAB {...props} />
-			<DEB {...props} />
+		<li
+			onClick={() => props.selectInstance(props.moduleInstance)}
+			className={classnames(
+				"p-2 rounded-md cursor-pointer flex items-center justify-between",
+				props.isSelected ? "bg-blue-500 text-white" : "bg-white hover:bg-gray-200",
+			)}
+		>
+			<ScrollableText>
+				<span className="font-medium">{props.moduleInstance.getVersion()}</span>
+			</ScrollableText>
+			<div className="flex items-center gap-2">
+				<RAB {...props} />
+				<DEB {...props} />
+			</div>
 		</li>
 	);
 };
@@ -116,6 +158,7 @@ const RemoveButton = (props: RABProps<LocalModuleInstance>) => {
 					props.updateInstalled();
 				}
 			}}
+			className="px-2 py-1 text-xs font-semibold text-red-500 bg-red-100 rounded hover:bg-red-200"
 		>
 			del
 		</button>
@@ -131,6 +174,7 @@ const AddButton = (props: RABProps<RemoteModuleInstance>) => {
 					props.updateInstalled();
 				}
 			}}
+			className="px-2 py-1 text-xs font-semibold text-green-500 bg-green-100 rounded hover:bg-green-200"
 		>
 			ins
 		</button>
@@ -141,6 +185,7 @@ const DEB = (props: BProps) => {
 	const isEnabled = React.useCallback(() => props.moduleInstance.isEnabled(), [props.moduleInstance]);
 	const [enabled, setEnabled, updateEnabled] = useUpdate(isEnabled);
 	const B = enabled ? DisableButton : EnableButton;
+
 	return (
 		<B
 			{...props}
@@ -169,6 +214,7 @@ const DisableButton = (props: DEBProps) => {
 					props.updateEnabled();
 				}
 			}}
+			className="px-2 py-1 text-xs font-semibold text-yellow-500 bg-yellow-100 rounded hover:bg-yellow-200"
 		>
 			dis
 		</button>
@@ -186,6 +232,7 @@ const EnableButton = (props: DEBProps) => {
 					props.updateEnabled();
 				}
 			}}
+			className="px-2 py-1 text-xs font-semibold text-blue-500 bg-blue-100 rounded hover:bg-blue-200"
 		>
 			ena
 		</button>
