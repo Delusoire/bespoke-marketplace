@@ -104,13 +104,13 @@ export default function () {
 	const selectedFilterFNs = React.useMemo(getSelectedFilterFNs, [selectedFilters]);
 
 	const [modules] = React.useState(getModuleInsts);
-	const getModulesToInst = (modules: Record<ModuleIdentifier, Array<Module<Module<any>>>>) =>
+	const getModuleToInst = (modules: Record<ModuleIdentifier, Array<Module<Module<any>>>>) =>
 		Object.fromEntries(
 			Object.entries(modules).flatMap(([identifier, modules]) => {
 				let selected: MI | null = null;
 
 				for (const module of modules) {
-					const version = module.getEnabledVersion() ?? module.instances.keys().next();
+					const version = module.getEnabledVersion() || module.instances.keys().next().value;
 					if (version) {
 						selected = module.instances.get(version) as MI;
 						break;
@@ -127,7 +127,7 @@ export default function () {
 			[moduleInstance.getModuleIdentifier()]: moduleInstance,
 		}),
 		modules,
-		getModulesToInst,
+		getModuleToInst,
 	);
 	const insts = React.useMemo(() => Array.from(Object.values(moduleToInst)), [moduleToInst]);
 

@@ -113,10 +113,10 @@ export default function() {
         selectedFilters
     ]);
     const [modules] = React.useState(getModuleInsts);
-    const getModulesToInst = (modules)=>Object.fromEntries(Object.entries(modules).flatMap(([identifier, modules])=>{
+    const getModuleToInst = (modules)=>Object.fromEntries(Object.entries(modules).flatMap(([identifier, modules])=>{
             let selected = null;
             for (const module of modules){
-                const version = module.getEnabledVersion() ?? module.instances.keys().next();
+                const version = module.getEnabledVersion() || module.instances.keys().next().value;
                 if (version) {
                     selected = module.instances.get(version);
                     break;
@@ -132,7 +132,7 @@ export default function() {
     const [moduleToInst, selectInst] = React.useReducer((moduleToInst, moduleInstance)=>({
             ...moduleToInst,
             [moduleInstance.getModuleIdentifier()]: moduleInstance
-        }), modules, getModulesToInst);
+        }), modules, getModuleToInst);
     const insts = React.useMemo(()=>Array.from(Object.values(moduleToInst)), [
         moduleToInst
     ]);
