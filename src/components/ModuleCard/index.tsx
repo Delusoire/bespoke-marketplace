@@ -9,7 +9,7 @@ import { Platform } from "/modules/official/stdlib/src/expose/Platform.ts";
 import { Cards, SettingToggle } from "/modules/official/stdlib/src/webpack/ReactComponents.ts";
 import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.ts";
 import { useQuery } from "/modules/official/stdlib/src/webpack/ReactQuery.ts";
-import { VersionListContent } from "../VersionList/index.tsx";
+import { VersionListPanel } from "../VersionList/index.tsx";
 import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.ts";
 import { MI } from "../../pages/Marketplace.tsx";
 
@@ -86,11 +86,10 @@ export default function (
 	let panel;
 	if (isSelected && panelTarget) {
 		panel = ReactDOM.createPortal(
-			<VersionListContent
+			<VersionListPanel
 				modules={modules}
 				selectedInstance={inst}
 				selectInstance={selectInstance}
-				cardUpdateEnabled={updateEnabled}
 			/>,
 			panelTarget,
 		);

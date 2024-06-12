@@ -11,7 +11,9 @@ export let logger;
 export let settings;
 export let settingsButton;
 export let hash;
+export let module;
 export default function(mod) {
+    module = mod;
     storage = createStorage(mod);
     logger = createLogger(mod);
     [settings, settingsButton] = createSettings(mod);

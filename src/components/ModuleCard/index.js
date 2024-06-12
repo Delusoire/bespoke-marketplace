@@ -8,7 +8,7 @@ import { Platform } from "/modules/official/stdlib/src/expose/Platform.js";
 import { Cards, SettingToggle } from "/modules/official/stdlib/src/webpack/ReactComponents.js";
 import { classnames } from "/modules/official/stdlib/src/webpack/ClassNames.js";
 import { useQuery } from "/modules/official/stdlib/src/webpack/ReactQuery.js";
-import { VersionListContent } from "../VersionList/index.js";
+import { VersionListPanel } from "../VersionList/index.js";
 import { ReactDOM } from "/modules/official/stdlib/src/webpack/React.js";
 const History = Platform.getHistory();
 const fallbackImage = ()=>/*#__PURE__*/ React.createElement("svg", {
@@ -61,11 +61,10 @@ export default function(props) {
     const panelTarget = document.querySelector("#MarketplacePanel");
     let panel;
     if (isSelected && panelTarget) {
-        panel = ReactDOM.createPortal(/*#__PURE__*/ React.createElement(VersionListContent, {
+        panel = ReactDOM.createPortal(/*#__PURE__*/ React.createElement(VersionListPanel, {
             modules: modules,
             selectedInstance: inst,
-            selectInstance: selectInstance,
-            cardUpdateEnabled: updateEnabled
+            selectInstance: selectInstance
         }), panelTarget);
     }
     return /*#__PURE__*/ React.createElement("div", {

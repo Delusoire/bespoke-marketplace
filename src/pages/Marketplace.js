@@ -129,12 +129,12 @@ export default function() {
                 ]
             ] : [];
         }));
-    const [moduleToInst, selectInst] = React.useReducer((moduleToInst, moduleInstance)=>({
+    const [moduleToInstance, selectInstance] = React.useReducer((moduleToInst, moduleInstance)=>({
             ...moduleToInst,
             [moduleInstance.getModuleIdentifier()]: moduleInstance
         }), modules, getModuleToInst);
-    const insts = React.useMemo(()=>Array.from(Object.values(moduleToInst)), [
-        moduleToInst
+    const insts = React.useMemo(()=>Array.from(Object.values(moduleToInstance)), [
+        moduleToInstance
     ]);
     const moduleCardProps = selectedFilterFNs.reduce((acc, fn)=>acc.filter(fn[TreeNodeVal]), insts).filter((moduleInst)=>{
         const { name, tags, authors } = moduleInst.metadata ?? dummy_metadata;
@@ -178,7 +178,7 @@ export default function() {
             modules: modules[moduleIdentifier],
             moduleInstance: moduleInst,
             isSelected: isSelected,
-            selectInstance: (moduleInstance)=>selectInst(moduleInstance),
+            selectInstance: selectInstance,
             onClick: ()=>{
                 if (isSelected) {
                     panelSend("panel_close_click_or_collapse");

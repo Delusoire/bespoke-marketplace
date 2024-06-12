@@ -121,7 +121,7 @@ export default function () {
 			}),
 		);
 
-	const [moduleToInst, selectInst] = React.useReducer(
+	const [moduleToInstance, selectInstance] = React.useReducer(
 		(moduleToInst: Record<ModuleIdentifier, MI>, moduleInstance: MI) => ({
 			...moduleToInst,
 			[moduleInstance.getModuleIdentifier()]: moduleInstance,
@@ -129,7 +129,7 @@ export default function () {
 		modules,
 		getModuleToInst,
 	);
-	const insts = React.useMemo(() => Array.from(Object.values(moduleToInst)), [moduleToInst]);
+	const insts = React.useMemo(() => Array.from(Object.values(moduleToInstance)), [moduleToInstance]);
 
 	const moduleCardProps = selectedFilterFNs
 		.reduce((acc, fn) => acc.filter(fn[TreeNodeVal]), insts)
@@ -180,7 +180,7 @@ export default function () {
 								modules={modules[moduleIdentifier]}
 								moduleInstance={moduleInst}
 								isSelected={isSelected}
-								selectInstance={(moduleInstance: MI) => selectInst(moduleInstance)}
+								selectInstance={selectInstance}
 								onClick={() => {
 									if (isSelected) {
 										panelSend("panel_close_click_or_collapse");

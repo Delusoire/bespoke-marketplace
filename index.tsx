@@ -17,7 +17,10 @@ export let settingsButton: React.JSX.Element;
 
 export let hash: { state: string; event: string } | undefined;
 
+export let module: Module;
+
 export default function (mod: Module) {
+	module = mod;
 	storage = createStorage(mod);
 	logger = createLogger(mod);
 	[settings, settingsButton] = createSettings(mod);

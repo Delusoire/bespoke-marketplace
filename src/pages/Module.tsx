@@ -6,12 +6,19 @@ import TrashIcon from "../components/icons/TrashIcon.tsx";
 import { t } from "../i18n.ts";
 import { renderMarkdown } from "../api/github.ts";
 import { logger } from "../../index.tsx";
-import { type Metadata, Module, type ModuleInstance } from "/hooks/module.ts";
+import {
+	LocalModuleInstance,
+	type Metadata,
+	Module,
+	ModuleIdentifier,
+	RemoteModuleInstance,
+	RootModule,
+	Version,
+} from "/hooks/module.ts";
 import { fetchJSON } from "/hooks/util.ts";
-import { useUpdate } from "../util/index.ts";
 import { useQuery, useSuspenseQuery } from "/modules/official/stdlib/src/webpack/ReactQuery.ts";
-
-const ShadowContent = ({ root, children }) => ReactDOM.createPortal(children, root);
+import { module as marketplaceModuleInstance } from "/modules/Delusoire/marketplace/index.tsx";
+import { MI } from "./Marketplace.tsx";
 
 interface ShadowRootProps {
 	mode: "open" | "closed";
@@ -36,10 +43,12 @@ const ShadowRoot = ({ mode, delegatesFocus, styleSheets, children }: ShadowRootP
 		}
 	}, [node, styleSheets]);
 
-	return <div ref={node}>{root && <ShadowContent root={root}>{children}</ShadowContent>}</div>;
+	const content = root && ReactDOM.createPortal(children, root);
+
+	return <div ref={node}>{content}</div>;
 };
 
-const RemoteMarkdown = React.memo(({ url }: { url: string; }) => {
+const RemoteMarkdown = React.memo(({ url }: { url: string }) => {
 	const {
 		status,
 		error,
@@ -48,8 +57,8 @@ const RemoteMarkdown = React.memo(({ url }: { url: string; }) => {
 		queryKey: ["markdown", url],
 		queryFn: () =>
 			fetch(url)
-				.then(res => res.text())
-				.then(markdown => renderMarkdown(markdown)),
+				.then((res) => res.text())
+				.then((markdown) => renderMarkdown(markdown)),
 	});
 
 	const fixRelativeImports = (markdown: string) => markdown.replace(/(src|href)="\.\//g, `$1="${url}/../`);
@@ -66,7 +75,11 @@ const RemoteMarkdown = React.memo(({ url }: { url: string; }) => {
 			return (
 				<ShadowRoot mode="open" delegatesFocus={true} styleSheets={[]}>
 					<style>@import "https://cdn.jsdelivr.xyz/npm/water.css@2/out/water.css";</style>
-					<div id="module-readme" className="select-text" dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }} />
+					<div
+						id="module-readme"
+						className="select-text"
+						dangerouslySetInnerHTML={{ __html: fixRelativeImports(markdown) }}
+					/>
 				</ShadowRoot>
 			);
 		}
@@ -77,33 +90,71 @@ const RemoteMarkdown = React.memo(({ url }: { url: string; }) => {
 	}
 });
 
-export default function ({ aurl }: { aurl: string; }) {
+async function getLocalModuleInstance(moduleIdentifier: ModuleIdentifier, version: Version) {
+	const localModule = RootModule.INSTANCE.getChild(moduleIdentifier);
+	const localModuleInstance = await localModule?.instances.get(version);
+	return localModuleInstance;
+}
+
+async function createRemoteModuleInstance(moduleIdentifier: ModuleIdentifier, version: Version, aurl: string) {
+	const marketplaceModule = marketplaceModuleInstance.getModule();
+	const remoteModule = await marketplaceModule.getChildOrNew(moduleIdentifier);
+	const remoteModuleInstance = await remoteModule.newInstance(version, {
+		installed: false,
+		artifacts: [aurl],
+		providers: [],
+	});
+	return remoteModuleInstance;
+}
+
+function useModuleInstance(moduleIdentifier: ModuleIdentifier, version: Version, aurl: string) {
+	const local = useQuery({
+		queryKey: ["getLocalModuleInstance", moduleIdentifier, version],
+		queryFn: () => getLocalModuleInstance(moduleIdentifier, version),
+	});
+
+	const remote = useQuery({
+		queryKey: ["createRemoteModuleInstance", moduleIdentifier, version, aurl],
+		queryFn: () => createRemoteModuleInstance(moduleIdentifier, version, aurl),
+		enabled: local.isSuccess && !local.data,
+	});
+
+	return [local.data ?? remote.data, local.refetch] as const;
+}
+
+export default function ({ aurl }: { aurl: string }) {
+	const basnename = aurl.slice(aurl.lastIndexOf("/") + 1);
+	const match = basnename.match(/^(<moduleIdentifier>[^@]+)@(<version>[^@]+)\.zip$/);
+	if (!match || !match.groups) {
+		return <div>Invalid module URL</div>;
+	}
+	const { moduleIdentifier, version } = match.groups;
+
 	const murl = aurl.replace(/\.zip$/, ".metadata.json");
 	const { data: metadata } = useSuspenseQuery({
 		queryKey: ["modulePage", murl],
 		queryFn: () => fetchJSON<Metadata>(murl),
 	});
 
-	// !
-	const author = metadata.authors[0];
-	const name = metadata.name;
-	const moduleIdentifier = `${author}/${name}`;
+	const [moduleInstance, refetchModuleInstance] = useModuleInstance(moduleIdentifier, version, aurl);
 
-	const getModuleInst = React.useCallback(() => {
-		const module = Module.get(moduleIdentifier);
-		const moduleInst = module?.instances.get(metadata.version);
-		return { module, moduleInst };
-	}, [moduleIdentifier, metadata.version]);
+	if (!metadata || !moduleInstance) {
+		return;
+	}
 
-	const [{ moduleInst }, _, updateModuleInst] = useUpdate(getModuleInst);
+	const isLocal = moduleInstance instanceof LocalModuleInstance;
 
-	const installed = moduleInst?.isInstalled();
+	const label = t(isLocal ? "pages.module.remove" : "pages.module.install");
 
-	const outdated = installed && false;
+	const sharedButtonProps = {
+		label,
+		metadata,
+		onUpdate: refetchModuleInstance,
+	};
 
-	const label = t(installed ? "pages.module.remove" : "pages.module.install");
-
-	const Button = installed && !outdated ? TrashButton : DownloadButton;
+	const Button = isLocal
+		? <TrashButton {...sharedButtonProps} moduleInstance={moduleInstance} />
+		: <DownloadButton {...sharedButtonProps} moduleInstance={moduleInstance} />;
 
 	return (
 		<section className="contentSpacing">
@@ -112,48 +163,56 @@ export default function ({ aurl }: { aurl: string; }) {
 					<h1>{t("pages.module.title")}</h1>
 				</div>
 				<div className="marketplace-header__right flex gap-2">
-					<Button label={label} moduleInst={moduleInst!} metadata={metadata} onUpdate={updateModuleInst} />
+					{Button}
 				</div>
 			</div>
-			<RemoteMarkdown url={readmeURL} />
+			<RemoteMarkdown url={metadata.readme} />
 		</section>
 	);
 }
 
 interface TrashButtonProps {
 	label: string;
-	moduleInst: ModuleInstance;
+	moduleInstance: LocalModuleInstance;
 	onUpdate: () => void;
 }
 const TrashButton = (props: TrashButtonProps) => {
-	return <Button label={props.label} onClick={async e => {
-		e.preventDefault();
+	return (
+		<Button
+			label={props.label}
+			onClick={async (e) => {
+				e.preventDefault();
 
-		if (await props.moduleInst!.remove()) {
-			props.onUpdate();
-		}
-	}}>
-		<TrashIcon />
-		{props.label}
-	</Button>;
+				if (await props.moduleInstance.remove()) {
+					props.onUpdate();
+				}
+			}}
+		>
+			<TrashIcon />
+			{props.label}
+		</Button>
+	);
 };
 
 interface DownloadButtonProps {
 	label: string;
-	metadata: Metadata;
+	moduleInstance: RemoteModuleInstance;
 	onUpdate: () => void;
 }
 const DownloadButton = (props: DownloadButtonProps) => {
-	return <Button label={props.label} onClick={async e => {
-		e.preventDefault();
+	return (
+		<Button
+			label={props.label}
+			onClick={async (e) => {
+				e.preventDefault();
 
-		const module = Module.getOrCreate(`${props.metadata.authors[0]}/${props.metadata.name}`);
-		const moduleInst = await module.getInstanceOrCreate(props.metadata.version);
-		if (await moduleInst.add()) {
-			props.onUpdate();
-		}
-	}}>
-		<TrashIcon />
-		{props.label}
-	</Button>;
+				if (await props.moduleInstance.add()) {
+					props.onUpdate();
+				}
+			}}
+		>
+			<TrashIcon />
+			{props.label}
+		</Button>
+	);
 };
